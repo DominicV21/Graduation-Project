@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">HaraldTestApp</string>
+    <string name="health_thermometer_service">Health Thermometer Service</string>
+    <string name="current_time_service">Current Time Service</string>
+    <string name="nordic_ota_service">Nordic OTA Service</string>
+    <string name="battery_level_service">Battery Level Service</string>
+    <string name="device_information_service">Device Information Service</string>
+    <string name="weight_scale_service">Weight Scale Service</string>
+    <string name="heart_rate_service">Heart Rate Service</string>
+    <string name="physical_activity_monitor_service">Physical Activity Monitor Service</string>
+</resources>

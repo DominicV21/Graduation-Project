@@ -1,0 +1,12 @@
+/*
+ * Copyright (c) Koninklijke Philips N.V., 2017.
+ * All rights reserved.
+ */
+
+include ':haraldtestapp'
+
+def localHaraldLibDir = '../android-haraldlib/haraldlib'
+if (new File(localHaraldLibDir).exists()) {
+    include ':haraldlib'
+    project(':haraldlib').projectDir = new File(localHaraldLibDir)
+}

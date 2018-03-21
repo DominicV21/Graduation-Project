@@ -1,0 +1,46 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion _compileSdkVersion
+    buildToolsVersion _buildToolsVersion
+
+    defaultConfig {
+        applicationId "chdws.philips.com.haraldapp"
+        minSdkVersion _minSdkVersion
+        targetSdkVersion _targetSdkVersion
+        versionCode _versionCode
+        versionName _versionName
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    output.outputFile.name.replace(".apk", "-${variant.versionName}.apk"))
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "com.android.support:appcompat-v7:${appcompatVersion}"
+    compile "com.android.support:design:${appcompatVersion}"
+
+    compile project(path: ':haraldlib')
+
+    testCompile "junit:junit:${junitVersion}"
+    testCompile "org.robolectric:robolectric:${robolectricVersion}"
+    testCompile "org.mockito:mockito-core:${mockitoVersion}"
+    testCompile ("com.squareup.assertj:assertj-android:${assertjAndroidVersion}") {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+}

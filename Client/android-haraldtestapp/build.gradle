@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) Koninklijke Philips N.V., 2017.
+ * All rights reserved.
+ */
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'org.batcha.gradle.plugins:git-dependencies:0.2'
+    }
+}
+
+allprojects {
+    apply plugin: 'jacoco'
+
+    repositories {
+        jcenter()
+    }
+
+    jacoco {
+        toolVersion = "0.7.6.201602180812"
+    }
+
+    ext._compileSdkVersion = 25
+    ext._buildToolsVersion = '25.0.2'
+    ext._minSdkVersion = 19
+    ext._targetSdkVersion = 25
+    ext._versionCode = 1
+    ext._versionName = getBuildVersion()
+
+    ext.appcompatVersion = '25.3.1'
+    ext.assertjAndroidVersion = "1.1.1"
+    ext.junitVersion = '4.12'
+    ext.mockitoVersion = "1.10.19"
+    ext.robolectricVersion = '3.3.2'
+    ext.gsonVersion = '2.5'
+}
+
+def getBuildVersion() {
+    def version = System.env.VERSION_PLACEHOLDER
+    def user = System.env.USER
+    def date = getDate()
+
+    if (version != null)
+        return "$version"
+    if (user != null)
+        return "$user.$date"
+
+    return "unknown.$date"
+}
+
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('dd.MM.yyyy')
+    return formattedDate
+}
