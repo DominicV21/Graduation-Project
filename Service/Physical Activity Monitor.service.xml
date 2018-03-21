@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-16"?>
+<CyProfileTreeItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:type="CyService" ID="20" DisplayName="Physical Activity Monitor" Name="Custom Service" Type="org.bluetooth.service.custom" UUID="00007F1000001000800000805F9B34FB">
+  <CyCharacteristic ID="31" DisplayName="Physical Activity Monitor Feature" Name="Custom Characteristic" Type="org.bluetooth.characteristic.custom" UUID="00007F1100001000800000805F9B34FB">
+    <CyDescriptor ID="32" DisplayName="Characteristic User Description" Name="Characteristic User Description" Type="org.bluetooth.descriptor.gatt.characteristic_user_description" UUID="2901">
+      <Field Name="User Description">
+        <DataFormat>utf8s</DataFormat>
+        <ByteLength>15</ByteLength>
+        <ValueType>BASIC</ValueType>
+        <GeneralValue>PAM Featurelist</GeneralValue>
+        <ArrayValue />
+      </Field>
+      <Properties>
+        <Property Type="READ" Present="true" Mandatory="false" />
+        <Property Type="WRITE" Present="false" Mandatory="false" />
+      </Properties>
+      <Permission />
+    </CyDescriptor>
+    <Field Name="Physical Activity Monitor Features">
+      <DataFormat>uint64</DataFormat>
+      <ByteLength>8</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Properties>
+      <Property Type="BROADCAST" Present="false" Mandatory="false" />
+      <Property Type="READ" Present="true" Mandatory="false" />
+      <Property Type="WRITE" Present="false" Mandatory="false" />
+      <Property Type="WRITE_WITHOUT_RESPONSE" Present="false" Mandatory="false" />
+      <Property Type="NOTIFY" Present="false" Mandatory="false" />
+      <Property Type="INDICATE" Present="false" Mandatory="false" />
+      <Property Type="AUTHENTICATED_SIGNED_WRITES" Present="false" Mandatory="false" />
+      <Property Type="RELIABLE_WRITE" Present="false" Mandatory="false" />
+      <Property Type="WRITABLE_AUXILIARIES" Present="false" Mandatory="false" />
+    </Properties>
+    <Permission />
+  </CyCharacteristic>
+  <CyCharacteristic ID="33" DisplayName="General Activity Instantaneous Data" Name="Custom Characteristic" Type="org.bluetooth.characteristic.custom" UUID="00007F1200001000800000805F9B34FB">
+    <CyDescriptor ID="35" DisplayName="GeneralActivityInstantaneousDataCCCD" Name="Client Characteristic Configuration" Type="org.bluetooth.descriptor.gatt.client_characteristic_configuration" UUID="2902">
+      <Field Name="Properties">
+        <DataFormat>16bit</DataFormat>
+        <ByteLength>2</ByteLength>
+        <Range>
+          <IsDeclared>true</IsDeclared>
+          <Minimum>0</Minimum>
+          <Maximum>3</Maximum>
+        </Range>
+        <ValueType>BITFIELD</ValueType>
+        <Bit>
+          <Index>0</Index>
+          <Size>1</Size>
+          <Value>0</Value>
+          <Enumerations>
+            <Enumeration key="0" value="Notifications disabled" />
+            <Enumeration key="1" value="Notifications enabled" />
+          </Enumerations>
+        </Bit>
+        <Bit>
+          <Index>1</Index>
+          <Size>1</Size>
+          <Value>0</Value>
+          <Enumerations>
+            <Enumeration key="0" value="Indications disabled" />
+            <Enumeration key="1" value="Indications enabled" />
+          </Enumerations>
+        </Bit>
+        <ArrayValue />
+      </Field>
+      <Properties>
+        <Property Type="READ" Present="true" Mandatory="false" />
+        <Property Type="WRITE" Present="true" Mandatory="false" />
+      </Properties>
+      <Permission>
+        <AccessPermission>READ_WRITE</AccessPermission>
+      </Permission>
+    </CyDescriptor>
+    <CyDescriptor ID="36" DisplayName="Characteristic User Description" Name="Characteristic User Description" Type="org.bluetooth.descriptor.gatt.characteristic_user_description" UUID="2901">
+      <Field Name="User Description">
+        <DataFormat>utf8s</DataFormat>
+        <ByteLength>35</ByteLength>
+        <ValueType>BASIC</ValueType>
+        <GeneralValue>General Activity Instantaneous Data</GeneralValue>
+        <ArrayValue />
+      </Field>
+      <Properties>
+        <Property Type="READ" Present="true" Mandatory="false" />
+        <Property Type="WRITE" Present="false" Mandatory="false" />
+      </Properties>
+      <Permission />
+    </CyDescriptor>
+    <Field Name="Flags">
+      <DataFormat>24bit</DataFormat>
+      <ByteLength>3</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Session ID">
+      <DataFormat>uint24</DataFormat>
+      <ByteLength>3</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Relative Timestamp">
+      <DataFormat>uint32</DataFormat>
+      <ByteLength>4</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Sequence Number">
+      <DataFormat>uint32</DataFormat>
+      <ByteLength>4</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Normal Walking Energy Expenditure per Hour">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Intensity Energy Expenditure per Hour">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Total Energy Expenditure per Hour">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Fat Burned Per Hour">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Metabolic Equivalent">
+      <DataFormat>uint8</DataFormat>
+      <ByteLength>1</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Speed">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Motion Cadence">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Elevation">
+      <DataFormat>sint24</DataFormat>
+      <ByteLength>3</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Activity Count pet Minute">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Activity Level">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Field Name="Activity Type">
+      <DataFormat>uint16</DataFormat>
+      <ByteLength>2</ByteLength>
+      <ValueType>BASIC</ValueType>
+      <ArrayValue />
+    </Field>
+    <Properties>
+      <Property Type="BROADCAST" Present="false" Mandatory="false" />
+      <Property Type="READ" Present="true" Mandatory="false" />
+      <Property Type="WRITE" Present="false" Mandatory="false" />
+      <Property Type="WRITE_WITHOUT_RESPONSE" Present="false" Mandatory="false" />
+      <Property Type="NOTIFY" Present="true" Mandatory="false" />
+      <Property Type="INDICATE" Present="false" Mandatory="false" />
+      <Property Type="AUTHENTICATED_SIGNED_WRITES" Present="false" Mandatory="false" />
+      <Property Type="RELIABLE_WRITE" Present="false" Mandatory="false" />
+      <Property Type="WRITABLE_AUXILIARIES" Present="false" Mandatory="false" />
+    </Properties>
+    <Permission />
+  </CyCharacteristic>
+  <Declaration>PrimarySingleInstance</Declaration>
+  <IncludedServices />
+</CyProfileTreeItem>

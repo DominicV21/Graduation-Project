@@ -1,0 +1,3952 @@
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m0
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"pamSasd.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.getPresentSasdFields,"ax",%progbits
+  20              		.align	2
+  21              		.global	getPresentSasdFields
+  22              		.code	16
+  23              		.thumb_func
+  24              		.type	getPresentSasdFields, %function
+  25              	getPresentSasdFields:
+  26              	.LFB37:
+  27              		.file 1 "pamSasd.c"
+   1:pamSasd.c     **** /* ========================================
+   2:pamSasd.c     ****  *
+   3:pamSasd.c     ****  * Copyright YOUR COMPANY, THE YEAR
+   4:pamSasd.c     ****  * All Rights Reserved
+   5:pamSasd.c     ****  * UNPUBLISHED, LICENSED SOFTWARE.
+   6:pamSasd.c     ****  *
+   7:pamSasd.c     ****  * CONFIDENTIAL AND PROPRIETARY INFORMATION
+   8:pamSasd.c     ****  * WHICH IS THE PROPERTY OF your company.
+   9:pamSasd.c     ****  *
+  10:pamSasd.c     ****  * ========================================
+  11:pamSasd.c     **** */
+  12:pamSasd.c     **** 
+  13:pamSasd.c     **** #include "pamSasd.h"
+  14:pamSasd.c     **** 
+  15:pamSasd.c     **** void UpdateSasd(void)
+  16:pamSasd.c     **** {
+  17:pamSasd.c     ****     CYBLE_GATTS_HANDLE_VALUE_NTF_T tempHandle;
+  18:pamSasd.c     ****     
+  19:pamSasd.c     ****     tempHandle.attrHandle = CYBLE_PHYSICAL_ACTIVITY_MONITOR_SLEEP_ACTIVITY_SUMMARY_DATA_CHAR_HANDLE
+  20:pamSasd.c     ****     tempHandle.value.val = (uint8 *)&SasData;
+  21:pamSasd.c     ****     tempHandle.value.len = sizeof(SasData);
+  22:pamSasd.c     ****     CyBle_GattsWriteAttributeValue(&tempHandle, 0, &cyBle_connHandle, 0);
+  23:pamSasd.c     ****     
+  24:pamSasd.c     ****     if(sleepactivitysummarydataIndicate)
+  25:pamSasd.c     ****     {
+  26:pamSasd.c     ****         uint8 PresentData[sizeof(SasData)];
+  27:pamSasd.c     ****         
+  28:pamSasd.c     ****         uint8 presentDataLength = getPresentSasdFields(PresentData);
+  29:pamSasd.c     ****         DBG_PRINTF("SLEEP ACTIVITY SUMMARY DATA presentdatalength = %i\r\n", presentDataLength);
+  30:pamSasd.c     ****         uint8 N = calculateNumberOfMessages(presentDataLength);
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 2
+
+
+  31:pamSasd.c     ****         DBG_PRINTF("SLEEP ACTIVITY SUMMARY DATA N = %i\r\n", N);
+  32:pamSasd.c     ****         
+  33:pamSasd.c     ****         uint8 byteCount = 1u;//Starts at 1 because 0 is the header field
+  34:pamSasd.c     ****         
+  35:pamSasd.c     ****         PresentData[byteCount] = SasData.Flags[0];
+  36:pamSasd.c     ****         PresentData[byteCount + 1] = SasData.Flags[1];
+  37:pamSasd.c     ****         PresentData[byteCount + 2] = SasData.Flags[2];
+  38:pamSasd.c     ****         byteCount += sizeof(SasData.Flags);
+  39:pamSasd.c     ****         
+  40:pamSasd.c     ****         CyBle_Set16ByPtr(&PresentData[byteCount], SasData.SessionID);
+  41:pamSasd.c     ****         byteCount += sizeof(SasData.SessionID);
+  42:pamSasd.c     ****         
+  43:pamSasd.c     ****         CyBle_Set16ByPtr(&PresentData[byteCount], SasData.SubSessionID);
+  44:pamSasd.c     ****         byteCount += sizeof(SasData.SubSessionID);
+  45:pamSasd.c     ****         
+  46:pamSasd.c     ****         CyBle_Set32ByPtr(&PresentData[byteCount], SasData.RelativeTimestamp);
+  47:pamSasd.c     ****         byteCount += sizeof(SasData.RelativeTimestamp);
+  48:pamSasd.c     ****         
+  49:pamSasd.c     ****         CyBle_Set32ByPtr(&PresentData[byteCount], SasData.SequenceNumber);
+  50:pamSasd.c     ****         byteCount += sizeof(SasData.SequenceNumber);
+  51:pamSasd.c     ****         //size = 15
+  52:pamSasd.c     ****         
+  53:pamSasd.c     ****         char* my_struct_in_bytes = (char*)(&PresentData);
+  54:pamSasd.c     ****         
+  55:pamSasd.c     ****         uint8 Message[PAM_MAX_MESSAGE_DATA_SIZE + HEADER_SIZE];
+  56:pamSasd.c     ****         uint8 MessageSize = 0;
+  57:pamSasd.c     ****         
+  58:pamSasd.c     ****         
+  59:pamSasd.c     ****         for(uint8 x = 0; x < N; x++)
+  60:pamSasd.c     ****         {
+  61:pamSasd.c     ****             if(x == 0)
+  62:pamSasd.c     ****             {
+  63:pamSasd.c     ****                 Message[0] = 0x80 + N - 1;
+  64:pamSasd.c     ****             }
+  65:pamSasd.c     ****             else
+  66:pamSasd.c     ****             {
+  67:pamSasd.c     ****                 Message[0] = 0x00 + N - 1 - x;
+  68:pamSasd.c     ****             }
+  69:pamSasd.c     ****             
+  70:pamSasd.c     ****             
+  71:pamSasd.c     ****             for(uint8 i = 1; i < PAM_MAX_MESSAGE_DATA_SIZE + HEADER_SIZE; i++)
+  72:pamSasd.c     ****             {
+  73:pamSasd.c     ****                 if((x * PAM_MAX_MESSAGE_DATA_SIZE + i) < presentDataLength)
+  74:pamSasd.c     ****                 {
+  75:pamSasd.c     ****                     Message[i] = my_struct_in_bytes[i + x * PAM_MAX_MESSAGE_DATA_SIZE];
+  76:pamSasd.c     ****                     MessageSize = i + HEADER_SIZE;
+  77:pamSasd.c     ****                 }
+  78:pamSasd.c     ****             }
+  79:pamSasd.c     ****             ble_SendIndication(CYBLE_PHYSICAL_ACTIVITY_MONITOR_SLEEP_ACTIVITY_SUMMARY_DATA_CHAR_HAN
+  80:pamSasd.c     ****         }
+  81:pamSasd.c     ****     }
+  82:pamSasd.c     **** }
+  83:pamSasd.c     **** 
+  84:pamSasd.c     **** 
+  85:pamSasd.c     **** uint8 getPresentSasdFields(uint8 *PresentData)
+  86:pamSasd.c     **** {
+  28              		.loc 1 86 0
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 3
+
+
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              	.LVL0:
+  33 0000 70B5     		push	{r4, r5, r6, lr}
+  34              		.cfi_def_cfa_offset 16
+  35              		.cfi_offset 4, -16
+  36              		.cfi_offset 5, -12
+  37              		.cfi_offset 6, -8
+  38              		.cfi_offset 14, -4
+  39 0002 0500     		movs	r5, r0
+  40              	.LVL1:
+  87:pamSasd.c     ****     uint8 length = ALWAYS_PRESENT_SASD_FIELD_LENGTH;
+  88:pamSasd.c     **** 
+  89:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[0], 1/*TOTAL SLEEP TIME PRESENT*/) &&
+  41              		.loc 1 89 0
+  42 0004 BD4B     		ldr	r3, .L38
+  43 0006 5B78     		ldrb	r3, [r3, #1]
+  44 0008 9B07     		lsls	r3, r3, #30
+  45 000a 0CD5     		bpl	.L36
+  90:pamSasd.c     ****        CHECK_BIT(pamFeature, TOTAL_SLEEP_TIME_SUPPORTED))
+  46              		.loc 1 90 0 discriminator 1
+  47 000c BC4B     		ldr	r3, .L38+4
+  48 000e 5B68     		ldr	r3, [r3, #4]
+  89:pamSasd.c     ****        CHECK_BIT(pamFeature, TOTAL_SLEEP_TIME_SUPPORTED))
+  49              		.loc 1 89 0 discriminator 1
+  50 0010 DB05     		lsls	r3, r3, #23
+  51 0012 0AD5     		bpl	.L37
+  91:pamSasd.c     ****     {
+  92:pamSasd.c     ****         PresentData[length] = SasData.TotalSleepTime[0];
+  52              		.loc 1 92 0 discriminator 1
+  53 0014 B94B     		ldr	r3, .L38
+  54 0016 1A7C     		ldrb	r2, [r3, #16]
+  55 0018 0274     		strb	r2, [r0, #16]
+  93:pamSasd.c     ****         PresentData[length+1] = SasData.TotalSleepTime[1];
+  56              		.loc 1 93 0 discriminator 1
+  57 001a 5A7C     		ldrb	r2, [r3, #17]
+  58 001c 4274     		strb	r2, [r0, #17]
+  94:pamSasd.c     ****         PresentData[length+2] = SasData.TotalSleepTime[2];
+  59              		.loc 1 94 0 discriminator 1
+  60 001e 9B7C     		ldrb	r3, [r3, #18]
+  61 0020 8374     		strb	r3, [r0, #18]
+  62              	.LVL2:
+  95:pamSasd.c     ****         length += sizeof(SasData.TotalSleepTime);
+  63              		.loc 1 95 0 discriminator 1
+  64 0022 1324     		movs	r4, #19
+  65 0024 02E0     		b	.L2
+  66              	.LVL3:
+  67              	.L36:
+  87:pamSasd.c     **** 
+  68              		.loc 1 87 0
+  69 0026 1024     		movs	r4, #16
+  70 0028 00E0     		b	.L2
+  71              	.L37:
+  72 002a 1024     		movs	r4, #16
+  73              	.LVL4:
+  74              	.L2:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 4
+
+
+  96:pamSasd.c     ****     }
+  97:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[0], 1/*TOTAL WAKE TIME PRESENT*/) &&
+  75              		.loc 1 97 0
+  76 002c B34B     		ldr	r3, .L38
+  77 002e 5B78     		ldrb	r3, [r3, #1]
+  78 0030 9B07     		lsls	r3, r3, #30
+  79 0032 0ED5     		bpl	.L4
+  98:pamSasd.c     ****        CHECK_BIT(pamFeature, TOTAL_WAKE_TIME_SUPPORTED))
+  80              		.loc 1 98 0 discriminator 1
+  81 0034 B24B     		ldr	r3, .L38+4
+  82 0036 5B68     		ldr	r3, [r3, #4]
+  97:pamSasd.c     ****        CHECK_BIT(pamFeature, TOTAL_WAKE_TIME_SUPPORTED))
+  83              		.loc 1 97 0 discriminator 1
+  84 0038 9B05     		lsls	r3, r3, #22
+  85 003a 0AD5     		bpl	.L4
+  99:pamSasd.c     ****     {
+ 100:pamSasd.c     ****         PresentData[length] = SasData.TotalWakeTime[0];
+  86              		.loc 1 100 0 discriminator 1
+  87 003c AF4B     		ldr	r3, .L38
+  88 003e DA7C     		ldrb	r2, [r3, #19]
+  89 0040 2A55     		strb	r2, [r5, r4]
+ 101:pamSasd.c     ****         PresentData[length+1] = SasData.TotalWakeTime[1];
+  90              		.loc 1 101 0 discriminator 1
+  91 0042 621C     		adds	r2, r4, #1
+  92 0044 197D     		ldrb	r1, [r3, #20]
+  93 0046 A954     		strb	r1, [r5, r2]
+ 102:pamSasd.c     ****         PresentData[length+2] = SasData.TotalWakeTime[2];
+  94              		.loc 1 102 0 discriminator 1
+  95 0048 A21C     		adds	r2, r4, #2
+  96 004a 5B7D     		ldrb	r3, [r3, #21]
+  97 004c AB54     		strb	r3, [r5, r2]
+ 103:pamSasd.c     ****         length += sizeof(SasData.TotalWakeTime);
+  98              		.loc 1 103 0 discriminator 1
+  99 004e 0334     		adds	r4, r4, #3
+ 100              	.LVL5:
+ 101 0050 E4B2     		uxtb	r4, r4
+ 102              	.LVL6:
+ 103              	.L4:
+ 104:pamSasd.c     ****     }
+ 105:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[0], 1/*TOTAL BED TIME PRESENT*/) &&
+ 104              		.loc 1 105 0
+ 105 0052 AA4B     		ldr	r3, .L38
+ 106 0054 5B78     		ldrb	r3, [r3, #1]
+ 107 0056 9B07     		lsls	r3, r3, #30
+ 108 0058 0ED5     		bpl	.L6
+ 106:pamSasd.c     ****        CHECK_BIT(pamFeature, TOTAL_BED_TIME_SUPPORTED))
+ 109              		.loc 1 106 0 discriminator 1
+ 110 005a A94B     		ldr	r3, .L38+4
+ 111 005c 5B68     		ldr	r3, [r3, #4]
+ 105:pamSasd.c     ****        CHECK_BIT(pamFeature, TOTAL_BED_TIME_SUPPORTED))
+ 112              		.loc 1 105 0 discriminator 1
+ 113 005e 5B05     		lsls	r3, r3, #21
+ 114 0060 0AD5     		bpl	.L6
+ 107:pamSasd.c     ****     {
+ 108:pamSasd.c     ****         PresentData[length] = SasData.TotalBedTime[0];
+ 115              		.loc 1 108 0 discriminator 1
+ 116 0062 A64B     		ldr	r3, .L38
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 5
+
+
+ 117 0064 9A7D     		ldrb	r2, [r3, #22]
+ 118 0066 2A55     		strb	r2, [r5, r4]
+ 109:pamSasd.c     ****         PresentData[length+1] = SasData.TotalBedTime[1];
+ 119              		.loc 1 109 0 discriminator 1
+ 120 0068 621C     		adds	r2, r4, #1
+ 121 006a D97D     		ldrb	r1, [r3, #23]
+ 122 006c A954     		strb	r1, [r5, r2]
+ 110:pamSasd.c     ****         PresentData[length+2] = SasData.TotalBedTime[2];
+ 123              		.loc 1 110 0 discriminator 1
+ 124 006e A21C     		adds	r2, r4, #2
+ 125 0070 1B7E     		ldrb	r3, [r3, #24]
+ 126 0072 AB54     		strb	r3, [r5, r2]
+ 111:pamSasd.c     ****         length += sizeof(SasData.TotalBedTime);
+ 127              		.loc 1 111 0 discriminator 1
+ 128 0074 0334     		adds	r4, r4, #3
+ 129              	.LVL7:
+ 130 0076 E4B2     		uxtb	r4, r4
+ 131              	.LVL8:
+ 132              	.L6:
+ 112:pamSasd.c     ****     }
+ 113:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[0], 1/*NR OF AWAKENINGS PRESENT*/) &&
+ 133              		.loc 1 113 0
+ 134 0078 A04B     		ldr	r3, .L38
+ 135 007a 5B78     		ldrb	r3, [r3, #1]
+ 136 007c 9B07     		lsls	r3, r3, #30
+ 137 007e 0DD5     		bpl	.L8
+ 114:pamSasd.c     ****        CHECK_BIT(pamFeature, NUMBER_OF_AWAKENINGS_SUPPORTED))
+ 138              		.loc 1 114 0 discriminator 1
+ 139 0080 9F4B     		ldr	r3, .L38+4
+ 140 0082 5B68     		ldr	r3, [r3, #4]
+ 113:pamSasd.c     ****        CHECK_BIT(pamFeature, NUMBER_OF_AWAKENINGS_SUPPORTED))
+ 141              		.loc 1 113 0 discriminator 1
+ 142 0084 1B05     		lsls	r3, r3, #20
+ 143 0086 09D5     		bpl	.L8
+ 115:pamSasd.c     ****     {
+ 116:pamSasd.c     ****         CyBle_Set16ByPtr(&PresentData[length], SasData.NumberOfAwakenings);
+ 144              		.loc 1 116 0 discriminator 1
+ 145 0088 9C4A     		ldr	r2, .L38
+ 146 008a 537E     		ldrb	r3, [r2, #25]
+ 147 008c 917E     		ldrb	r1, [r2, #26]
+ 148 008e 0902     		lsls	r1, r1, #8
+ 149 0090 1943     		orrs	r1, r3
+ 150 0092 2819     		adds	r0, r5, r4
+ 151              	.LVL9:
+ 152 0094 FFF7FEFF 		bl	CyBle_Set16ByPtr
+ 153              	.LVL10:
+ 117:pamSasd.c     ****         length += sizeof(SasData.NumberOfAwakenings);
+ 154              		.loc 1 117 0 discriminator 1
+ 155 0098 0234     		adds	r4, r4, #2
+ 156              	.LVL11:
+ 157 009a E4B2     		uxtb	r4, r4
+ 158              	.LVL12:
+ 159              	.L8:
+ 118:pamSasd.c     ****     }
+ 119:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[0], 1/*SLEEP LATENCY PRESENT*/) &&
+ 160              		.loc 1 119 0
+ 161 009c 974B     		ldr	r3, .L38
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 6
+
+
+ 162 009e 5B78     		ldrb	r3, [r3, #1]
+ 163 00a0 9B07     		lsls	r3, r3, #30
+ 164 00a2 0DD5     		bpl	.L10
+ 120:pamSasd.c     ****        CHECK_BIT(pamFeature, SLEEP_LATENCY_SUPPORTED))
+ 165              		.loc 1 120 0 discriminator 1
+ 166 00a4 964B     		ldr	r3, .L38+4
+ 167 00a6 5B68     		ldr	r3, [r3, #4]
+ 119:pamSasd.c     ****        CHECK_BIT(pamFeature, SLEEP_LATENCY_SUPPORTED))
+ 168              		.loc 1 119 0 discriminator 1
+ 169 00a8 DB04     		lsls	r3, r3, #19
+ 170 00aa 09D5     		bpl	.L10
+ 121:pamSasd.c     ****     {
+ 122:pamSasd.c     ****         CyBle_Set16ByPtr(&PresentData[length], SasData.SleepLatency);
+ 171              		.loc 1 122 0 discriminator 1
+ 172 00ac 934A     		ldr	r2, .L38
+ 173 00ae D37E     		ldrb	r3, [r2, #27]
+ 174 00b0 117F     		ldrb	r1, [r2, #28]
+ 175 00b2 0902     		lsls	r1, r1, #8
+ 176 00b4 1943     		orrs	r1, r3
+ 177 00b6 2819     		adds	r0, r5, r4
+ 178 00b8 FFF7FEFF 		bl	CyBle_Set16ByPtr
+ 179              	.LVL13:
+ 123:pamSasd.c     ****         length += sizeof(SasData.SleepLatency);
+ 180              		.loc 1 123 0 discriminator 1
+ 181 00bc 0234     		adds	r4, r4, #2
+ 182              	.LVL14:
+ 183 00be E4B2     		uxtb	r4, r4
+ 184              	.LVL15:
+ 185              	.L10:
+ 124:pamSasd.c     ****     }
+ 125:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[0], 1/*SLEEP EDDICIENCY PRESENT*/) &&
+ 186              		.loc 1 125 0
+ 187 00c0 8E4B     		ldr	r3, .L38
+ 188 00c2 5B78     		ldrb	r3, [r3, #1]
+ 189 00c4 9B07     		lsls	r3, r3, #30
+ 190 00c6 08D5     		bpl	.L12
+ 126:pamSasd.c     ****        CHECK_BIT(pamFeature, SLEEP_EFFICIENCY_SUPPORTED))
+ 191              		.loc 1 126 0 discriminator 1
+ 192 00c8 8D4B     		ldr	r3, .L38+4
+ 193 00ca 5B68     		ldr	r3, [r3, #4]
+ 125:pamSasd.c     ****        CHECK_BIT(pamFeature, SLEEP_EFFICIENCY_SUPPORTED))
+ 194              		.loc 1 125 0 discriminator 1
+ 195 00cc 9B04     		lsls	r3, r3, #18
+ 196 00ce 04D5     		bpl	.L12
+ 127:pamSasd.c     ****     {
+ 128:pamSasd.c     ****         PresentData[length] = SasData.SleepEfficiency;
+ 197              		.loc 1 128 0 discriminator 1
+ 198 00d0 8A4B     		ldr	r3, .L38
+ 199 00d2 5B7F     		ldrb	r3, [r3, #29]
+ 200 00d4 2B55     		strb	r3, [r5, r4]
+ 129:pamSasd.c     ****         length += sizeof(SasData.SleepEfficiency);
+ 201              		.loc 1 129 0 discriminator 1
+ 202 00d6 0134     		adds	r4, r4, #1
+ 203              	.LVL16:
+ 204 00d8 E4B2     		uxtb	r4, r4
+ 205              	.LVL17:
+ 206              	.L12:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 7
+
+
+ 130:pamSasd.c     ****     }
+ 131:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[0], 1/*SNOOZE TIME PRESENT*/) &&
+ 207              		.loc 1 131 0
+ 208 00da 884B     		ldr	r3, .L38
+ 209 00dc 5B78     		ldrb	r3, [r3, #1]
+ 210 00de 9B07     		lsls	r3, r3, #30
+ 211 00e0 0DD5     		bpl	.L14
+ 132:pamSasd.c     ****        CHECK_BIT(pamFeature, SNOOZE_TIME_SUPPORTED))
+ 212              		.loc 1 132 0 discriminator 1
+ 213 00e2 874B     		ldr	r3, .L38+4
+ 214 00e4 5B68     		ldr	r3, [r3, #4]
+ 131:pamSasd.c     ****        CHECK_BIT(pamFeature, SNOOZE_TIME_SUPPORTED))
+ 215              		.loc 1 131 0 discriminator 1
+ 216 00e6 5B04     		lsls	r3, r3, #17
+ 217 00e8 09D5     		bpl	.L14
+ 133:pamSasd.c     ****     {
+ 134:pamSasd.c     ****         CyBle_Set16ByPtr(&PresentData[length], SasData.SnoozeTime);
+ 218              		.loc 1 134 0 discriminator 1
+ 219 00ea 844A     		ldr	r2, .L38
+ 220 00ec 937F     		ldrb	r3, [r2, #30]
+ 221 00ee D17F     		ldrb	r1, [r2, #31]
+ 222 00f0 0902     		lsls	r1, r1, #8
+ 223 00f2 1943     		orrs	r1, r3
+ 224 00f4 2819     		adds	r0, r5, r4
+ 225 00f6 FFF7FEFF 		bl	CyBle_Set16ByPtr
+ 226              	.LVL18:
+ 135:pamSasd.c     ****         length += sizeof(SasData.SnoozeTime);
+ 227              		.loc 1 135 0 discriminator 1
+ 228 00fa 0234     		adds	r4, r4, #2
+ 229              	.LVL19:
+ 230 00fc E4B2     		uxtb	r4, r4
+ 231              	.LVL20:
+ 232              	.L14:
+ 136:pamSasd.c     ****     }
+ 137:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[0], 1/*NROF TOSSNTURN EVENTS PRESENT*/) &&
+ 233              		.loc 1 137 0
+ 234 00fe 7F4B     		ldr	r3, .L38
+ 235 0100 5B78     		ldrb	r3, [r3, #1]
+ 236 0102 9B07     		lsls	r3, r3, #30
+ 237 0104 0FD5     		bpl	.L16
+ 138:pamSasd.c     ****        CHECK_BIT(pamFeature, NUMBER_OF_TOSS_N_TURN_EVENTS_SUPPORTED))
+ 238              		.loc 1 138 0 discriminator 1
+ 239 0106 7E4B     		ldr	r3, .L38+4
+ 240 0108 5B68     		ldr	r3, [r3, #4]
+ 137:pamSasd.c     ****        CHECK_BIT(pamFeature, NUMBER_OF_TOSS_N_TURN_EVENTS_SUPPORTED))
+ 241              		.loc 1 137 0 discriminator 1
+ 242 010a 1B04     		lsls	r3, r3, #16
+ 243 010c 0BD5     		bpl	.L16
+ 139:pamSasd.c     ****     {
+ 140:pamSasd.c     ****         CyBle_Set16ByPtr(&PresentData[length], SasData.NumberOfTossNturnEvents);
+ 244              		.loc 1 140 0 discriminator 1
+ 245 010e 7B4A     		ldr	r2, .L38
+ 246 0110 2023     		movs	r3, #32
+ 247 0112 D35C     		ldrb	r3, [r2, r3]
+ 248 0114 2121     		movs	r1, #33
+ 249 0116 515C     		ldrb	r1, [r2, r1]
+ 250 0118 0902     		lsls	r1, r1, #8
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 8
+
+
+ 251 011a 1943     		orrs	r1, r3
+ 252 011c 2819     		adds	r0, r5, r4
+ 253 011e FFF7FEFF 		bl	CyBle_Set16ByPtr
+ 254              	.LVL21:
+ 141:pamSasd.c     ****         length += sizeof(SasData.NumberOfTossNturnEvents);
+ 255              		.loc 1 141 0 discriminator 1
+ 256 0122 0234     		adds	r4, r4, #2
+ 257              	.LVL22:
+ 258 0124 E4B2     		uxtb	r4, r4
+ 259              	.LVL23:
+ 260              	.L16:
+ 142:pamSasd.c     ****     }
+ 143:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*TIME OF AWEKENING AFTER ALARM PRESENT*/) &&
+ 261              		.loc 1 143 0
+ 262 0126 754B     		ldr	r3, .L38
+ 263 0128 9B78     		ldrb	r3, [r3, #2]
+ 264 012a DB07     		lsls	r3, r3, #31
+ 265 012c 11D5     		bpl	.L18
+ 144:pamSasd.c     ****        CHECK_BIT(pamFeature, TIME_OF_AWAKENING_AFTER_ALARM_SUPPORTED))
+ 266              		.loc 1 144 0 discriminator 1
+ 267 012e 744B     		ldr	r3, .L38+4
+ 268 0130 5B68     		ldr	r3, [r3, #4]
+ 143:pamSasd.c     ****        CHECK_BIT(pamFeature, TIME_OF_AWAKENING_AFTER_ALARM_SUPPORTED))
+ 269              		.loc 1 143 0 discriminator 1
+ 270 0132 DB03     		lsls	r3, r3, #15
+ 271 0134 0DD5     		bpl	.L18
+ 145:pamSasd.c     ****     {
+ 146:pamSasd.c     ****         PresentData[length] = SasData.TimeOfAwakeningAfterAlarm[0];
+ 272              		.loc 1 146 0 discriminator 1
+ 273 0136 714B     		ldr	r3, .L38
+ 274 0138 2222     		movs	r2, #34
+ 275 013a 9A5C     		ldrb	r2, [r3, r2]
+ 276 013c 2A55     		strb	r2, [r5, r4]
+ 147:pamSasd.c     ****         PresentData[length+1] = SasData.TimeOfAwakeningAfterAlarm[1];
+ 277              		.loc 1 147 0 discriminator 1
+ 278 013e 621C     		adds	r2, r4, #1
+ 279 0140 2321     		movs	r1, #35
+ 280 0142 595C     		ldrb	r1, [r3, r1]
+ 281 0144 A954     		strb	r1, [r5, r2]
+ 148:pamSasd.c     ****         PresentData[length+2] = SasData.TimeOfAwakeningAfterAlarm[2];
+ 282              		.loc 1 148 0 discriminator 1
+ 283 0146 A21C     		adds	r2, r4, #2
+ 284 0148 2421     		movs	r1, #36
+ 285 014a 5B5C     		ldrb	r3, [r3, r1]
+ 286 014c AB54     		strb	r3, [r5, r2]
+ 149:pamSasd.c     ****         length += sizeof(SasData.TimeOfAwakeningAfterAlarm);
+ 287              		.loc 1 149 0 discriminator 1
+ 288 014e 0334     		adds	r4, r4, #3
+ 289              	.LVL24:
+ 290 0150 E4B2     		uxtb	r4, r4
+ 291              	.LVL25:
+ 292              	.L18:
+ 150:pamSasd.c     ****     }
+ 151:pamSasd.c     ****     if(CHECK_BIT(pamFeature, VISIBLE_LIGHT_LEVEL_SUPPORTED))
+ 293              		.loc 1 151 0
+ 294 0152 6B4B     		ldr	r3, .L38+4
+ 295 0154 5B68     		ldr	r3, [r3, #4]
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 9
+
+
+ 296 0156 9B03     		lsls	r3, r3, #14
+ 297 0158 35D5     		bpl	.L20
+ 152:pamSasd.c     ****     {
+ 153:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MinimumVisibleLightLevel PRESENT*/))
+ 298              		.loc 1 153 0
+ 299 015a 684B     		ldr	r3, .L38
+ 300 015c 9B78     		ldrb	r3, [r3, #2]
+ 301 015e DB07     		lsls	r3, r3, #31
+ 302 0160 0DD5     		bpl	.L22
+ 154:pamSasd.c     ****         {
+ 155:pamSasd.c     ****             PresentData[length] = SasData.MinimumVisibleLightLevel[0];
+ 303              		.loc 1 155 0
+ 304 0162 664B     		ldr	r3, .L38
+ 305 0164 2522     		movs	r2, #37
+ 306 0166 9A5C     		ldrb	r2, [r3, r2]
+ 307 0168 2A55     		strb	r2, [r5, r4]
+ 156:pamSasd.c     ****             PresentData[length+1] = SasData.MinimumVisibleLightLevel[1];
+ 308              		.loc 1 156 0
+ 309 016a 621C     		adds	r2, r4, #1
+ 310 016c 2621     		movs	r1, #38
+ 311 016e 595C     		ldrb	r1, [r3, r1]
+ 312 0170 A954     		strb	r1, [r5, r2]
+ 157:pamSasd.c     ****             PresentData[length+2] = SasData.MinimumVisibleLightLevel[2];
+ 313              		.loc 1 157 0
+ 314 0172 A21C     		adds	r2, r4, #2
+ 315 0174 2721     		movs	r1, #39
+ 316 0176 5B5C     		ldrb	r3, [r3, r1]
+ 317 0178 AB54     		strb	r3, [r5, r2]
+ 158:pamSasd.c     ****             length += sizeof(SasData.MinimumVisibleLightLevel);
+ 318              		.loc 1 158 0
+ 319 017a 0334     		adds	r4, r4, #3
+ 320              	.LVL26:
+ 321 017c E4B2     		uxtb	r4, r4
+ 322              	.LVL27:
+ 323              	.L22:
+ 159:pamSasd.c     ****         }
+ 160:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MAXIMUMVisibleLightLevel PRESENT*/))
+ 324              		.loc 1 160 0
+ 325 017e 5F4B     		ldr	r3, .L38
+ 326 0180 9B78     		ldrb	r3, [r3, #2]
+ 327 0182 DB07     		lsls	r3, r3, #31
+ 328 0184 0DD5     		bpl	.L23
+ 161:pamSasd.c     ****         {
+ 162:pamSasd.c     ****             PresentData[length] = SasData.MaximumVisibleLightLevel[0];
+ 329              		.loc 1 162 0
+ 330 0186 5D4B     		ldr	r3, .L38
+ 331 0188 2822     		movs	r2, #40
+ 332 018a 9A5C     		ldrb	r2, [r3, r2]
+ 333 018c 2A55     		strb	r2, [r5, r4]
+ 163:pamSasd.c     ****             PresentData[length+1] = SasData.MaximumVisibleLightLevel[1];
+ 334              		.loc 1 163 0
+ 335 018e 621C     		adds	r2, r4, #1
+ 336 0190 2921     		movs	r1, #41
+ 337 0192 595C     		ldrb	r1, [r3, r1]
+ 338 0194 A954     		strb	r1, [r5, r2]
+ 164:pamSasd.c     ****             PresentData[length+2] = SasData.MaximumVisibleLightLevel[2];
+ 339              		.loc 1 164 0
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 10
+
+
+ 340 0196 A21C     		adds	r2, r4, #2
+ 341 0198 2A21     		movs	r1, #42
+ 342 019a 5B5C     		ldrb	r3, [r3, r1]
+ 343 019c AB54     		strb	r3, [r5, r2]
+ 165:pamSasd.c     ****             length += sizeof(SasData.MaximumVisibleLightLevel);
+ 344              		.loc 1 165 0
+ 345 019e 0334     		adds	r4, r4, #3
+ 346              	.LVL28:
+ 347 01a0 E4B2     		uxtb	r4, r4
+ 348              	.LVL29:
+ 349              	.L23:
+ 166:pamSasd.c     ****         }
+ 167:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*AVERAGEVisibleLightLevel PRESENT*/))
+ 350              		.loc 1 167 0
+ 351 01a2 564B     		ldr	r3, .L38
+ 352 01a4 9B78     		ldrb	r3, [r3, #2]
+ 353 01a6 DB07     		lsls	r3, r3, #31
+ 354 01a8 0DD5     		bpl	.L20
+ 168:pamSasd.c     ****         {
+ 169:pamSasd.c     ****             PresentData[length] = SasData.AverageVisibleLightLevel[0];
+ 355              		.loc 1 169 0
+ 356 01aa 544B     		ldr	r3, .L38
+ 357 01ac 2B22     		movs	r2, #43
+ 358 01ae 9A5C     		ldrb	r2, [r3, r2]
+ 359 01b0 2A55     		strb	r2, [r5, r4]
+ 170:pamSasd.c     ****             PresentData[length+1] = SasData.AverageVisibleLightLevel[1];
+ 360              		.loc 1 170 0
+ 361 01b2 621C     		adds	r2, r4, #1
+ 362 01b4 2C21     		movs	r1, #44
+ 363 01b6 595C     		ldrb	r1, [r3, r1]
+ 364 01b8 A954     		strb	r1, [r5, r2]
+ 171:pamSasd.c     ****             PresentData[length+2] = SasData.AverageVisibleLightLevel[2];
+ 365              		.loc 1 171 0
+ 366 01ba A21C     		adds	r2, r4, #2
+ 367 01bc 2D21     		movs	r1, #45
+ 368 01be 5B5C     		ldrb	r3, [r3, r1]
+ 369 01c0 AB54     		strb	r3, [r5, r2]
+ 172:pamSasd.c     ****             length += sizeof(SasData.AverageVisibleLightLevel);
+ 370              		.loc 1 172 0
+ 371 01c2 0334     		adds	r4, r4, #3
+ 372              	.LVL30:
+ 373 01c4 E4B2     		uxtb	r4, r4
+ 374              	.LVL31:
+ 375              	.L20:
+ 173:pamSasd.c     ****         }
+ 174:pamSasd.c     ****     }
+ 175:pamSasd.c     ****     if(CHECK_BIT(pamFeature, UV_LIGHT_LEVEL_SUPPORTED))
+ 376              		.loc 1 175 0
+ 377 01c6 4E4B     		ldr	r3, .L38+4
+ 378 01c8 5B68     		ldr	r3, [r3, #4]
+ 379 01ca 5B03     		lsls	r3, r3, #13
+ 380 01cc 35D5     		bpl	.L24
+ 176:pamSasd.c     ****     {
+ 177:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*Minimumuvlight PRESENT*/))
+ 381              		.loc 1 177 0
+ 382 01ce 4B4B     		ldr	r3, .L38
+ 383 01d0 9B78     		ldrb	r3, [r3, #2]
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 11
+
+
+ 384 01d2 DB07     		lsls	r3, r3, #31
+ 385 01d4 0DD5     		bpl	.L26
+ 178:pamSasd.c     ****         {
+ 179:pamSasd.c     ****             PresentData[length] = SasData.MinimumUVLightLevel[0];
+ 386              		.loc 1 179 0
+ 387 01d6 494B     		ldr	r3, .L38
+ 388 01d8 2E22     		movs	r2, #46
+ 389 01da 9A5C     		ldrb	r2, [r3, r2]
+ 390 01dc 2A55     		strb	r2, [r5, r4]
+ 180:pamSasd.c     ****             PresentData[length+1] = SasData.MinimumUVLightLevel[1];
+ 391              		.loc 1 180 0
+ 392 01de 621C     		adds	r2, r4, #1
+ 393 01e0 2F21     		movs	r1, #47
+ 394 01e2 595C     		ldrb	r1, [r3, r1]
+ 395 01e4 A954     		strb	r1, [r5, r2]
+ 181:pamSasd.c     ****             PresentData[length+2] = SasData.MinimumUVLightLevel[2];
+ 396              		.loc 1 181 0
+ 397 01e6 A21C     		adds	r2, r4, #2
+ 398 01e8 3021     		movs	r1, #48
+ 399 01ea 5B5C     		ldrb	r3, [r3, r1]
+ 400 01ec AB54     		strb	r3, [r5, r2]
+ 182:pamSasd.c     ****             length += sizeof(SasData.MinimumUVLightLevel);
+ 401              		.loc 1 182 0
+ 402 01ee 0334     		adds	r4, r4, #3
+ 403              	.LVL32:
+ 404 01f0 E4B2     		uxtb	r4, r4
+ 405              	.LVL33:
+ 406              	.L26:
+ 183:pamSasd.c     ****         }
+ 184:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MAXIMUMuvlight PRESENT*/))
+ 407              		.loc 1 184 0
+ 408 01f2 424B     		ldr	r3, .L38
+ 409 01f4 9B78     		ldrb	r3, [r3, #2]
+ 410 01f6 DB07     		lsls	r3, r3, #31
+ 411 01f8 0DD5     		bpl	.L27
+ 185:pamSasd.c     ****         {
+ 186:pamSasd.c     ****             PresentData[length] = SasData.MaximumUVLightLevel[0];
+ 412              		.loc 1 186 0
+ 413 01fa 404B     		ldr	r3, .L38
+ 414 01fc 3122     		movs	r2, #49
+ 415 01fe 9A5C     		ldrb	r2, [r3, r2]
+ 416 0200 2A55     		strb	r2, [r5, r4]
+ 187:pamSasd.c     ****             PresentData[length+1] = SasData.MaximumUVLightLevel[1];
+ 417              		.loc 1 187 0
+ 418 0202 621C     		adds	r2, r4, #1
+ 419 0204 3221     		movs	r1, #50
+ 420 0206 595C     		ldrb	r1, [r3, r1]
+ 421 0208 A954     		strb	r1, [r5, r2]
+ 188:pamSasd.c     ****             PresentData[length+2] = SasData.MaximumUVLightLevel[2];
+ 422              		.loc 1 188 0
+ 423 020a A21C     		adds	r2, r4, #2
+ 424 020c 3321     		movs	r1, #51
+ 425 020e 5B5C     		ldrb	r3, [r3, r1]
+ 426 0210 AB54     		strb	r3, [r5, r2]
+ 189:pamSasd.c     ****             length += sizeof(SasData.MaximumUVLightLevel);
+ 427              		.loc 1 189 0
+ 428 0212 0334     		adds	r4, r4, #3
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 12
+
+
+ 429              	.LVL34:
+ 430 0214 E4B2     		uxtb	r4, r4
+ 431              	.LVL35:
+ 432              	.L27:
+ 190:pamSasd.c     ****         }
+ 191:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*AVERAGEuvlight PRESENT*/))
+ 433              		.loc 1 191 0
+ 434 0216 394B     		ldr	r3, .L38
+ 435 0218 9B78     		ldrb	r3, [r3, #2]
+ 436 021a DB07     		lsls	r3, r3, #31
+ 437 021c 0DD5     		bpl	.L24
+ 192:pamSasd.c     ****         {
+ 193:pamSasd.c     ****             PresentData[length] = SasData.AverageUVLightLevel[0];
+ 438              		.loc 1 193 0
+ 439 021e 374B     		ldr	r3, .L38
+ 440 0220 3422     		movs	r2, #52
+ 441 0222 9A5C     		ldrb	r2, [r3, r2]
+ 442 0224 2A55     		strb	r2, [r5, r4]
+ 194:pamSasd.c     ****             PresentData[length+1] = SasData.AverageUVLightLevel[1];
+ 443              		.loc 1 194 0
+ 444 0226 621C     		adds	r2, r4, #1
+ 445 0228 3521     		movs	r1, #53
+ 446 022a 595C     		ldrb	r1, [r3, r1]
+ 447 022c A954     		strb	r1, [r5, r2]
+ 195:pamSasd.c     ****             PresentData[length+2] = SasData.AverageUVLightLevel[2];
+ 448              		.loc 1 195 0
+ 449 022e A21C     		adds	r2, r4, #2
+ 450 0230 3621     		movs	r1, #54
+ 451 0232 5B5C     		ldrb	r3, [r3, r1]
+ 452 0234 AB54     		strb	r3, [r5, r2]
+ 196:pamSasd.c     ****             length += sizeof(SasData.AverageUVLightLevel);
+ 453              		.loc 1 196 0
+ 454 0236 0334     		adds	r4, r4, #3
+ 455              	.LVL36:
+ 456 0238 E4B2     		uxtb	r4, r4
+ 457              	.LVL37:
+ 458              	.L24:
+ 197:pamSasd.c     ****         }
+ 198:pamSasd.c     ****     }
+ 199:pamSasd.c     ****     if(CHECK_BIT(pamFeature, IR_LIGHT_LEVEL_SUPPORTED))
+ 459              		.loc 1 199 0
+ 460 023a 314B     		ldr	r3, .L38+4
+ 461 023c 5B68     		ldr	r3, [r3, #4]
+ 462 023e 1B03     		lsls	r3, r3, #12
+ 463 0240 35D5     		bpl	.L28
+ 200:pamSasd.c     ****     {
+ 201:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MinimumIRlight PRESENT*/))
+ 464              		.loc 1 201 0
+ 465 0242 2E4B     		ldr	r3, .L38
+ 466 0244 9B78     		ldrb	r3, [r3, #2]
+ 467 0246 DB07     		lsls	r3, r3, #31
+ 468 0248 0DD5     		bpl	.L30
+ 202:pamSasd.c     ****         {
+ 203:pamSasd.c     ****             PresentData[length] = SasData.MinimumIRLightLevel[0];
+ 469              		.loc 1 203 0
+ 470 024a 2C4B     		ldr	r3, .L38
+ 471 024c 3722     		movs	r2, #55
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 13
+
+
+ 472 024e 9A5C     		ldrb	r2, [r3, r2]
+ 473 0250 2A55     		strb	r2, [r5, r4]
+ 204:pamSasd.c     ****             PresentData[length+1] = SasData.MinimumIRLightLevel[1];
+ 474              		.loc 1 204 0
+ 475 0252 621C     		adds	r2, r4, #1
+ 476 0254 3821     		movs	r1, #56
+ 477 0256 595C     		ldrb	r1, [r3, r1]
+ 478 0258 A954     		strb	r1, [r5, r2]
+ 205:pamSasd.c     ****             PresentData[length+2] = SasData.MinimumIRLightLevel[2];
+ 479              		.loc 1 205 0
+ 480 025a A21C     		adds	r2, r4, #2
+ 481 025c 3921     		movs	r1, #57
+ 482 025e 5B5C     		ldrb	r3, [r3, r1]
+ 483 0260 AB54     		strb	r3, [r5, r2]
+ 206:pamSasd.c     ****             length += sizeof(SasData.MinimumIRLightLevel);
+ 484              		.loc 1 206 0
+ 485 0262 0334     		adds	r4, r4, #3
+ 486              	.LVL38:
+ 487 0264 E4B2     		uxtb	r4, r4
+ 488              	.LVL39:
+ 489              	.L30:
+ 207:pamSasd.c     ****         }
+ 208:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MAXIMUMIRlight PRESENT*/))
+ 490              		.loc 1 208 0
+ 491 0266 254B     		ldr	r3, .L38
+ 492 0268 9B78     		ldrb	r3, [r3, #2]
+ 493 026a DB07     		lsls	r3, r3, #31
+ 494 026c 0DD5     		bpl	.L31
+ 209:pamSasd.c     ****         {
+ 210:pamSasd.c     ****             PresentData[length] = SasData.MaximumIRLightLevel[0];
+ 495              		.loc 1 210 0
+ 496 026e 234B     		ldr	r3, .L38
+ 497 0270 3A22     		movs	r2, #58
+ 498 0272 9A5C     		ldrb	r2, [r3, r2]
+ 499 0274 2A55     		strb	r2, [r5, r4]
+ 211:pamSasd.c     ****             PresentData[length+1] = SasData.MaximumIRLightLevel[1];
+ 500              		.loc 1 211 0
+ 501 0276 621C     		adds	r2, r4, #1
+ 502 0278 3B21     		movs	r1, #59
+ 503 027a 595C     		ldrb	r1, [r3, r1]
+ 504 027c A954     		strb	r1, [r5, r2]
+ 212:pamSasd.c     ****             PresentData[length+2] = SasData.MaximumIRLightLevel[2];
+ 505              		.loc 1 212 0
+ 506 027e A21C     		adds	r2, r4, #2
+ 507 0280 3C21     		movs	r1, #60
+ 508 0282 5B5C     		ldrb	r3, [r3, r1]
+ 509 0284 AB54     		strb	r3, [r5, r2]
+ 213:pamSasd.c     ****             length += sizeof(SasData.MaximumIRLightLevel);
+ 510              		.loc 1 213 0
+ 511 0286 0334     		adds	r4, r4, #3
+ 512              	.LVL40:
+ 513 0288 E4B2     		uxtb	r4, r4
+ 514              	.LVL41:
+ 515              	.L31:
+ 214:pamSasd.c     ****         }
+ 215:pamSasd.c     ****         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*AVERAGEIRlight PRESENT*/))
+ 516              		.loc 1 215 0
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 14
+
+
+ 517 028a 1C4B     		ldr	r3, .L38
+ 518 028c 9B78     		ldrb	r3, [r3, #2]
+ 519 028e DB07     		lsls	r3, r3, #31
+ 520 0290 0DD5     		bpl	.L28
+ 216:pamSasd.c     ****         {
+ 217:pamSasd.c     ****             PresentData[length] = SasData.AverageIRLightLevel[0];
+ 521              		.loc 1 217 0
+ 522 0292 1A4B     		ldr	r3, .L38
+ 523 0294 3D22     		movs	r2, #61
+ 524 0296 9A5C     		ldrb	r2, [r3, r2]
+ 525 0298 2A55     		strb	r2, [r5, r4]
+ 218:pamSasd.c     ****             PresentData[length+1] = SasData.AverageIRLightLevel[1];
+ 526              		.loc 1 218 0
+ 527 029a 621C     		adds	r2, r4, #1
+ 528 029c 3E21     		movs	r1, #62
+ 529 029e 595C     		ldrb	r1, [r3, r1]
+ 530 02a0 A954     		strb	r1, [r5, r2]
+ 219:pamSasd.c     ****             PresentData[length+2] = SasData.AverageIRLightLevel[2];
+ 531              		.loc 1 219 0
+ 532 02a2 A21C     		adds	r2, r4, #2
+ 533 02a4 3F21     		movs	r1, #63
+ 534 02a6 5B5C     		ldrb	r3, [r3, r1]
+ 535 02a8 AB54     		strb	r3, [r5, r2]
+ 220:pamSasd.c     ****             length += sizeof(SasData.AverageIRLightLevel);
+ 536              		.loc 1 220 0
+ 537 02aa 0334     		adds	r4, r4, #3
+ 538              	.LVL42:
+ 539 02ac E4B2     		uxtb	r4, r4
+ 540              	.LVL43:
+ 541              	.L28:
+ 221:pamSasd.c     ****         }
+ 222:pamSasd.c     ****     }
+ 223:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*AVERAGE SLEEPING HEART RATE*/) &&
+ 542              		.loc 1 223 0
+ 543 02ae 134B     		ldr	r3, .L38
+ 544 02b0 9B78     		ldrb	r3, [r3, #2]
+ 545 02b2 DB07     		lsls	r3, r3, #31
+ 546 02b4 09D5     		bpl	.L32
+ 224:pamSasd.c     ****        CHECK_BIT(pamFeature, SLEEPING_HEART_RATE_SUPPORTED))
+ 547              		.loc 1 224 0 discriminator 1
+ 548 02b6 124B     		ldr	r3, .L38+4
+ 549 02b8 5B68     		ldr	r3, [r3, #4]
+ 223:pamSasd.c     ****        CHECK_BIT(pamFeature, SLEEPING_HEART_RATE_SUPPORTED))
+ 550              		.loc 1 223 0 discriminator 1
+ 551 02ba 9B02     		lsls	r3, r3, #10
+ 552 02bc 05D5     		bpl	.L32
+ 225:pamSasd.c     ****     {
+ 226:pamSasd.c     ****         PresentData[length] = SasData.AverageSleepingHeartRate;
+ 553              		.loc 1 226 0 discriminator 1
+ 554 02be 4023     		movs	r3, #64
+ 555 02c0 0E4A     		ldr	r2, .L38
+ 556 02c2 D35C     		ldrb	r3, [r2, r3]
+ 557 02c4 2B55     		strb	r3, [r5, r4]
+ 227:pamSasd.c     ****         length += sizeof(SasData.AverageSleepingHeartRate);
+ 558              		.loc 1 227 0 discriminator 1
+ 559 02c6 0134     		adds	r4, r4, #1
+ 560              	.LVL44:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 15
+
+
+ 561 02c8 E4B2     		uxtb	r4, r4
+ 562              	.LVL45:
+ 563              	.L32:
+ 228:pamSasd.c     ****     }
+ 229:pamSasd.c     ****     if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MinimumIRlight PRESENT*/) &&
+ 564              		.loc 1 229 0
+ 565 02ca 0C4B     		ldr	r3, .L38
+ 566 02cc 9B78     		ldrb	r3, [r3, #2]
+ 567 02ce DB07     		lsls	r3, r3, #31
+ 568 02d0 11D5     		bpl	.L34
+ 230:pamSasd.c     ****        CHECK_BIT(pamFeature, WORN_DURATION_SUPPORTED))
+ 569              		.loc 1 230 0 discriminator 1
+ 570 02d2 0B4B     		ldr	r3, .L38+4
+ 571 02d4 1B68     		ldr	r3, [r3]
+ 229:pamSasd.c     ****        CHECK_BIT(pamFeature, WORN_DURATION_SUPPORTED))
+ 572              		.loc 1 229 0 discriminator 1
+ 573 02d6 DB01     		lsls	r3, r3, #7
+ 574 02d8 0DD5     		bpl	.L34
+ 231:pamSasd.c     ****     {
+ 232:pamSasd.c     ****         PresentData[length] = SasData.WornDuration[0];
+ 575              		.loc 1 232 0 discriminator 1
+ 576 02da 084B     		ldr	r3, .L38
+ 577 02dc 4122     		movs	r2, #65
+ 578 02de 9A5C     		ldrb	r2, [r3, r2]
+ 579 02e0 2A55     		strb	r2, [r5, r4]
+ 233:pamSasd.c     ****         PresentData[length+1] = SasData.WornDuration[1];
+ 580              		.loc 1 233 0 discriminator 1
+ 581 02e2 621C     		adds	r2, r4, #1
+ 582 02e4 4221     		movs	r1, #66
+ 583 02e6 595C     		ldrb	r1, [r3, r1]
+ 584 02e8 A954     		strb	r1, [r5, r2]
+ 234:pamSasd.c     ****         PresentData[length+2] = SasData.WornDuration[2];
+ 585              		.loc 1 234 0 discriminator 1
+ 586 02ea A21C     		adds	r2, r4, #2
+ 587 02ec 4321     		movs	r1, #67
+ 588 02ee 5B5C     		ldrb	r3, [r3, r1]
+ 589 02f0 AB54     		strb	r3, [r5, r2]
+ 235:pamSasd.c     ****         length += sizeof(SasData.WornDuration);
+ 590              		.loc 1 235 0 discriminator 1
+ 591 02f2 0334     		adds	r4, r4, #3
+ 592              	.LVL46:
+ 593 02f4 E4B2     		uxtb	r4, r4
+ 594              	.LVL47:
+ 595              	.L34:
+ 236:pamSasd.c     ****     }
+ 237:pamSasd.c     ****    
+ 238:pamSasd.c     ****     return length;
+ 239:pamSasd.c     **** }
+ 596              		.loc 1 239 0
+ 597 02f6 2000     		movs	r0, r4
+ 598              		@ sp needed
+ 599              	.LVL48:
+ 600              	.LVL49:
+ 601 02f8 70BD     		pop	{r4, r5, r6, pc}
+ 602              	.L39:
+ 603 02fa C046     		.align	2
+ 604              	.L38:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 16
+
+
+ 605 02fc 00000000 		.word	SasData
+ 606 0300 00000000 		.word	pamFeature
+ 607              		.cfi_endproc
+ 608              	.LFE37:
+ 609              		.size	getPresentSasdFields, .-getPresentSasdFields
+ 610              		.global	__aeabi_ui2d
+ 611              		.section	.text.UpdateSasd,"ax",%progbits
+ 612              		.align	2
+ 613              		.global	UpdateSasd
+ 614              		.code	16
+ 615              		.thumb_func
+ 616              		.type	UpdateSasd, %function
+ 617              	UpdateSasd:
+ 618              	.LFB36:
+  16:pamSasd.c     ****     CYBLE_GATTS_HANDLE_VALUE_NTF_T tempHandle;
+ 619              		.loc 1 16 0
+ 620              		.cfi_startproc
+ 621              		@ args = 0, pretend = 0, frame = 104
+ 622              		@ frame_needed = 0, uses_anonymous_args = 0
+ 623 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 624              		.cfi_def_cfa_offset 20
+ 625              		.cfi_offset 4, -20
+ 626              		.cfi_offset 5, -16
+ 627              		.cfi_offset 6, -12
+ 628              		.cfi_offset 7, -8
+ 629              		.cfi_offset 14, -4
+ 630 0002 9BB0     		sub	sp, sp, #108
+ 631              		.cfi_def_cfa_offset 128
+  19:pamSasd.c     ****     tempHandle.value.val = (uint8 *)&SasData;
+ 632              		.loc 1 19 0
+ 633 0004 17A8     		add	r0, sp, #92
+ 634 0006 2E23     		movs	r3, #46
+ 635 0008 0381     		strh	r3, [r0, #8]
+  20:pamSasd.c     ****     tempHandle.value.len = sizeof(SasData);
+ 636              		.loc 1 20 0
+ 637 000a 404B     		ldr	r3, .L49
+ 638 000c 1793     		str	r3, [sp, #92]
+  21:pamSasd.c     ****     CyBle_GattsWriteAttributeValue(&tempHandle, 0, &cyBle_connHandle, 0);
+ 639              		.loc 1 21 0
+ 640 000e 4423     		movs	r3, #68
+ 641 0010 8380     		strh	r3, [r0, #4]
+  22:pamSasd.c     ****     
+ 642              		.loc 1 22 0
+ 643 0012 0023     		movs	r3, #0
+ 644 0014 3E4A     		ldr	r2, .L49+4
+ 645 0016 0021     		movs	r1, #0
+ 646 0018 FFF7FEFF 		bl	CyBle_GattsWriteAttributeValue
+ 647              	.LVL50:
+  24:pamSasd.c     ****     {
+ 648              		.loc 1 24 0
+ 649 001c 3D4B     		ldr	r3, .L49+8
+ 650 001e 1B68     		ldr	r3, [r3]
+ 651 0020 002B     		cmp	r3, #0
+ 652 0022 71D0     		beq	.L40
+ 653              	.LBB2:
+  28:pamSasd.c     ****         DBG_PRINTF("SLEEP ACTIVITY SUMMARY DATA presentdatalength = %i\r\n", presentDataLength);
+ 654              		.loc 1 28 0
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 17
+
+
+ 655 0024 06AD     		add	r5, sp, #24
+ 656 0026 2800     		movs	r0, r5
+ 657 0028 FFF7FEFF 		bl	getPresentSasdFields
+ 658              	.LVL51:
+ 659 002c 0400     		movs	r4, r0
+ 660 002e 0600     		movs	r6, r0
+ 661              	.LVL52:
+  29:pamSasd.c     ****         uint8 N = calculateNumberOfMessages(presentDataLength);
+ 662              		.loc 1 29 0
+ 663 0030 0100     		movs	r1, r0
+ 664 0032 3948     		ldr	r0, .L49+12
+ 665              	.LVL53:
+ 666 0034 FFF7FEFF 		bl	printf
+ 667              	.LVL54:
+  30:pamSasd.c     ****         DBG_PRINTF("SLEEP ACTIVITY SUMMARY DATA N = %i\r\n", N);
+ 668              		.loc 1 30 0
+ 669 0038 2000     		movs	r0, r4
+ 670 003a FFF7FEFF 		bl	__aeabi_ui2d
+ 671              	.LVL55:
+ 672 003e FFF7FEFF 		bl	calculateNumberOfMessages
+ 673              	.LVL56:
+ 674 0042 0100     		movs	r1, r0
+ 675 0044 0700     		movs	r7, r0
+ 676              	.LVL57:
+  31:pamSasd.c     ****         
+ 677              		.loc 1 31 0
+ 678 0046 3548     		ldr	r0, .L49+16
+ 679 0048 FFF7FEFF 		bl	printf
+ 680              	.LVL58:
+  35:pamSasd.c     ****         PresentData[byteCount + 1] = SasData.Flags[1];
+ 681              		.loc 1 35 0
+ 682 004c 2F4C     		ldr	r4, .L49
+ 683 004e 6378     		ldrb	r3, [r4, #1]
+ 684 0050 6B70     		strb	r3, [r5, #1]
+  36:pamSasd.c     ****         PresentData[byteCount + 2] = SasData.Flags[2];
+ 685              		.loc 1 36 0
+ 686 0052 A378     		ldrb	r3, [r4, #2]
+ 687 0054 AB70     		strb	r3, [r5, #2]
+  37:pamSasd.c     ****         byteCount += sizeof(SasData.Flags);
+ 688              		.loc 1 37 0
+ 689 0056 E378     		ldrb	r3, [r4, #3]
+ 690 0058 EB70     		strb	r3, [r5, #3]
+ 691              	.LVL59:
+  40:pamSasd.c     ****         byteCount += sizeof(SasData.SessionID);
+ 692              		.loc 1 40 0
+ 693 005a 2379     		ldrb	r3, [r4, #4]
+ 694 005c 6179     		ldrb	r1, [r4, #5]
+ 695 005e 0902     		lsls	r1, r1, #8
+ 696 0060 1943     		orrs	r1, r3
+ 697 0062 07A8     		add	r0, sp, #28
+ 698 0064 FFF7FEFF 		bl	CyBle_Set16ByPtr
+ 699              	.LVL60:
+  43:pamSasd.c     ****         byteCount += sizeof(SasData.SubSessionID);
+ 700              		.loc 1 43 0
+ 701 0068 A379     		ldrb	r3, [r4, #6]
+ 702 006a E179     		ldrb	r1, [r4, #7]
+ 703 006c 0902     		lsls	r1, r1, #8
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 18
+
+
+ 704 006e 1943     		orrs	r1, r3
+ 705 0070 1E20     		movs	r0, #30
+ 706 0072 6844     		add	r0, r0, sp
+ 707 0074 FFF7FEFF 		bl	CyBle_Set16ByPtr
+ 708              	.LVL61:
+  46:pamSasd.c     ****         byteCount += sizeof(SasData.RelativeTimestamp);
+ 709              		.loc 1 46 0
+ 710 0078 207A     		ldrb	r0, [r4, #8]
+ 711 007a 637A     		ldrb	r3, [r4, #9]
+ 712 007c 1B02     		lsls	r3, r3, #8
+ 713 007e 0343     		orrs	r3, r0
+ 714 0080 1A00     		movs	r2, r3
+ 715 0082 A17A     		ldrb	r1, [r4, #10]
+ 716 0084 0904     		lsls	r1, r1, #16
+ 717 0086 0B00     		movs	r3, r1
+ 718 0088 1343     		orrs	r3, r2
+ 719 008a E17A     		ldrb	r1, [r4, #11]
+ 720 008c 0906     		lsls	r1, r1, #24
+ 721 008e 1943     		orrs	r1, r3
+ 722 0090 08A8     		add	r0, sp, #32
+ 723 0092 FFF7FEFF 		bl	CyBle_Set32ByPtr
+ 724              	.LVL62:
+  49:pamSasd.c     ****         byteCount += sizeof(SasData.SequenceNumber);
+ 725              		.loc 1 49 0
+ 726 0096 207B     		ldrb	r0, [r4, #12]
+ 727 0098 637B     		ldrb	r3, [r4, #13]
+ 728 009a 1B02     		lsls	r3, r3, #8
+ 729 009c 0343     		orrs	r3, r0
+ 730 009e 1A00     		movs	r2, r3
+ 731 00a0 A17B     		ldrb	r1, [r4, #14]
+ 732 00a2 0904     		lsls	r1, r1, #16
+ 733 00a4 0B00     		movs	r3, r1
+ 734 00a6 1343     		orrs	r3, r2
+ 735 00a8 E17B     		ldrb	r1, [r4, #15]
+ 736 00aa 0906     		lsls	r1, r1, #24
+ 737 00ac 1943     		orrs	r1, r3
+ 738 00ae 09A8     		add	r0, sp, #36
+ 739 00b0 FFF7FEFF 		bl	CyBle_Set32ByPtr
+ 740              	.LVL63:
+ 741              	.LBB3:
+  59:pamSasd.c     ****         {
+ 742              		.loc 1 59 0
+ 743 00b4 0024     		movs	r4, #0
+ 744              	.LBE3:
+  56:pamSasd.c     ****         
+ 745              		.loc 1 56 0
+ 746 00b6 0025     		movs	r5, #0
+ 747              	.LVL64:
+ 748              	.LBB5:
+  59:pamSasd.c     ****         {
+ 749              		.loc 1 59 0
+ 750 00b8 24E0     		b	.L42
+ 751              	.LVL65:
+ 752              	.L48:
+  61:pamSasd.c     ****             {
+ 753              		.loc 1 61 0
+ 754 00ba 002C     		cmp	r4, #0
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 19
+
+
+ 755 00bc 05D1     		bne	.L43
+  63:pamSasd.c     ****             }
+ 756              		.loc 1 63 0
+ 757 00be 01AA     		add	r2, sp, #4
+ 758 00c0 3B00     		movs	r3, r7
+ 759 00c2 7F33     		adds	r3, r3, #127
+ 760 00c4 1370     		strb	r3, [r2]
+ 761              	.L45:
+ 762              	.LBE5:
+ 763              	.LBE2:
+  16:pamSasd.c     ****     CYBLE_GATTS_HANDLE_VALUE_NTF_T tempHandle;
+ 764              		.loc 1 16 0 discriminator 1
+ 765 00c6 0122     		movs	r2, #1
+ 766 00c8 13E0     		b	.L44
+ 767              	.L43:
+ 768              	.LBB7:
+ 769              	.LBB6:
+  67:pamSasd.c     ****             }
+ 770              		.loc 1 67 0
+ 771 00ca 3B1B     		subs	r3, r7, r4
+ 772 00cc 013B     		subs	r3, r3, #1
+ 773 00ce 01AA     		add	r2, sp, #4
+ 774 00d0 1370     		strb	r3, [r2]
+ 775 00d2 F8E7     		b	.L45
+ 776              	.LVL66:
+ 777              	.L47:
+ 778              	.LBB4:
+  73:pamSasd.c     ****                 {
+ 779              		.loc 1 73 0
+ 780 00d4 E300     		lsls	r3, r4, #3
+ 781 00d6 1B19     		adds	r3, r3, r4
+ 782 00d8 5B00     		lsls	r3, r3, #1
+ 783 00da 1B19     		adds	r3, r3, r4
+ 784 00dc D318     		adds	r3, r2, r3
+ 785 00de B342     		cmp	r3, r6
+ 786 00e0 05D2     		bcs	.L46
+  75:pamSasd.c     ****                     MessageSize = i + HEADER_SIZE;
+ 787              		.loc 1 75 0
+ 788 00e2 06A9     		add	r1, sp, #24
+ 789              	.LVL67:
+ 790 00e4 C95C     		ldrb	r1, [r1, r3]
+ 791              	.LVL68:
+ 792 00e6 01AB     		add	r3, sp, #4
+ 793 00e8 9954     		strb	r1, [r3, r2]
+  76:pamSasd.c     ****                 }
+ 794              		.loc 1 76 0
+ 795 00ea 551C     		adds	r5, r2, #1
+ 796              	.LVL69:
+ 797 00ec EDB2     		uxtb	r5, r5
+ 798              	.LVL70:
+ 799              	.L46:
+  71:pamSasd.c     ****             {
+ 800              		.loc 1 71 0 discriminator 2
+ 801 00ee 0132     		adds	r2, r2, #1
+ 802              	.LVL71:
+ 803 00f0 D2B2     		uxtb	r2, r2
+ 804              	.LVL72:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 20
+
+
+ 805              	.L44:
+  71:pamSasd.c     ****             {
+ 806              		.loc 1 71 0 is_stmt 0 discriminator 1
+ 807 00f2 132A     		cmp	r2, #19
+ 808 00f4 EED9     		bls	.L47
+ 809              	.LBE4:
+  79:pamSasd.c     ****         }
+ 810              		.loc 1 79 0 is_stmt 1 discriminator 2
+ 811 00f6 AAB2     		uxth	r2, r5
+ 812              	.LVL73:
+ 813 00f8 01A9     		add	r1, sp, #4
+ 814 00fa 2E20     		movs	r0, #46
+ 815 00fc FFF7FEFF 		bl	ble_SendIndication
+ 816              	.LVL74:
+  59:pamSasd.c     ****         {
+ 817              		.loc 1 59 0 discriminator 2
+ 818 0100 0134     		adds	r4, r4, #1
+ 819              	.LVL75:
+ 820 0102 E4B2     		uxtb	r4, r4
+ 821              	.LVL76:
+ 822              	.L42:
+  59:pamSasd.c     ****         {
+ 823              		.loc 1 59 0 is_stmt 0 discriminator 1
+ 824 0104 BC42     		cmp	r4, r7
+ 825 0106 D8D3     		bcc	.L48
+ 826              	.LVL77:
+ 827              	.L40:
+ 828              	.LBE6:
+ 829              	.LBE7:
+  82:pamSasd.c     **** 
+ 830              		.loc 1 82 0 is_stmt 1
+ 831 0108 1BB0     		add	sp, sp, #108
+ 832              		@ sp needed
+ 833 010a F0BD     		pop	{r4, r5, r6, r7, pc}
+ 834              	.L50:
+ 835              		.align	2
+ 836              	.L49:
+ 837 010c 00000000 		.word	SasData
+ 838 0110 00000000 		.word	cyBle_connHandle
+ 839 0114 00000000 		.word	sleepactivitysummarydataIndicate
+ 840 0118 00000000 		.word	.LC5
+ 841 011c 38000000 		.word	.LC7
+ 842              		.cfi_endproc
+ 843              	.LFE36:
+ 844              		.size	UpdateSasd, .-UpdateSasd
+ 845              		.comm	sleepactivitysummarydataIndicate,4,4
+ 846              		.comm	SasData,68,4
+ 847              		.comm	sessionDescriptorIndicate,1,1
+ 848              		.comm	pamFeature,8,8
+ 849              		.comm	send_Deleted_Sessions,1,1
+ 850              		.comm	Get_Ended_Data_Value,1,1
+ 851              		.comm	Get_Ended_Data_Sub_SessionID,2,2
+ 852              		.comm	Get_Ended_Data_SessionID,2,2
+ 853              		.comm	Enquire_Sub_Sessions_Requested_For_ID,2,2
+ 854              		.comm	Enquire_Sessions_Requested,2,2
+ 855              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 856              		.align	2
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 21
+
+
+ 857              	.LC5:
+ 858 0000 534C4545 		.ascii	"SLEEP ACTIVITY SUMMARY DATA presentdatalength = %i\015"
+ 858      50204143 
+ 858      54495649 
+ 858      54592053 
+ 858      554D4D41 
+ 859 0033 0A00     		.ascii	"\012\000"
+ 860 0035 000000   		.space	3
+ 861              	.LC7:
+ 862 0038 534C4545 		.ascii	"SLEEP ACTIVITY SUMMARY DATA N = %i\015\012\000"
+ 862      50204143 
+ 862      54495649 
+ 862      54592053 
+ 862      554D4D41 
+ 863              		.text
+ 864              	.Letext0:
+ 865              		.file 2 "Generated_Source\\PSoC4/cytypes.h"
+ 866              		.file 3 "Generated_Source\\PSoC4/ble_StackGatt.h"
+ 867              		.file 4 "Generated_Source\\PSoC4/ble_StackGattServer.h"
+ 868              		.file 5 "pamSasd.h"
+ 869              		.file 6 "Generated_Source\\PSoC4/ble_eventHandler.h"
+ 870              		.file 7 "pams.h"
+ 871              		.file 8 "pamFeatures.h"
+ 872              		.file 9 "pamSessDescr.h"
+ 873              		.file 10 "Generated_Source\\PSoC4/ble.h"
+ 874              		.file 11 "c:\\program files (x86)\\cypress\\psoc creator\\4.1\\psoc creator\\import\\gnu\\arm\\5.4
+ 875              		.file 12 "Generated_Source\\PSoC4/ble_StackGattDb.h"
+ 876              		.file 13 "Generated_Source\\PSoC4/ble_Stack.h"
+ 877              		.section	.debug_info,"",%progbits
+ 878              	.Ldebug_info0:
+ 879 0000 E4070000 		.4byte	0x7e4
+ 880 0004 0400     		.2byte	0x4
+ 881 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 882 000a 04       		.byte	0x4
+ 883 000b 01       		.uleb128 0x1
+ 884 000c 59010000 		.4byte	.LASF152
+ 885 0010 0C       		.byte	0xc
+ 886 0011 2A0A0000 		.4byte	.LASF153
+ 887 0015 2B030000 		.4byte	.LASF154
+ 888 0019 38000000 		.4byte	.Ldebug_ranges0+0x38
+ 889 001d 00000000 		.4byte	0
+ 890 0021 00000000 		.4byte	.Ldebug_line0
+ 891 0025 02       		.uleb128 0x2
+ 892 0026 01       		.byte	0x1
+ 893 0027 06       		.byte	0x6
+ 894 0028 0C030000 		.4byte	.LASF0
+ 895 002c 02       		.uleb128 0x2
+ 896 002d 01       		.byte	0x1
+ 897 002e 08       		.byte	0x8
+ 898 002f BD0A0000 		.4byte	.LASF1
+ 899 0033 02       		.uleb128 0x2
+ 900 0034 02       		.byte	0x2
+ 901 0035 05       		.byte	0x5
+ 902 0036 F60A0000 		.4byte	.LASF2
+ 903 003a 02       		.uleb128 0x2
+ 904 003b 02       		.byte	0x2
+ 905 003c 07       		.byte	0x7
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 22
+
+
+ 906 003d 63060000 		.4byte	.LASF3
+ 907 0041 02       		.uleb128 0x2
+ 908 0042 04       		.byte	0x4
+ 909 0043 05       		.byte	0x5
+ 910 0044 50010000 		.4byte	.LASF4
+ 911 0048 02       		.uleb128 0x2
+ 912 0049 04       		.byte	0x4
+ 913 004a 07       		.byte	0x7
+ 914 004b BA050000 		.4byte	.LASF5
+ 915 004f 02       		.uleb128 0x2
+ 916 0050 08       		.byte	0x8
+ 917 0051 05       		.byte	0x5
+ 918 0052 FE020000 		.4byte	.LASF6
+ 919 0056 02       		.uleb128 0x2
+ 920 0057 08       		.byte	0x8
+ 921 0058 07       		.byte	0x7
+ 922 0059 EE010000 		.4byte	.LASF7
+ 923 005d 03       		.uleb128 0x3
+ 924 005e 04       		.byte	0x4
+ 925 005f 05       		.byte	0x5
+ 926 0060 696E7400 		.ascii	"int\000"
+ 927 0064 02       		.uleb128 0x2
+ 928 0065 04       		.byte	0x4
+ 929 0066 07       		.byte	0x7
+ 930 0067 4D050000 		.4byte	.LASF8
+ 931 006b 04       		.uleb128 0x4
+ 932 006c 51040000 		.4byte	.LASF9
+ 933 0070 02       		.byte	0x2
+ 934 0071 D201     		.2byte	0x1d2
+ 935 0073 2C000000 		.4byte	0x2c
+ 936 0077 04       		.uleb128 0x4
+ 937 0078 3F000000 		.4byte	.LASF10
+ 938 007c 02       		.byte	0x2
+ 939 007d D301     		.2byte	0x1d3
+ 940 007f 3A000000 		.4byte	0x3a
+ 941 0083 04       		.uleb128 0x4
+ 942 0084 A8040000 		.4byte	.LASF11
+ 943 0088 02       		.byte	0x2
+ 944 0089 D401     		.2byte	0x1d4
+ 945 008b 48000000 		.4byte	0x48
+ 946 008f 02       		.uleb128 0x2
+ 947 0090 04       		.byte	0x4
+ 948 0091 04       		.byte	0x4
+ 949 0092 AC0A0000 		.4byte	.LASF12
+ 950 0096 02       		.uleb128 0x2
+ 951 0097 08       		.byte	0x8
+ 952 0098 04       		.byte	0x4
+ 953 0099 DE0E0000 		.4byte	.LASF13
+ 954 009d 04       		.uleb128 0x4
+ 955 009e EF0A0000 		.4byte	.LASF14
+ 956 00a2 02       		.byte	0x2
+ 957 00a3 DE01     		.2byte	0x1de
+ 958 00a5 56000000 		.4byte	0x56
+ 959 00a9 02       		.uleb128 0x2
+ 960 00aa 01       		.byte	0x1
+ 961 00ab 08       		.byte	0x8
+ 962 00ac 170C0000 		.4byte	.LASF15
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 23
+
+
+ 963 00b0 02       		.uleb128 0x2
+ 964 00b1 08       		.byte	0x8
+ 965 00b2 04       		.byte	0x4
+ 966 00b3 F30B0000 		.4byte	.LASF16
+ 967 00b7 02       		.uleb128 0x2
+ 968 00b8 04       		.byte	0x4
+ 969 00b9 07       		.byte	0x7
+ 970 00ba C1080000 		.4byte	.LASF17
+ 971 00be 05       		.uleb128 0x5
+ 972 00bf 04       		.byte	0x4
+ 973 00c0 A9000000 		.4byte	0xa9
+ 974 00c4 06       		.uleb128 0x6
+ 975 00c5 01       		.byte	0x1
+ 976 00c6 2C000000 		.4byte	0x2c
+ 977 00ca 0D       		.byte	0xd
+ 978 00cb 4D01     		.2byte	0x14d
+ 979 00cd 82020000 		.4byte	0x282
+ 980 00d1 07       		.uleb128 0x7
+ 981 00d2 76060000 		.4byte	.LASF18
+ 982 00d6 00       		.byte	0
+ 983 00d7 07       		.uleb128 0x7
+ 984 00d8 18030000 		.4byte	.LASF19
+ 985 00dc 01       		.byte	0x1
+ 986 00dd 07       		.uleb128 0x7
+ 987 00de 3E010000 		.4byte	.LASF20
+ 988 00e2 02       		.byte	0x2
+ 989 00e3 07       		.uleb128 0x7
+ 990 00e4 BE0C0000 		.4byte	.LASF21
+ 991 00e8 03       		.byte	0x3
+ 992 00e9 07       		.uleb128 0x7
+ 993 00ea 18020000 		.4byte	.LASF22
+ 994 00ee 04       		.byte	0x4
+ 995 00ef 07       		.uleb128 0x7
+ 996 00f0 23000000 		.4byte	.LASF23
+ 997 00f4 05       		.byte	0x5
+ 998 00f5 07       		.uleb128 0x7
+ 999 00f6 AB060000 		.4byte	.LASF24
+ 1000 00fa 06       		.byte	0x6
+ 1001 00fb 07       		.uleb128 0x7
+ 1002 00fc 04080000 		.4byte	.LASF25
+ 1003 0100 20       		.byte	0x20
+ 1004 0101 07       		.uleb128 0x7
+ 1005 0102 D0030000 		.4byte	.LASF26
+ 1006 0106 21       		.byte	0x21
+ 1007 0107 07       		.uleb128 0x7
+ 1008 0108 E3060000 		.4byte	.LASF27
+ 1009 010c 22       		.byte	0x22
+ 1010 010d 07       		.uleb128 0x7
+ 1011 010e 66070000 		.4byte	.LASF28
+ 1012 0112 23       		.byte	0x23
+ 1013 0113 07       		.uleb128 0x7
+ 1014 0114 BA090000 		.4byte	.LASF29
+ 1015 0118 24       		.byte	0x24
+ 1016 0119 07       		.uleb128 0x7
+ 1017 011a 16090000 		.4byte	.LASF30
+ 1018 011e 25       		.byte	0x25
+ 1019 011f 07       		.uleb128 0x7
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 24
+
+
+ 1020 0120 050D0000 		.4byte	.LASF31
+ 1021 0124 26       		.byte	0x26
+ 1022 0125 07       		.uleb128 0x7
+ 1023 0126 07070000 		.4byte	.LASF32
+ 1024 012a 27       		.byte	0x27
+ 1025 012b 07       		.uleb128 0x7
+ 1026 012c 1C0C0000 		.4byte	.LASF33
+ 1027 0130 28       		.byte	0x28
+ 1028 0131 07       		.uleb128 0x7
+ 1029 0132 90020000 		.4byte	.LASF34
+ 1030 0136 29       		.byte	0x29
+ 1031 0137 07       		.uleb128 0x7
+ 1032 0138 5A000000 		.4byte	.LASF35
+ 1033 013c 2A       		.byte	0x2a
+ 1034 013d 07       		.uleb128 0x7
+ 1035 013e A7030000 		.4byte	.LASF36
+ 1036 0142 2B       		.byte	0x2b
+ 1037 0143 07       		.uleb128 0x7
+ 1038 0144 0E0E0000 		.4byte	.LASF37
+ 1039 0148 2C       		.byte	0x2c
+ 1040 0149 07       		.uleb128 0x7
+ 1041 014a C6020000 		.4byte	.LASF38
+ 1042 014e 2D       		.byte	0x2d
+ 1043 014f 07       		.uleb128 0x7
+ 1044 0150 CB0A0000 		.4byte	.LASF39
+ 1045 0154 2E       		.byte	0x2e
+ 1046 0155 07       		.uleb128 0x7
+ 1047 0156 A4000000 		.4byte	.LASF40
+ 1048 015a 2F       		.byte	0x2f
+ 1049 015b 07       		.uleb128 0x7
+ 1050 015c 7C090000 		.4byte	.LASF41
+ 1051 0160 30       		.byte	0x30
+ 1052 0161 07       		.uleb128 0x7
+ 1053 0162 9E0E0000 		.4byte	.LASF42
+ 1054 0166 31       		.byte	0x31
+ 1055 0167 07       		.uleb128 0x7
+ 1056 0168 5B090000 		.4byte	.LASF43
+ 1057 016c 32       		.byte	0x32
+ 1058 016d 07       		.uleb128 0x7
+ 1059 016e AF0B0000 		.4byte	.LASF44
+ 1060 0172 33       		.byte	0x33
+ 1061 0173 07       		.uleb128 0x7
+ 1062 0174 CC050000 		.4byte	.LASF45
+ 1063 0178 34       		.byte	0x34
+ 1064 0179 07       		.uleb128 0x7
+ 1065 017a 9D090000 		.4byte	.LASF46
+ 1066 017e 35       		.byte	0x35
+ 1067 017f 07       		.uleb128 0x7
+ 1068 0180 38070000 		.4byte	.LASF47
+ 1069 0184 36       		.byte	0x36
+ 1070 0185 07       		.uleb128 0x7
+ 1071 0186 430E0000 		.4byte	.LASF48
+ 1072 018a 37       		.byte	0x37
+ 1073 018b 07       		.uleb128 0x7
+ 1074 018c 950B0000 		.4byte	.LASF49
+ 1075 0190 40       		.byte	0x40
+ 1076 0191 07       		.uleb128 0x7
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 25
+
+
+ 1077 0192 8C070000 		.4byte	.LASF50
+ 1078 0196 41       		.byte	0x41
+ 1079 0197 07       		.uleb128 0x7
+ 1080 0198 E50E0000 		.4byte	.LASF51
+ 1081 019c 42       		.byte	0x42
+ 1082 019d 07       		.uleb128 0x7
+ 1083 019e 380D0000 		.4byte	.LASF52
+ 1084 01a2 43       		.byte	0x43
+ 1085 01a3 07       		.uleb128 0x7
+ 1086 01a4 FE050000 		.4byte	.LASF53
+ 1087 01a8 44       		.byte	0x44
+ 1088 01a9 07       		.uleb128 0x7
+ 1089 01aa 850A0000 		.4byte	.LASF54
+ 1090 01ae 45       		.byte	0x45
+ 1091 01af 07       		.uleb128 0x7
+ 1092 01b0 7E080000 		.4byte	.LASF55
+ 1093 01b4 46       		.byte	0x46
+ 1094 01b5 07       		.uleb128 0x7
+ 1095 01b6 8D060000 		.4byte	.LASF56
+ 1096 01ba 47       		.byte	0x47
+ 1097 01bb 07       		.uleb128 0x7
+ 1098 01bc E70D0000 		.4byte	.LASF57
+ 1099 01c0 48       		.byte	0x48
+ 1100 01c1 07       		.uleb128 0x7
+ 1101 01c2 E7030000 		.4byte	.LASF58
+ 1102 01c6 49       		.byte	0x49
+ 1103 01c7 07       		.uleb128 0x7
+ 1104 01c8 840D0000 		.4byte	.LASF59
+ 1105 01cc 4A       		.byte	0x4a
+ 1106 01cd 07       		.uleb128 0x7
+ 1107 01ce E6000000 		.4byte	.LASF60
+ 1108 01d2 4B       		.byte	0x4b
+ 1109 01d3 07       		.uleb128 0x7
+ 1110 01d4 E4050000 		.4byte	.LASF61
+ 1111 01d8 4C       		.byte	0x4c
+ 1112 01d9 07       		.uleb128 0x7
+ 1113 01da 41090000 		.4byte	.LASF62
+ 1114 01de 4D       		.byte	0x4d
+ 1115 01df 07       		.uleb128 0x7
+ 1116 01e0 00040000 		.4byte	.LASF63
+ 1117 01e4 4E       		.byte	0x4e
+ 1118 01e5 07       		.uleb128 0x7
+ 1119 01e6 550B0000 		.4byte	.LASF64
+ 1120 01ea 4F       		.byte	0x4f
+ 1121 01eb 07       		.uleb128 0x7
+ 1122 01ec 05010000 		.4byte	.LASF65
+ 1123 01f0 50       		.byte	0x50
+ 1124 01f1 07       		.uleb128 0x7
+ 1125 01f2 57040000 		.4byte	.LASF66
+ 1126 01f6 51       		.byte	0x51
+ 1127 01f7 07       		.uleb128 0x7
+ 1128 01f8 EA090000 		.4byte	.LASF67
+ 1129 01fc 52       		.byte	0x52
+ 1130 01fd 07       		.uleb128 0x7
+ 1131 01fe 000B0000 		.4byte	.LASF68
+ 1132 0202 53       		.byte	0x53
+ 1133 0203 07       		.uleb128 0x7
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 26
+
+
+ 1134 0204 740B0000 		.4byte	.LASF69
+ 1135 0208 54       		.byte	0x54
+ 1136 0209 07       		.uleb128 0x7
+ 1137 020a 1C060000 		.4byte	.LASF70
+ 1138 020e 55       		.byte	0x55
+ 1139 020f 07       		.uleb128 0x7
+ 1140 0210 2B050000 		.4byte	.LASF71
+ 1141 0214 56       		.byte	0x56
+ 1142 0215 07       		.uleb128 0x7
+ 1143 0216 3E0C0000 		.4byte	.LASF72
+ 1144 021a 57       		.byte	0x57
+ 1145 021b 07       		.uleb128 0x7
+ 1146 021c 40060000 		.4byte	.LASF73
+ 1147 0220 58       		.byte	0x58
+ 1148 0221 07       		.uleb128 0x7
+ 1149 0222 6A020000 		.4byte	.LASF74
+ 1150 0226 70       		.byte	0x70
+ 1151 0227 07       		.uleb128 0x7
+ 1152 0228 780E0000 		.4byte	.LASF75
+ 1153 022c 71       		.byte	0x71
+ 1154 022d 07       		.uleb128 0x7
+ 1155 022e D4070000 		.4byte	.LASF76
+ 1156 0232 72       		.byte	0x72
+ 1157 0233 07       		.uleb128 0x7
+ 1158 0234 60080000 		.4byte	.LASF77
+ 1159 0238 73       		.byte	0x73
+ 1160 0239 07       		.uleb128 0x7
+ 1161 023a 340A0000 		.4byte	.LASF78
+ 1162 023e 74       		.byte	0x74
+ 1163 023f 07       		.uleb128 0x7
+ 1164 0240 87040000 		.4byte	.LASF79
+ 1165 0244 75       		.byte	0x75
+ 1166 0245 07       		.uleb128 0x7
+ 1167 0246 83000000 		.4byte	.LASF80
+ 1168 024a 76       		.byte	0x76
+ 1169 024b 07       		.uleb128 0x7
+ 1170 024c C4060000 		.4byte	.LASF81
+ 1171 0250 77       		.byte	0x77
+ 1172 0251 07       		.uleb128 0x7
+ 1173 0252 00000000 		.4byte	.LASF82
+ 1174 0256 78       		.byte	0x78
+ 1175 0257 07       		.uleb128 0x7
+ 1176 0258 8A0C0000 		.4byte	.LASF83
+ 1177 025c 79       		.byte	0x79
+ 1178 025d 07       		.uleb128 0x7
+ 1179 025e D7040000 		.4byte	.LASF84
+ 1180 0262 7A       		.byte	0x7a
+ 1181 0263 07       		.uleb128 0x7
+ 1182 0264 38020000 		.4byte	.LASF85
+ 1183 0268 FA       		.byte	0xfa
+ 1184 0269 07       		.uleb128 0x7
+ 1185 026a 5A050000 		.4byte	.LASF86
+ 1186 026e FB       		.byte	0xfb
+ 1187 026f 07       		.uleb128 0x7
+ 1188 0270 210B0000 		.4byte	.LASF87
+ 1189 0274 FC       		.byte	0xfc
+ 1190 0275 07       		.uleb128 0x7
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 27
+
+
+ 1191 0276 FF0B0000 		.4byte	.LASF88
+ 1192 027a FD       		.byte	0xfd
+ 1193 027b 07       		.uleb128 0x7
+ 1194 027c AF040000 		.4byte	.LASF89
+ 1195 0280 FF       		.byte	0xff
+ 1196 0281 00       		.byte	0
+ 1197 0282 05       		.uleb128 0x5
+ 1198 0283 04       		.byte	0x4
+ 1199 0284 6B000000 		.4byte	0x6b
+ 1200 0288 04       		.uleb128 0x4
+ 1201 0289 C20E0000 		.4byte	.LASF90
+ 1202 028d 03       		.byte	0x3
+ 1203 028e 8901     		.2byte	0x189
+ 1204 0290 77000000 		.4byte	0x77
+ 1205 0294 08       		.uleb128 0x8
+ 1206 0295 02       		.byte	0x2
+ 1207 0296 03       		.byte	0x3
+ 1208 0297 9301     		.2byte	0x193
+ 1209 0299 B8020000 		.4byte	0x2b8
+ 1210 029d 09       		.uleb128 0x9
+ 1211 029e 320E0000 		.4byte	.LASF91
+ 1212 02a2 03       		.byte	0x3
+ 1213 02a3 9A01     		.2byte	0x19a
+ 1214 02a5 6B000000 		.4byte	0x6b
+ 1215 02a9 00       		.byte	0
+ 1216 02aa 09       		.uleb128 0x9
+ 1217 02ab 28080000 		.4byte	.LASF92
+ 1218 02af 03       		.byte	0x3
+ 1219 02b0 A001     		.2byte	0x1a0
+ 1220 02b2 6B000000 		.4byte	0x6b
+ 1221 02b6 01       		.byte	0x1
+ 1222 02b7 00       		.byte	0
+ 1223 02b8 04       		.uleb128 0x4
+ 1224 02b9 46000000 		.4byte	.LASF93
+ 1225 02bd 03       		.byte	0x3
+ 1226 02be A201     		.2byte	0x1a2
+ 1227 02c0 94020000 		.4byte	0x294
+ 1228 02c4 08       		.uleb128 0x8
+ 1229 02c5 08       		.byte	0x8
+ 1230 02c6 03       		.byte	0x3
+ 1231 02c7 BE01     		.2byte	0x1be
+ 1232 02c9 F5020000 		.4byte	0x2f5
+ 1233 02cd 0A       		.uleb128 0xa
+ 1234 02ce 76616C00 		.ascii	"val\000"
+ 1235 02d2 03       		.byte	0x3
+ 1236 02d3 C101     		.2byte	0x1c1
+ 1237 02d5 82020000 		.4byte	0x282
+ 1238 02d9 00       		.byte	0
+ 1239 02da 0A       		.uleb128 0xa
+ 1240 02db 6C656E00 		.ascii	"len\000"
+ 1241 02df 03       		.byte	0x3
+ 1242 02e0 C401     		.2byte	0x1c4
+ 1243 02e2 77000000 		.4byte	0x77
+ 1244 02e6 04       		.byte	0x4
+ 1245 02e7 09       		.uleb128 0x9
+ 1246 02e8 C6030000 		.4byte	.LASF94
+ 1247 02ec 03       		.byte	0x3
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 28
+
+
+ 1248 02ed CB01     		.2byte	0x1cb
+ 1249 02ef 77000000 		.4byte	0x77
+ 1250 02f3 06       		.byte	0x6
+ 1251 02f4 00       		.byte	0
+ 1252 02f5 04       		.uleb128 0x4
+ 1253 02f6 05020000 		.4byte	.LASF95
+ 1254 02fa 03       		.byte	0x3
+ 1255 02fb CD01     		.2byte	0x1cd
+ 1256 02fd C4020000 		.4byte	0x2c4
+ 1257 0301 08       		.uleb128 0x8
+ 1258 0302 0C       		.byte	0xc
+ 1259 0303 03       		.byte	0x3
+ 1260 0304 D001     		.2byte	0x1d0
+ 1261 0306 25030000 		.4byte	0x325
+ 1262 030a 09       		.uleb128 0x9
+ 1263 030b 06050000 		.4byte	.LASF96
+ 1264 030f 03       		.byte	0x3
+ 1265 0310 D301     		.2byte	0x1d3
+ 1266 0312 F5020000 		.4byte	0x2f5
+ 1267 0316 00       		.byte	0
+ 1268 0317 09       		.uleb128 0x9
+ 1269 0318 FB040000 		.4byte	.LASF97
+ 1270 031c 03       		.byte	0x3
+ 1271 031d D601     		.2byte	0x1d6
+ 1272 031f 88020000 		.4byte	0x288
+ 1273 0323 08       		.byte	0x8
+ 1274 0324 00       		.byte	0
+ 1275 0325 04       		.uleb128 0x4
+ 1276 0326 0B0A0000 		.4byte	.LASF98
+ 1277 032a 03       		.byte	0x3
+ 1278 032b D801     		.2byte	0x1d8
+ 1279 032d 01030000 		.4byte	0x301
+ 1280 0331 0B       		.uleb128 0xb
+ 1281 0332 DD080000 		.4byte	.LASF99
+ 1282 0336 04       		.byte	0x4
+ 1283 0337 34       		.byte	0x34
+ 1284 0338 25030000 		.4byte	0x325
+ 1285 033c 0C       		.uleb128 0xc
+ 1286 033d 44       		.byte	0x44
+ 1287 033e 05       		.byte	0x5
+ 1288 033f 1B       		.byte	0x1b
+ 1289 0340 7D040000 		.4byte	0x47d
+ 1290 0344 0D       		.uleb128 0xd
+ 1291 0345 24010000 		.4byte	.LASF100
+ 1292 0349 05       		.byte	0x5
+ 1293 034a 1D       		.byte	0x1d
+ 1294 034b 6B000000 		.4byte	0x6b
+ 1295 034f 00       		.byte	0
+ 1296 0350 0D       		.uleb128 0xd
+ 1297 0351 840C0000 		.4byte	.LASF101
+ 1298 0355 05       		.byte	0x5
+ 1299 0356 1E       		.byte	0x1e
+ 1300 0357 7D040000 		.4byte	0x47d
+ 1301 035b 01       		.byte	0x1
+ 1302 035c 0D       		.uleb128 0xd
+ 1303 035d B7080000 		.4byte	.LASF102
+ 1304 0361 05       		.byte	0x5
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 29
+
+
+ 1305 0362 1F       		.byte	0x1f
+ 1306 0363 77000000 		.4byte	0x77
+ 1307 0367 04       		.byte	0x4
+ 1308 0368 0D       		.uleb128 0xd
+ 1309 0369 3E0B0000 		.4byte	.LASF103
+ 1310 036d 05       		.byte	0x5
+ 1311 036e 20       		.byte	0x20
+ 1312 036f 77000000 		.4byte	0x77
+ 1313 0373 06       		.byte	0x6
+ 1314 0374 0D       		.uleb128 0xd
+ 1315 0375 3F040000 		.4byte	.LASF104
+ 1316 0379 05       		.byte	0x5
+ 1317 037a 21       		.byte	0x21
+ 1318 037b 83000000 		.4byte	0x83
+ 1319 037f 08       		.byte	0x8
+ 1320 0380 0D       		.uleb128 0xd
+ 1321 0381 EF020000 		.4byte	.LASF105
+ 1322 0385 05       		.byte	0x5
+ 1323 0386 22       		.byte	0x22
+ 1324 0387 83000000 		.4byte	0x83
+ 1325 038b 0C       		.byte	0xc
+ 1326 038c 0D       		.uleb128 0xd
+ 1327 038d 750D0000 		.4byte	.LASF106
+ 1328 0391 05       		.byte	0x5
+ 1329 0392 23       		.byte	0x23
+ 1330 0393 7D040000 		.4byte	0x47d
+ 1331 0397 10       		.byte	0x10
+ 1332 0398 0D       		.uleb128 0xd
+ 1333 0399 D70C0000 		.4byte	.LASF107
+ 1334 039d 05       		.byte	0x5
+ 1335 039e 24       		.byte	0x24
+ 1336 039f 7D040000 		.4byte	0x47d
+ 1337 03a3 13       		.byte	0x13
+ 1338 03a4 0D       		.uleb128 0xd
+ 1339 03a5 030F0000 		.4byte	.LASF108
+ 1340 03a9 05       		.byte	0x5
+ 1341 03aa 25       		.byte	0x25
+ 1342 03ab 7D040000 		.4byte	0x47d
+ 1343 03af 16       		.byte	0x16
+ 1344 03b0 0D       		.uleb128 0xd
+ 1345 03b1 2B010000 		.4byte	.LASF109
+ 1346 03b5 05       		.byte	0x5
+ 1347 03b6 26       		.byte	0x26
+ 1348 03b7 77000000 		.4byte	0x77
+ 1349 03bb 19       		.byte	0x19
+ 1350 03bc 0D       		.uleb128 0xd
+ 1351 03bd 520A0000 		.4byte	.LASF110
+ 1352 03c1 05       		.byte	0x5
+ 1353 03c2 27       		.byte	0x27
+ 1354 03c3 77000000 		.4byte	0x77
+ 1355 03c7 1B       		.byte	0x1b
+ 1356 03c8 0D       		.uleb128 0xd
+ 1357 03c9 BC0D0000 		.4byte	.LASF111
+ 1358 03cd 05       		.byte	0x5
+ 1359 03ce 28       		.byte	0x28
+ 1360 03cf 6B000000 		.4byte	0x6b
+ 1361 03d3 1D       		.byte	0x1d
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 30
+
+
+ 1362 03d4 0D       		.uleb128 0xd
+ 1363 03d5 2D0D0000 		.4byte	.LASF112
+ 1364 03d9 05       		.byte	0x5
+ 1365 03da 29       		.byte	0x29
+ 1366 03db 77000000 		.4byte	0x77
+ 1367 03df 1E       		.byte	0x1e
+ 1368 03e0 0D       		.uleb128 0xd
+ 1369 03e1 9F080000 		.4byte	.LASF113
+ 1370 03e5 05       		.byte	0x5
+ 1371 03e6 2A       		.byte	0x2a
+ 1372 03e7 77000000 		.4byte	0x77
+ 1373 03eb 20       		.byte	0x20
+ 1374 03ec 0D       		.uleb128 0xd
+ 1375 03ed BD040000 		.4byte	.LASF114
+ 1376 03f1 05       		.byte	0x5
+ 1377 03f2 2B       		.byte	0x2b
+ 1378 03f3 7D040000 		.4byte	0x47d
+ 1379 03f7 22       		.byte	0x22
+ 1380 03f8 0D       		.uleb128 0xd
+ 1381 03f9 A1050000 		.4byte	.LASF115
+ 1382 03fd 05       		.byte	0x5
+ 1383 03fe 2C       		.byte	0x2c
+ 1384 03ff 7D040000 		.4byte	0x47d
+ 1385 0403 25       		.byte	0x25
+ 1386 0404 0D       		.uleb128 0xd
+ 1387 0405 EC0C0000 		.4byte	.LASF116
+ 1388 0409 05       		.byte	0x5
+ 1389 040a 2D       		.byte	0x2d
+ 1390 040b 7D040000 		.4byte	0x47d
+ 1391 040f 28       		.byte	0x28
+ 1392 0410 0D       		.uleb128 0xd
+ 1393 0411 AD020000 		.4byte	.LASF117
+ 1394 0415 05       		.byte	0x5
+ 1395 0416 2E       		.byte	0x2e
+ 1396 0417 7D040000 		.4byte	0x47d
+ 1397 041b 2B       		.byte	0x2b
+ 1398 041c 0D       		.uleb128 0xd
+ 1399 041d 79050000 		.4byte	.LASF118
+ 1400 0421 05       		.byte	0x5
+ 1401 0422 2F       		.byte	0x2f
+ 1402 0423 7D040000 		.4byte	0x47d
+ 1403 0427 2E       		.byte	0x2e
+ 1404 0428 0D       		.uleb128 0xd
+ 1405 0429 8D050000 		.4byte	.LASF119
+ 1406 042d 05       		.byte	0x5
+ 1407 042e 30       		.byte	0x30
+ 1408 042f 7D040000 		.4byte	0x47d
+ 1409 0433 31       		.byte	0x31
+ 1410 0434 0D       		.uleb128 0xd
+ 1411 0435 56020000 		.4byte	.LASF120
+ 1412 0439 05       		.byte	0x5
+ 1413 043a 31       		.byte	0x31
+ 1414 043b 7D040000 		.4byte	0x47d
+ 1415 043f 34       		.byte	0x34
+ 1416 0440 0D       		.uleb128 0xd
+ 1417 0441 A7070000 		.4byte	.LASF121
+ 1418 0445 05       		.byte	0x5
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 31
+
+
+ 1419 0446 32       		.byte	0x32
+ 1420 0447 7D040000 		.4byte	0x47d
+ 1421 044b 37       		.byte	0x37
+ 1422 044c 0D       		.uleb128 0xd
+ 1423 044d F0070000 		.4byte	.LASF122
+ 1424 0451 05       		.byte	0x5
+ 1425 0452 33       		.byte	0x33
+ 1426 0453 7D040000 		.4byte	0x47d
+ 1427 0457 3A       		.byte	0x3a
+ 1428 0458 0D       		.uleb128 0xd
+ 1429 0459 D6090000 		.4byte	.LASF123
+ 1430 045d 05       		.byte	0x5
+ 1431 045e 34       		.byte	0x34
+ 1432 045f 7D040000 		.4byte	0x47d
+ 1433 0463 3D       		.byte	0x3d
+ 1434 0464 0D       		.uleb128 0xd
+ 1435 0465 BB070000 		.4byte	.LASF124
+ 1436 0469 05       		.byte	0x5
+ 1437 046a 35       		.byte	0x35
+ 1438 046b 6B000000 		.4byte	0x6b
+ 1439 046f 40       		.byte	0x40
+ 1440 0470 0D       		.uleb128 0xd
+ 1441 0471 59070000 		.4byte	.LASF125
+ 1442 0475 05       		.byte	0x5
+ 1443 0476 36       		.byte	0x36
+ 1444 0477 7D040000 		.4byte	0x47d
+ 1445 047b 41       		.byte	0x41
+ 1446 047c 00       		.byte	0
+ 1447 047d 0E       		.uleb128 0xe
+ 1448 047e 6B000000 		.4byte	0x6b
+ 1449 0482 8D040000 		.4byte	0x48d
+ 1450 0486 0F       		.uleb128 0xf
+ 1451 0487 B7000000 		.4byte	0xb7
+ 1452 048b 02       		.byte	0x2
+ 1453 048c 00       		.byte	0
+ 1454 048d 0B       		.uleb128 0xb
+ 1455 048e 76040000 		.4byte	.LASF126
+ 1456 0492 05       		.byte	0x5
+ 1457 0493 38       		.byte	0x38
+ 1458 0494 3C030000 		.4byte	0x33c
+ 1459 0498 10       		.uleb128 0x10
+ 1460 0499 4B080000 		.4byte	.LASF155
+ 1461 049d 01       		.byte	0x1
+ 1462 049e 55       		.byte	0x55
+ 1463 049f 6B000000 		.4byte	0x6b
+ 1464 04a3 00000000 		.4byte	.LFB37
+ 1465 04a7 04030000 		.4byte	.LFE37-.LFB37
+ 1466 04ab 01       		.uleb128 0x1
+ 1467 04ac 9C       		.byte	0x9c
+ 1468 04ad 28050000 		.4byte	0x528
+ 1469 04b1 11       		.uleb128 0x11
+ 1470 04b2 E70B0000 		.4byte	.LASF129
+ 1471 04b6 01       		.byte	0x1
+ 1472 04b7 55       		.byte	0x55
+ 1473 04b8 82020000 		.4byte	0x282
+ 1474 04bc 00000000 		.4byte	.LLST0
+ 1475 04c0 12       		.uleb128 0x12
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 32
+
+
+ 1476 04c1 E50C0000 		.4byte	.LASF127
+ 1477 04c5 01       		.byte	0x1
+ 1478 04c6 57       		.byte	0x57
+ 1479 04c7 6B000000 		.4byte	0x6b
+ 1480 04cb 2C000000 		.4byte	.LLST1
+ 1481 04cf 13       		.uleb128 0x13
+ 1482 04d0 98000000 		.4byte	.LVL10
+ 1483 04d4 A3070000 		.4byte	0x7a3
+ 1484 04d8 E6040000 		.4byte	0x4e6
+ 1485 04dc 14       		.uleb128 0x14
+ 1486 04dd 01       		.uleb128 0x1
+ 1487 04de 50       		.byte	0x50
+ 1488 04df 05       		.uleb128 0x5
+ 1489 04e0 75       		.byte	0x75
+ 1490 04e1 00       		.sleb128 0
+ 1491 04e2 74       		.byte	0x74
+ 1492 04e3 00       		.sleb128 0
+ 1493 04e4 22       		.byte	0x22
+ 1494 04e5 00       		.byte	0
+ 1495 04e6 13       		.uleb128 0x13
+ 1496 04e7 BC000000 		.4byte	.LVL13
+ 1497 04eb A3070000 		.4byte	0x7a3
+ 1498 04ef FD040000 		.4byte	0x4fd
+ 1499 04f3 14       		.uleb128 0x14
+ 1500 04f4 01       		.uleb128 0x1
+ 1501 04f5 50       		.byte	0x50
+ 1502 04f6 05       		.uleb128 0x5
+ 1503 04f7 75       		.byte	0x75
+ 1504 04f8 00       		.sleb128 0
+ 1505 04f9 74       		.byte	0x74
+ 1506 04fa 00       		.sleb128 0
+ 1507 04fb 22       		.byte	0x22
+ 1508 04fc 00       		.byte	0
+ 1509 04fd 13       		.uleb128 0x13
+ 1510 04fe FA000000 		.4byte	.LVL18
+ 1511 0502 A3070000 		.4byte	0x7a3
+ 1512 0506 14050000 		.4byte	0x514
+ 1513 050a 14       		.uleb128 0x14
+ 1514 050b 01       		.uleb128 0x1
+ 1515 050c 50       		.byte	0x50
+ 1516 050d 05       		.uleb128 0x5
+ 1517 050e 75       		.byte	0x75
+ 1518 050f 00       		.sleb128 0
+ 1519 0510 74       		.byte	0x74
+ 1520 0511 00       		.sleb128 0
+ 1521 0512 22       		.byte	0x22
+ 1522 0513 00       		.byte	0
+ 1523 0514 15       		.uleb128 0x15
+ 1524 0515 22010000 		.4byte	.LVL21
+ 1525 0519 A3070000 		.4byte	0x7a3
+ 1526 051d 14       		.uleb128 0x14
+ 1527 051e 01       		.uleb128 0x1
+ 1528 051f 50       		.byte	0x50
+ 1529 0520 05       		.uleb128 0x5
+ 1530 0521 75       		.byte	0x75
+ 1531 0522 00       		.sleb128 0
+ 1532 0523 74       		.byte	0x74
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 33
+
+
+ 1533 0524 00       		.sleb128 0
+ 1534 0525 22       		.byte	0x22
+ 1535 0526 00       		.byte	0
+ 1536 0527 00       		.byte	0
+ 1537 0528 16       		.uleb128 0x16
+ 1538 0529 330B0000 		.4byte	.LASF156
+ 1539 052d 01       		.byte	0x1
+ 1540 052e 0F       		.byte	0xf
+ 1541 052f 00000000 		.4byte	.LFB36
+ 1542 0533 20010000 		.4byte	.LFE36-.LFB36
+ 1543 0537 01       		.uleb128 0x1
+ 1544 0538 9C       		.byte	0x9c
+ 1545 0539 CD060000 		.4byte	0x6cd
+ 1546 053d 17       		.uleb128 0x17
+ 1547 053e B20A0000 		.4byte	.LASF128
+ 1548 0542 01       		.byte	0x1
+ 1549 0543 11       		.byte	0x11
+ 1550 0544 31030000 		.4byte	0x331
+ 1551 0548 02       		.uleb128 0x2
+ 1552 0549 91       		.byte	0x91
+ 1553 054a 5C       		.sleb128 -36
+ 1554 054b 18       		.uleb128 0x18
+ 1555 054c 00000000 		.4byte	.Ldebug_ranges0+0
+ 1556 0550 B2060000 		.4byte	0x6b2
+ 1557 0554 17       		.uleb128 0x17
+ 1558 0555 E70B0000 		.4byte	.LASF129
+ 1559 0559 01       		.byte	0x1
+ 1560 055a 1A       		.byte	0x1a
+ 1561 055b CD060000 		.4byte	0x6cd
+ 1562 055f 03       		.uleb128 0x3
+ 1563 0560 91       		.byte	0x91
+ 1564 0561 987F     		.sleb128 -104
+ 1565 0563 12       		.uleb128 0x12
+ 1566 0564 26070000 		.4byte	.LASF130
+ 1567 0568 01       		.byte	0x1
+ 1568 0569 1C       		.byte	0x1c
+ 1569 056a 6B000000 		.4byte	0x6b
+ 1570 056e 34010000 		.4byte	.LLST2
+ 1571 0572 19       		.uleb128 0x19
+ 1572 0573 4E00     		.ascii	"N\000"
+ 1573 0575 01       		.byte	0x1
+ 1574 0576 1E       		.byte	0x1e
+ 1575 0577 6B000000 		.4byte	0x6b
+ 1576 057b 47010000 		.4byte	.LLST3
+ 1577 057f 12       		.uleb128 0x12
+ 1578 0580 4B0B0000 		.4byte	.LASF131
+ 1579 0584 01       		.byte	0x1
+ 1580 0585 21       		.byte	0x21
+ 1581 0586 6B000000 		.4byte	0x6b
+ 1582 058a 5A010000 		.4byte	.LLST4
+ 1583 058e 12       		.uleb128 0x12
+ 1584 058f CA080000 		.4byte	.LASF132
+ 1585 0593 01       		.byte	0x1
+ 1586 0594 35       		.byte	0x35
+ 1587 0595 BE000000 		.4byte	0xbe
+ 1588 0599 AA010000 		.4byte	.LLST5
+ 1589 059d 17       		.uleb128 0x17
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 34
+
+
+ 1590 059e 670C0000 		.4byte	.LASF133
+ 1591 05a2 01       		.byte	0x1
+ 1592 05a3 37       		.byte	0x37
+ 1593 05a4 DD060000 		.4byte	0x6dd
+ 1594 05a8 03       		.uleb128 0x3
+ 1595 05a9 91       		.byte	0x91
+ 1596 05aa 847F     		.sleb128 -124
+ 1597 05ac 12       		.uleb128 0x12
+ 1598 05ad 560D0000 		.4byte	.LASF134
+ 1599 05b1 01       		.byte	0x1
+ 1600 05b2 38       		.byte	0x38
+ 1601 05b3 6B000000 		.4byte	0x6b
+ 1602 05b7 E4010000 		.4byte	.LLST6
+ 1603 05bb 18       		.uleb128 0x18
+ 1604 05bc 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 1605 05c0 0A060000 		.4byte	0x60a
+ 1606 05c4 19       		.uleb128 0x19
+ 1607 05c5 7800     		.ascii	"x\000"
+ 1608 05c7 01       		.byte	0x1
+ 1609 05c8 3B       		.byte	0x3b
+ 1610 05c9 6B000000 		.4byte	0x6b
+ 1611 05cd 0E020000 		.4byte	.LLST7
+ 1612 05d1 1A       		.uleb128 0x1a
+ 1613 05d2 D4000000 		.4byte	.LBB4
+ 1614 05d6 22000000 		.4byte	.LBE4-.LBB4
+ 1615 05da EC050000 		.4byte	0x5ec
+ 1616 05de 19       		.uleb128 0x19
+ 1617 05df 6900     		.ascii	"i\000"
+ 1618 05e1 01       		.byte	0x1
+ 1619 05e2 47       		.byte	0x47
+ 1620 05e3 6B000000 		.4byte	0x6b
+ 1621 05e7 38020000 		.4byte	.LLST8
+ 1622 05eb 00       		.byte	0
+ 1623 05ec 15       		.uleb128 0x15
+ 1624 05ed 00010000 		.4byte	.LVL74
+ 1625 05f1 AF070000 		.4byte	0x7af
+ 1626 05f5 14       		.uleb128 0x14
+ 1627 05f6 01       		.uleb128 0x1
+ 1628 05f7 50       		.byte	0x50
+ 1629 05f8 02       		.uleb128 0x2
+ 1630 05f9 08       		.byte	0x8
+ 1631 05fa 2E       		.byte	0x2e
+ 1632 05fb 14       		.uleb128 0x14
+ 1633 05fc 01       		.uleb128 0x1
+ 1634 05fd 51       		.byte	0x51
+ 1635 05fe 03       		.uleb128 0x3
+ 1636 05ff 91       		.byte	0x91
+ 1637 0600 847F     		.sleb128 -124
+ 1638 0602 14       		.uleb128 0x14
+ 1639 0603 01       		.uleb128 0x1
+ 1640 0604 52       		.byte	0x52
+ 1641 0605 02       		.uleb128 0x2
+ 1642 0606 75       		.byte	0x75
+ 1643 0607 00       		.sleb128 0
+ 1644 0608 00       		.byte	0
+ 1645 0609 00       		.byte	0
+ 1646 060a 13       		.uleb128 0x13
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 35
+
+
+ 1647 060b 2C000000 		.4byte	.LVL51
+ 1648 060f 98040000 		.4byte	0x498
+ 1649 0613 1E060000 		.4byte	0x61e
+ 1650 0617 14       		.uleb128 0x14
+ 1651 0618 01       		.uleb128 0x1
+ 1652 0619 50       		.byte	0x50
+ 1653 061a 02       		.uleb128 0x2
+ 1654 061b 75       		.byte	0x75
+ 1655 061c 00       		.sleb128 0
+ 1656 061d 00       		.byte	0
+ 1657 061e 13       		.uleb128 0x13
+ 1658 061f 38000000 		.4byte	.LVL54
+ 1659 0623 BA070000 		.4byte	0x7ba
+ 1660 0627 3B060000 		.4byte	0x63b
+ 1661 062b 14       		.uleb128 0x14
+ 1662 062c 01       		.uleb128 0x1
+ 1663 062d 50       		.byte	0x50
+ 1664 062e 05       		.uleb128 0x5
+ 1665 062f 03       		.byte	0x3
+ 1666 0630 00000000 		.4byte	.LC5
+ 1667 0634 14       		.uleb128 0x14
+ 1668 0635 01       		.uleb128 0x1
+ 1669 0636 51       		.byte	0x51
+ 1670 0637 02       		.uleb128 0x2
+ 1671 0638 74       		.byte	0x74
+ 1672 0639 00       		.sleb128 0
+ 1673 063a 00       		.byte	0
+ 1674 063b 1B       		.uleb128 0x1b
+ 1675 063c 42000000 		.4byte	.LVL56
+ 1676 0640 C5070000 		.4byte	0x7c5
+ 1677 0644 13       		.uleb128 0x13
+ 1678 0645 4C000000 		.4byte	.LVL58
+ 1679 0649 BA070000 		.4byte	0x7ba
+ 1680 064d 61060000 		.4byte	0x661
+ 1681 0651 14       		.uleb128 0x14
+ 1682 0652 01       		.uleb128 0x1
+ 1683 0653 50       		.byte	0x50
+ 1684 0654 05       		.uleb128 0x5
+ 1685 0655 03       		.byte	0x3
+ 1686 0656 38000000 		.4byte	.LC7
+ 1687 065a 14       		.uleb128 0x14
+ 1688 065b 01       		.uleb128 0x1
+ 1689 065c 51       		.byte	0x51
+ 1690 065d 02       		.uleb128 0x2
+ 1691 065e 77       		.byte	0x77
+ 1692 065f 00       		.sleb128 0
+ 1693 0660 00       		.byte	0
+ 1694 0661 13       		.uleb128 0x13
+ 1695 0662 68000000 		.4byte	.LVL60
+ 1696 0666 A3070000 		.4byte	0x7a3
+ 1697 066a 76060000 		.4byte	0x676
+ 1698 066e 14       		.uleb128 0x14
+ 1699 066f 01       		.uleb128 0x1
+ 1700 0670 50       		.byte	0x50
+ 1701 0671 03       		.uleb128 0x3
+ 1702 0672 91       		.byte	0x91
+ 1703 0673 9C7F     		.sleb128 -100
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 36
+
+
+ 1704 0675 00       		.byte	0
+ 1705 0676 13       		.uleb128 0x13
+ 1706 0677 78000000 		.4byte	.LVL61
+ 1707 067b A3070000 		.4byte	0x7a3
+ 1708 067f 8B060000 		.4byte	0x68b
+ 1709 0683 14       		.uleb128 0x14
+ 1710 0684 01       		.uleb128 0x1
+ 1711 0685 50       		.byte	0x50
+ 1712 0686 03       		.uleb128 0x3
+ 1713 0687 91       		.byte	0x91
+ 1714 0688 9E7F     		.sleb128 -98
+ 1715 068a 00       		.byte	0
+ 1716 068b 13       		.uleb128 0x13
+ 1717 068c 96000000 		.4byte	.LVL62
+ 1718 0690 D0070000 		.4byte	0x7d0
+ 1719 0694 A0060000 		.4byte	0x6a0
+ 1720 0698 14       		.uleb128 0x14
+ 1721 0699 01       		.uleb128 0x1
+ 1722 069a 50       		.byte	0x50
+ 1723 069b 03       		.uleb128 0x3
+ 1724 069c 91       		.byte	0x91
+ 1725 069d A07F     		.sleb128 -96
+ 1726 069f 00       		.byte	0
+ 1727 06a0 15       		.uleb128 0x15
+ 1728 06a1 B4000000 		.4byte	.LVL63
+ 1729 06a5 D0070000 		.4byte	0x7d0
+ 1730 06a9 14       		.uleb128 0x14
+ 1731 06aa 01       		.uleb128 0x1
+ 1732 06ab 50       		.byte	0x50
+ 1733 06ac 03       		.uleb128 0x3
+ 1734 06ad 91       		.byte	0x91
+ 1735 06ae A47F     		.sleb128 -92
+ 1736 06b0 00       		.byte	0
+ 1737 06b1 00       		.byte	0
+ 1738 06b2 15       		.uleb128 0x15
+ 1739 06b3 1C000000 		.4byte	.LVL50
+ 1740 06b7 DB070000 		.4byte	0x7db
+ 1741 06bb 14       		.uleb128 0x14
+ 1742 06bc 01       		.uleb128 0x1
+ 1743 06bd 50       		.byte	0x50
+ 1744 06be 02       		.uleb128 0x2
+ 1745 06bf 91       		.byte	0x91
+ 1746 06c0 5C       		.sleb128 -36
+ 1747 06c1 14       		.uleb128 0x14
+ 1748 06c2 01       		.uleb128 0x1
+ 1749 06c3 51       		.byte	0x51
+ 1750 06c4 01       		.uleb128 0x1
+ 1751 06c5 30       		.byte	0x30
+ 1752 06c6 14       		.uleb128 0x14
+ 1753 06c7 01       		.uleb128 0x1
+ 1754 06c8 53       		.byte	0x53
+ 1755 06c9 01       		.uleb128 0x1
+ 1756 06ca 30       		.byte	0x30
+ 1757 06cb 00       		.byte	0
+ 1758 06cc 00       		.byte	0
+ 1759 06cd 0E       		.uleb128 0xe
+ 1760 06ce 6B000000 		.4byte	0x6b
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 37
+
+
+ 1761 06d2 DD060000 		.4byte	0x6dd
+ 1762 06d6 0F       		.uleb128 0xf
+ 1763 06d7 B7000000 		.4byte	0xb7
+ 1764 06db 43       		.byte	0x43
+ 1765 06dc 00       		.byte	0
+ 1766 06dd 0E       		.uleb128 0xe
+ 1767 06de 6B000000 		.4byte	0x6b
+ 1768 06e2 ED060000 		.4byte	0x6ed
+ 1769 06e6 0F       		.uleb128 0xf
+ 1770 06e7 B7000000 		.4byte	0xb7
+ 1771 06eb 13       		.byte	0x13
+ 1772 06ec 00       		.byte	0
+ 1773 06ed 1C       		.uleb128 0x1c
+ 1774 06ee 30090000 		.4byte	.LASF135
+ 1775 06f2 06       		.byte	0x6
+ 1776 06f3 AA0A     		.2byte	0xaaa
+ 1777 06f5 B8020000 		.4byte	0x2b8
+ 1778 06f9 1D       		.uleb128 0x1d
+ 1779 06fa CC0D0000 		.4byte	.LASF136
+ 1780 06fe 07       		.byte	0x7
+ 1781 06ff 36       		.byte	0x36
+ 1782 0700 77000000 		.4byte	0x77
+ 1783 0704 05       		.uleb128 0x5
+ 1784 0705 03       		.byte	0x3
+ 1785 0706 00000000 		.4byte	Enquire_Sessions_Requested
+ 1786 070a 1D       		.uleb128 0x1d
+ 1787 070b 5F0A0000 		.4byte	.LASF137
+ 1788 070f 07       		.byte	0x7
+ 1789 0710 37       		.byte	0x37
+ 1790 0711 77000000 		.4byte	0x77
+ 1791 0715 05       		.uleb128 0x5
+ 1792 0716 03       		.byte	0x3
+ 1793 0717 00000000 		.4byte	Enquire_Sub_Sessions_Requested_For_ID
+ 1794 071b 1D       		.uleb128 0x1d
+ 1795 071c CD000000 		.4byte	.LASF138
+ 1796 0720 07       		.byte	0x7
+ 1797 0721 38       		.byte	0x38
+ 1798 0722 77000000 		.4byte	0x77
+ 1799 0726 05       		.uleb128 0x5
+ 1800 0727 03       		.byte	0x3
+ 1801 0728 00000000 		.4byte	Get_Ended_Data_SessionID
+ 1802 072c 1D       		.uleb128 0x1d
+ 1803 072d 2E080000 		.4byte	.LASF139
+ 1804 0731 07       		.byte	0x7
+ 1805 0732 39       		.byte	0x39
+ 1806 0733 77000000 		.4byte	0x77
+ 1807 0737 05       		.uleb128 0x5
+ 1808 0738 03       		.byte	0x3
+ 1809 0739 00000000 		.4byte	Get_Ended_Data_Sub_SessionID
+ 1810 073d 1D       		.uleb128 0x1d
+ 1811 073e 6F0C0000 		.4byte	.LASF140
+ 1812 0742 07       		.byte	0x7
+ 1813 0743 3A       		.byte	0x3a
+ 1814 0744 6B000000 		.4byte	0x6b
+ 1815 0748 05       		.uleb128 0x5
+ 1816 0749 03       		.byte	0x3
+ 1817 074a 00000000 		.4byte	Get_Ended_Data_Value
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 38
+
+
+ 1818 074e 1D       		.uleb128 0x1d
+ 1819 074f 91030000 		.4byte	.LASF141
+ 1820 0753 07       		.byte	0x7
+ 1821 0754 3B       		.byte	0x3b
+ 1822 0755 6B000000 		.4byte	0x6b
+ 1823 0759 05       		.uleb128 0x5
+ 1824 075a 03       		.byte	0x3
+ 1825 075b 00000000 		.4byte	send_Deleted_Sessions
+ 1826 075f 1D       		.uleb128 0x1d
+ 1827 0760 2D020000 		.4byte	.LASF142
+ 1828 0764 08       		.byte	0x8
+ 1829 0765 5D       		.byte	0x5d
+ 1830 0766 9D000000 		.4byte	0x9d
+ 1831 076a 05       		.uleb128 0x5
+ 1832 076b 03       		.byte	0x3
+ 1833 076c 00000000 		.4byte	pamFeature
+ 1834 0770 1D       		.uleb128 0x1d
+ 1835 0771 A20D0000 		.4byte	.LASF143
+ 1836 0775 09       		.byte	0x9
+ 1837 0776 28       		.byte	0x28
+ 1838 0777 6B000000 		.4byte	0x6b
+ 1839 077b 05       		.uleb128 0x5
+ 1840 077c 03       		.byte	0x3
+ 1841 077d 00000000 		.4byte	sessionDescriptorIndicate
+ 1842 0781 1D       		.uleb128 0x1d
+ 1843 0782 3B0E0000 		.4byte	.LASF144
+ 1844 0786 05       		.byte	0x5
+ 1845 0787 40       		.byte	0x40
+ 1846 0788 8D040000 		.4byte	0x48d
+ 1847 078c 05       		.uleb128 0x5
+ 1848 078d 03       		.byte	0x3
+ 1849 078e 00000000 		.4byte	SasData
+ 1850 0792 1D       		.uleb128 0x1d
+ 1851 0793 1E040000 		.4byte	.LASF145
+ 1852 0797 05       		.byte	0x5
+ 1853 0798 42       		.byte	0x42
+ 1854 0799 5D000000 		.4byte	0x5d
+ 1855 079d 05       		.uleb128 0x5
+ 1856 079e 03       		.byte	0x3
+ 1857 079f 00000000 		.4byte	sleepactivitysummarydataIndicate
+ 1858 07a3 1E       		.uleb128 0x1e
+ 1859 07a4 AD0C0000 		.4byte	.LASF146
+ 1860 07a8 AD0C0000 		.4byte	.LASF146
+ 1861 07ac 0A       		.byte	0xa
+ 1862 07ad 6502     		.2byte	0x265
+ 1863 07af 1F       		.uleb128 0x1f
+ 1864 07b0 620D0000 		.4byte	.LASF147
+ 1865 07b4 620D0000 		.4byte	.LASF147
+ 1866 07b8 07       		.byte	0x7
+ 1867 07b9 2D       		.byte	0x2d
+ 1868 07ba 1F       		.uleb128 0x1f
+ 1869 07bb E7010000 		.4byte	.LASF148
+ 1870 07bf E7010000 		.4byte	.LASF148
+ 1871 07c3 0B       		.byte	0xb
+ 1872 07c4 BB       		.byte	0xbb
+ 1873 07c5 1F       		.uleb128 0x1f
+ 1874 07c6 FC080000 		.4byte	.LASF149
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 39
+
+
+ 1875 07ca FC080000 		.4byte	.LASF149
+ 1876 07ce 07       		.byte	0x7
+ 1877 07cf 31       		.byte	0x31
+ 1878 07d0 1F       		.uleb128 0x1f
+ 1879 07d1 D60B0000 		.4byte	.LASF150
+ 1880 07d5 D60B0000 		.4byte	.LASF150
+ 1881 07d9 07       		.byte	0x7
+ 1882 07da 2F       		.byte	0x2f
+ 1883 07db 1E       		.uleb128 0x1e
+ 1884 07dc 0C050000 		.4byte	.LASF151
+ 1885 07e0 0C050000 		.4byte	.LASF151
+ 1886 07e4 0C       		.byte	0xc
+ 1887 07e5 7E01     		.2byte	0x17e
+ 1888 07e7 00       		.byte	0
+ 1889              		.section	.debug_abbrev,"",%progbits
+ 1890              	.Ldebug_abbrev0:
+ 1891 0000 01       		.uleb128 0x1
+ 1892 0001 11       		.uleb128 0x11
+ 1893 0002 01       		.byte	0x1
+ 1894 0003 25       		.uleb128 0x25
+ 1895 0004 0E       		.uleb128 0xe
+ 1896 0005 13       		.uleb128 0x13
+ 1897 0006 0B       		.uleb128 0xb
+ 1898 0007 03       		.uleb128 0x3
+ 1899 0008 0E       		.uleb128 0xe
+ 1900 0009 1B       		.uleb128 0x1b
+ 1901 000a 0E       		.uleb128 0xe
+ 1902 000b 55       		.uleb128 0x55
+ 1903 000c 17       		.uleb128 0x17
+ 1904 000d 11       		.uleb128 0x11
+ 1905 000e 01       		.uleb128 0x1
+ 1906 000f 10       		.uleb128 0x10
+ 1907 0010 17       		.uleb128 0x17
+ 1908 0011 00       		.byte	0
+ 1909 0012 00       		.byte	0
+ 1910 0013 02       		.uleb128 0x2
+ 1911 0014 24       		.uleb128 0x24
+ 1912 0015 00       		.byte	0
+ 1913 0016 0B       		.uleb128 0xb
+ 1914 0017 0B       		.uleb128 0xb
+ 1915 0018 3E       		.uleb128 0x3e
+ 1916 0019 0B       		.uleb128 0xb
+ 1917 001a 03       		.uleb128 0x3
+ 1918 001b 0E       		.uleb128 0xe
+ 1919 001c 00       		.byte	0
+ 1920 001d 00       		.byte	0
+ 1921 001e 03       		.uleb128 0x3
+ 1922 001f 24       		.uleb128 0x24
+ 1923 0020 00       		.byte	0
+ 1924 0021 0B       		.uleb128 0xb
+ 1925 0022 0B       		.uleb128 0xb
+ 1926 0023 3E       		.uleb128 0x3e
+ 1927 0024 0B       		.uleb128 0xb
+ 1928 0025 03       		.uleb128 0x3
+ 1929 0026 08       		.uleb128 0x8
+ 1930 0027 00       		.byte	0
+ 1931 0028 00       		.byte	0
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 40
+
+
+ 1932 0029 04       		.uleb128 0x4
+ 1933 002a 16       		.uleb128 0x16
+ 1934 002b 00       		.byte	0
+ 1935 002c 03       		.uleb128 0x3
+ 1936 002d 0E       		.uleb128 0xe
+ 1937 002e 3A       		.uleb128 0x3a
+ 1938 002f 0B       		.uleb128 0xb
+ 1939 0030 3B       		.uleb128 0x3b
+ 1940 0031 05       		.uleb128 0x5
+ 1941 0032 49       		.uleb128 0x49
+ 1942 0033 13       		.uleb128 0x13
+ 1943 0034 00       		.byte	0
+ 1944 0035 00       		.byte	0
+ 1945 0036 05       		.uleb128 0x5
+ 1946 0037 0F       		.uleb128 0xf
+ 1947 0038 00       		.byte	0
+ 1948 0039 0B       		.uleb128 0xb
+ 1949 003a 0B       		.uleb128 0xb
+ 1950 003b 49       		.uleb128 0x49
+ 1951 003c 13       		.uleb128 0x13
+ 1952 003d 00       		.byte	0
+ 1953 003e 00       		.byte	0
+ 1954 003f 06       		.uleb128 0x6
+ 1955 0040 04       		.uleb128 0x4
+ 1956 0041 01       		.byte	0x1
+ 1957 0042 0B       		.uleb128 0xb
+ 1958 0043 0B       		.uleb128 0xb
+ 1959 0044 49       		.uleb128 0x49
+ 1960 0045 13       		.uleb128 0x13
+ 1961 0046 3A       		.uleb128 0x3a
+ 1962 0047 0B       		.uleb128 0xb
+ 1963 0048 3B       		.uleb128 0x3b
+ 1964 0049 05       		.uleb128 0x5
+ 1965 004a 01       		.uleb128 0x1
+ 1966 004b 13       		.uleb128 0x13
+ 1967 004c 00       		.byte	0
+ 1968 004d 00       		.byte	0
+ 1969 004e 07       		.uleb128 0x7
+ 1970 004f 28       		.uleb128 0x28
+ 1971 0050 00       		.byte	0
+ 1972 0051 03       		.uleb128 0x3
+ 1973 0052 0E       		.uleb128 0xe
+ 1974 0053 1C       		.uleb128 0x1c
+ 1975 0054 0B       		.uleb128 0xb
+ 1976 0055 00       		.byte	0
+ 1977 0056 00       		.byte	0
+ 1978 0057 08       		.uleb128 0x8
+ 1979 0058 13       		.uleb128 0x13
+ 1980 0059 01       		.byte	0x1
+ 1981 005a 0B       		.uleb128 0xb
+ 1982 005b 0B       		.uleb128 0xb
+ 1983 005c 3A       		.uleb128 0x3a
+ 1984 005d 0B       		.uleb128 0xb
+ 1985 005e 3B       		.uleb128 0x3b
+ 1986 005f 05       		.uleb128 0x5
+ 1987 0060 01       		.uleb128 0x1
+ 1988 0061 13       		.uleb128 0x13
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 41
+
+
+ 1989 0062 00       		.byte	0
+ 1990 0063 00       		.byte	0
+ 1991 0064 09       		.uleb128 0x9
+ 1992 0065 0D       		.uleb128 0xd
+ 1993 0066 00       		.byte	0
+ 1994 0067 03       		.uleb128 0x3
+ 1995 0068 0E       		.uleb128 0xe
+ 1996 0069 3A       		.uleb128 0x3a
+ 1997 006a 0B       		.uleb128 0xb
+ 1998 006b 3B       		.uleb128 0x3b
+ 1999 006c 05       		.uleb128 0x5
+ 2000 006d 49       		.uleb128 0x49
+ 2001 006e 13       		.uleb128 0x13
+ 2002 006f 38       		.uleb128 0x38
+ 2003 0070 0B       		.uleb128 0xb
+ 2004 0071 00       		.byte	0
+ 2005 0072 00       		.byte	0
+ 2006 0073 0A       		.uleb128 0xa
+ 2007 0074 0D       		.uleb128 0xd
+ 2008 0075 00       		.byte	0
+ 2009 0076 03       		.uleb128 0x3
+ 2010 0077 08       		.uleb128 0x8
+ 2011 0078 3A       		.uleb128 0x3a
+ 2012 0079 0B       		.uleb128 0xb
+ 2013 007a 3B       		.uleb128 0x3b
+ 2014 007b 05       		.uleb128 0x5
+ 2015 007c 49       		.uleb128 0x49
+ 2016 007d 13       		.uleb128 0x13
+ 2017 007e 38       		.uleb128 0x38
+ 2018 007f 0B       		.uleb128 0xb
+ 2019 0080 00       		.byte	0
+ 2020 0081 00       		.byte	0
+ 2021 0082 0B       		.uleb128 0xb
+ 2022 0083 16       		.uleb128 0x16
+ 2023 0084 00       		.byte	0
+ 2024 0085 03       		.uleb128 0x3
+ 2025 0086 0E       		.uleb128 0xe
+ 2026 0087 3A       		.uleb128 0x3a
+ 2027 0088 0B       		.uleb128 0xb
+ 2028 0089 3B       		.uleb128 0x3b
+ 2029 008a 0B       		.uleb128 0xb
+ 2030 008b 49       		.uleb128 0x49
+ 2031 008c 13       		.uleb128 0x13
+ 2032 008d 00       		.byte	0
+ 2033 008e 00       		.byte	0
+ 2034 008f 0C       		.uleb128 0xc
+ 2035 0090 13       		.uleb128 0x13
+ 2036 0091 01       		.byte	0x1
+ 2037 0092 0B       		.uleb128 0xb
+ 2038 0093 0B       		.uleb128 0xb
+ 2039 0094 3A       		.uleb128 0x3a
+ 2040 0095 0B       		.uleb128 0xb
+ 2041 0096 3B       		.uleb128 0x3b
+ 2042 0097 0B       		.uleb128 0xb
+ 2043 0098 01       		.uleb128 0x1
+ 2044 0099 13       		.uleb128 0x13
+ 2045 009a 00       		.byte	0
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 42
+
+
+ 2046 009b 00       		.byte	0
+ 2047 009c 0D       		.uleb128 0xd
+ 2048 009d 0D       		.uleb128 0xd
+ 2049 009e 00       		.byte	0
+ 2050 009f 03       		.uleb128 0x3
+ 2051 00a0 0E       		.uleb128 0xe
+ 2052 00a1 3A       		.uleb128 0x3a
+ 2053 00a2 0B       		.uleb128 0xb
+ 2054 00a3 3B       		.uleb128 0x3b
+ 2055 00a4 0B       		.uleb128 0xb
+ 2056 00a5 49       		.uleb128 0x49
+ 2057 00a6 13       		.uleb128 0x13
+ 2058 00a7 38       		.uleb128 0x38
+ 2059 00a8 0B       		.uleb128 0xb
+ 2060 00a9 00       		.byte	0
+ 2061 00aa 00       		.byte	0
+ 2062 00ab 0E       		.uleb128 0xe
+ 2063 00ac 01       		.uleb128 0x1
+ 2064 00ad 01       		.byte	0x1
+ 2065 00ae 49       		.uleb128 0x49
+ 2066 00af 13       		.uleb128 0x13
+ 2067 00b0 01       		.uleb128 0x1
+ 2068 00b1 13       		.uleb128 0x13
+ 2069 00b2 00       		.byte	0
+ 2070 00b3 00       		.byte	0
+ 2071 00b4 0F       		.uleb128 0xf
+ 2072 00b5 21       		.uleb128 0x21
+ 2073 00b6 00       		.byte	0
+ 2074 00b7 49       		.uleb128 0x49
+ 2075 00b8 13       		.uleb128 0x13
+ 2076 00b9 2F       		.uleb128 0x2f
+ 2077 00ba 0B       		.uleb128 0xb
+ 2078 00bb 00       		.byte	0
+ 2079 00bc 00       		.byte	0
+ 2080 00bd 10       		.uleb128 0x10
+ 2081 00be 2E       		.uleb128 0x2e
+ 2082 00bf 01       		.byte	0x1
+ 2083 00c0 3F       		.uleb128 0x3f
+ 2084 00c1 19       		.uleb128 0x19
+ 2085 00c2 03       		.uleb128 0x3
+ 2086 00c3 0E       		.uleb128 0xe
+ 2087 00c4 3A       		.uleb128 0x3a
+ 2088 00c5 0B       		.uleb128 0xb
+ 2089 00c6 3B       		.uleb128 0x3b
+ 2090 00c7 0B       		.uleb128 0xb
+ 2091 00c8 27       		.uleb128 0x27
+ 2092 00c9 19       		.uleb128 0x19
+ 2093 00ca 49       		.uleb128 0x49
+ 2094 00cb 13       		.uleb128 0x13
+ 2095 00cc 11       		.uleb128 0x11
+ 2096 00cd 01       		.uleb128 0x1
+ 2097 00ce 12       		.uleb128 0x12
+ 2098 00cf 06       		.uleb128 0x6
+ 2099 00d0 40       		.uleb128 0x40
+ 2100 00d1 18       		.uleb128 0x18
+ 2101 00d2 9742     		.uleb128 0x2117
+ 2102 00d4 19       		.uleb128 0x19
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 43
+
+
+ 2103 00d5 01       		.uleb128 0x1
+ 2104 00d6 13       		.uleb128 0x13
+ 2105 00d7 00       		.byte	0
+ 2106 00d8 00       		.byte	0
+ 2107 00d9 11       		.uleb128 0x11
+ 2108 00da 05       		.uleb128 0x5
+ 2109 00db 00       		.byte	0
+ 2110 00dc 03       		.uleb128 0x3
+ 2111 00dd 0E       		.uleb128 0xe
+ 2112 00de 3A       		.uleb128 0x3a
+ 2113 00df 0B       		.uleb128 0xb
+ 2114 00e0 3B       		.uleb128 0x3b
+ 2115 00e1 0B       		.uleb128 0xb
+ 2116 00e2 49       		.uleb128 0x49
+ 2117 00e3 13       		.uleb128 0x13
+ 2118 00e4 02       		.uleb128 0x2
+ 2119 00e5 17       		.uleb128 0x17
+ 2120 00e6 00       		.byte	0
+ 2121 00e7 00       		.byte	0
+ 2122 00e8 12       		.uleb128 0x12
+ 2123 00e9 34       		.uleb128 0x34
+ 2124 00ea 00       		.byte	0
+ 2125 00eb 03       		.uleb128 0x3
+ 2126 00ec 0E       		.uleb128 0xe
+ 2127 00ed 3A       		.uleb128 0x3a
+ 2128 00ee 0B       		.uleb128 0xb
+ 2129 00ef 3B       		.uleb128 0x3b
+ 2130 00f0 0B       		.uleb128 0xb
+ 2131 00f1 49       		.uleb128 0x49
+ 2132 00f2 13       		.uleb128 0x13
+ 2133 00f3 02       		.uleb128 0x2
+ 2134 00f4 17       		.uleb128 0x17
+ 2135 00f5 00       		.byte	0
+ 2136 00f6 00       		.byte	0
+ 2137 00f7 13       		.uleb128 0x13
+ 2138 00f8 898201   		.uleb128 0x4109
+ 2139 00fb 01       		.byte	0x1
+ 2140 00fc 11       		.uleb128 0x11
+ 2141 00fd 01       		.uleb128 0x1
+ 2142 00fe 31       		.uleb128 0x31
+ 2143 00ff 13       		.uleb128 0x13
+ 2144 0100 01       		.uleb128 0x1
+ 2145 0101 13       		.uleb128 0x13
+ 2146 0102 00       		.byte	0
+ 2147 0103 00       		.byte	0
+ 2148 0104 14       		.uleb128 0x14
+ 2149 0105 8A8201   		.uleb128 0x410a
+ 2150 0108 00       		.byte	0
+ 2151 0109 02       		.uleb128 0x2
+ 2152 010a 18       		.uleb128 0x18
+ 2153 010b 9142     		.uleb128 0x2111
+ 2154 010d 18       		.uleb128 0x18
+ 2155 010e 00       		.byte	0
+ 2156 010f 00       		.byte	0
+ 2157 0110 15       		.uleb128 0x15
+ 2158 0111 898201   		.uleb128 0x4109
+ 2159 0114 01       		.byte	0x1
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 44
+
+
+ 2160 0115 11       		.uleb128 0x11
+ 2161 0116 01       		.uleb128 0x1
+ 2162 0117 31       		.uleb128 0x31
+ 2163 0118 13       		.uleb128 0x13
+ 2164 0119 00       		.byte	0
+ 2165 011a 00       		.byte	0
+ 2166 011b 16       		.uleb128 0x16
+ 2167 011c 2E       		.uleb128 0x2e
+ 2168 011d 01       		.byte	0x1
+ 2169 011e 3F       		.uleb128 0x3f
+ 2170 011f 19       		.uleb128 0x19
+ 2171 0120 03       		.uleb128 0x3
+ 2172 0121 0E       		.uleb128 0xe
+ 2173 0122 3A       		.uleb128 0x3a
+ 2174 0123 0B       		.uleb128 0xb
+ 2175 0124 3B       		.uleb128 0x3b
+ 2176 0125 0B       		.uleb128 0xb
+ 2177 0126 27       		.uleb128 0x27
+ 2178 0127 19       		.uleb128 0x19
+ 2179 0128 11       		.uleb128 0x11
+ 2180 0129 01       		.uleb128 0x1
+ 2181 012a 12       		.uleb128 0x12
+ 2182 012b 06       		.uleb128 0x6
+ 2183 012c 40       		.uleb128 0x40
+ 2184 012d 18       		.uleb128 0x18
+ 2185 012e 9642     		.uleb128 0x2116
+ 2186 0130 19       		.uleb128 0x19
+ 2187 0131 01       		.uleb128 0x1
+ 2188 0132 13       		.uleb128 0x13
+ 2189 0133 00       		.byte	0
+ 2190 0134 00       		.byte	0
+ 2191 0135 17       		.uleb128 0x17
+ 2192 0136 34       		.uleb128 0x34
+ 2193 0137 00       		.byte	0
+ 2194 0138 03       		.uleb128 0x3
+ 2195 0139 0E       		.uleb128 0xe
+ 2196 013a 3A       		.uleb128 0x3a
+ 2197 013b 0B       		.uleb128 0xb
+ 2198 013c 3B       		.uleb128 0x3b
+ 2199 013d 0B       		.uleb128 0xb
+ 2200 013e 49       		.uleb128 0x49
+ 2201 013f 13       		.uleb128 0x13
+ 2202 0140 02       		.uleb128 0x2
+ 2203 0141 18       		.uleb128 0x18
+ 2204 0142 00       		.byte	0
+ 2205 0143 00       		.byte	0
+ 2206 0144 18       		.uleb128 0x18
+ 2207 0145 0B       		.uleb128 0xb
+ 2208 0146 01       		.byte	0x1
+ 2209 0147 55       		.uleb128 0x55
+ 2210 0148 17       		.uleb128 0x17
+ 2211 0149 01       		.uleb128 0x1
+ 2212 014a 13       		.uleb128 0x13
+ 2213 014b 00       		.byte	0
+ 2214 014c 00       		.byte	0
+ 2215 014d 19       		.uleb128 0x19
+ 2216 014e 34       		.uleb128 0x34
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 45
+
+
+ 2217 014f 00       		.byte	0
+ 2218 0150 03       		.uleb128 0x3
+ 2219 0151 08       		.uleb128 0x8
+ 2220 0152 3A       		.uleb128 0x3a
+ 2221 0153 0B       		.uleb128 0xb
+ 2222 0154 3B       		.uleb128 0x3b
+ 2223 0155 0B       		.uleb128 0xb
+ 2224 0156 49       		.uleb128 0x49
+ 2225 0157 13       		.uleb128 0x13
+ 2226 0158 02       		.uleb128 0x2
+ 2227 0159 17       		.uleb128 0x17
+ 2228 015a 00       		.byte	0
+ 2229 015b 00       		.byte	0
+ 2230 015c 1A       		.uleb128 0x1a
+ 2231 015d 0B       		.uleb128 0xb
+ 2232 015e 01       		.byte	0x1
+ 2233 015f 11       		.uleb128 0x11
+ 2234 0160 01       		.uleb128 0x1
+ 2235 0161 12       		.uleb128 0x12
+ 2236 0162 06       		.uleb128 0x6
+ 2237 0163 01       		.uleb128 0x1
+ 2238 0164 13       		.uleb128 0x13
+ 2239 0165 00       		.byte	0
+ 2240 0166 00       		.byte	0
+ 2241 0167 1B       		.uleb128 0x1b
+ 2242 0168 898201   		.uleb128 0x4109
+ 2243 016b 00       		.byte	0
+ 2244 016c 11       		.uleb128 0x11
+ 2245 016d 01       		.uleb128 0x1
+ 2246 016e 31       		.uleb128 0x31
+ 2247 016f 13       		.uleb128 0x13
+ 2248 0170 00       		.byte	0
+ 2249 0171 00       		.byte	0
+ 2250 0172 1C       		.uleb128 0x1c
+ 2251 0173 34       		.uleb128 0x34
+ 2252 0174 00       		.byte	0
+ 2253 0175 03       		.uleb128 0x3
+ 2254 0176 0E       		.uleb128 0xe
+ 2255 0177 3A       		.uleb128 0x3a
+ 2256 0178 0B       		.uleb128 0xb
+ 2257 0179 3B       		.uleb128 0x3b
+ 2258 017a 05       		.uleb128 0x5
+ 2259 017b 49       		.uleb128 0x49
+ 2260 017c 13       		.uleb128 0x13
+ 2261 017d 3F       		.uleb128 0x3f
+ 2262 017e 19       		.uleb128 0x19
+ 2263 017f 3C       		.uleb128 0x3c
+ 2264 0180 19       		.uleb128 0x19
+ 2265 0181 00       		.byte	0
+ 2266 0182 00       		.byte	0
+ 2267 0183 1D       		.uleb128 0x1d
+ 2268 0184 34       		.uleb128 0x34
+ 2269 0185 00       		.byte	0
+ 2270 0186 03       		.uleb128 0x3
+ 2271 0187 0E       		.uleb128 0xe
+ 2272 0188 3A       		.uleb128 0x3a
+ 2273 0189 0B       		.uleb128 0xb
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 46
+
+
+ 2274 018a 3B       		.uleb128 0x3b
+ 2275 018b 0B       		.uleb128 0xb
+ 2276 018c 49       		.uleb128 0x49
+ 2277 018d 13       		.uleb128 0x13
+ 2278 018e 3F       		.uleb128 0x3f
+ 2279 018f 19       		.uleb128 0x19
+ 2280 0190 02       		.uleb128 0x2
+ 2281 0191 18       		.uleb128 0x18
+ 2282 0192 00       		.byte	0
+ 2283 0193 00       		.byte	0
+ 2284 0194 1E       		.uleb128 0x1e
+ 2285 0195 2E       		.uleb128 0x2e
+ 2286 0196 00       		.byte	0
+ 2287 0197 3F       		.uleb128 0x3f
+ 2288 0198 19       		.uleb128 0x19
+ 2289 0199 3C       		.uleb128 0x3c
+ 2290 019a 19       		.uleb128 0x19
+ 2291 019b 6E       		.uleb128 0x6e
+ 2292 019c 0E       		.uleb128 0xe
+ 2293 019d 03       		.uleb128 0x3
+ 2294 019e 0E       		.uleb128 0xe
+ 2295 019f 3A       		.uleb128 0x3a
+ 2296 01a0 0B       		.uleb128 0xb
+ 2297 01a1 3B       		.uleb128 0x3b
+ 2298 01a2 05       		.uleb128 0x5
+ 2299 01a3 00       		.byte	0
+ 2300 01a4 00       		.byte	0
+ 2301 01a5 1F       		.uleb128 0x1f
+ 2302 01a6 2E       		.uleb128 0x2e
+ 2303 01a7 00       		.byte	0
+ 2304 01a8 3F       		.uleb128 0x3f
+ 2305 01a9 19       		.uleb128 0x19
+ 2306 01aa 3C       		.uleb128 0x3c
+ 2307 01ab 19       		.uleb128 0x19
+ 2308 01ac 6E       		.uleb128 0x6e
+ 2309 01ad 0E       		.uleb128 0xe
+ 2310 01ae 03       		.uleb128 0x3
+ 2311 01af 0E       		.uleb128 0xe
+ 2312 01b0 3A       		.uleb128 0x3a
+ 2313 01b1 0B       		.uleb128 0xb
+ 2314 01b2 3B       		.uleb128 0x3b
+ 2315 01b3 0B       		.uleb128 0xb
+ 2316 01b4 00       		.byte	0
+ 2317 01b5 00       		.byte	0
+ 2318 01b6 00       		.byte	0
+ 2319              		.section	.debug_loc,"",%progbits
+ 2320              	.Ldebug_loc0:
+ 2321              	.LLST0:
+ 2322 0000 00000000 		.4byte	.LVL0
+ 2323 0004 94000000 		.4byte	.LVL9
+ 2324 0008 0100     		.2byte	0x1
+ 2325 000a 50       		.byte	0x50
+ 2326 000b 94000000 		.4byte	.LVL9
+ 2327 000f F8020000 		.4byte	.LVL49
+ 2328 0013 0100     		.2byte	0x1
+ 2329 0015 55       		.byte	0x55
+ 2330 0016 F8020000 		.4byte	.LVL49
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 47
+
+
+ 2331 001a 04030000 		.4byte	.LFE37
+ 2332 001e 0400     		.2byte	0x4
+ 2333 0020 F3       		.byte	0xf3
+ 2334 0021 01       		.uleb128 0x1
+ 2335 0022 50       		.byte	0x50
+ 2336 0023 9F       		.byte	0x9f
+ 2337 0024 00000000 		.4byte	0
+ 2338 0028 00000000 		.4byte	0
+ 2339              	.LLST1:
+ 2340 002c 04000000 		.4byte	.LVL1
+ 2341 0030 22000000 		.4byte	.LVL2
+ 2342 0034 0200     		.2byte	0x2
+ 2343 0036 40       		.byte	0x40
+ 2344 0037 9F       		.byte	0x9f
+ 2345 0038 22000000 		.4byte	.LVL2
+ 2346 003c 26000000 		.4byte	.LVL3
+ 2347 0040 0200     		.2byte	0x2
+ 2348 0042 43       		.byte	0x43
+ 2349 0043 9F       		.byte	0x9f
+ 2350 0044 26000000 		.4byte	.LVL3
+ 2351 0048 2C000000 		.4byte	.LVL4
+ 2352 004c 0200     		.2byte	0x2
+ 2353 004e 40       		.byte	0x40
+ 2354 004f 9F       		.byte	0x9f
+ 2355 0050 2C000000 		.4byte	.LVL4
+ 2356 0054 50000000 		.4byte	.LVL5
+ 2357 0058 0100     		.2byte	0x1
+ 2358 005a 54       		.byte	0x54
+ 2359 005b 52000000 		.4byte	.LVL6
+ 2360 005f 76000000 		.4byte	.LVL7
+ 2361 0063 0100     		.2byte	0x1
+ 2362 0065 54       		.byte	0x54
+ 2363 0066 78000000 		.4byte	.LVL8
+ 2364 006a 9A000000 		.4byte	.LVL11
+ 2365 006e 0100     		.2byte	0x1
+ 2366 0070 54       		.byte	0x54
+ 2367 0071 9C000000 		.4byte	.LVL12
+ 2368 0075 BE000000 		.4byte	.LVL14
+ 2369 0079 0100     		.2byte	0x1
+ 2370 007b 54       		.byte	0x54
+ 2371 007c C0000000 		.4byte	.LVL15
+ 2372 0080 D8000000 		.4byte	.LVL16
+ 2373 0084 0100     		.2byte	0x1
+ 2374 0086 54       		.byte	0x54
+ 2375 0087 DA000000 		.4byte	.LVL17
+ 2376 008b FC000000 		.4byte	.LVL19
+ 2377 008f 0100     		.2byte	0x1
+ 2378 0091 54       		.byte	0x54
+ 2379 0092 FE000000 		.4byte	.LVL20
+ 2380 0096 24010000 		.4byte	.LVL22
+ 2381 009a 0100     		.2byte	0x1
+ 2382 009c 54       		.byte	0x54
+ 2383 009d 26010000 		.4byte	.LVL23
+ 2384 00a1 50010000 		.4byte	.LVL24
+ 2385 00a5 0100     		.2byte	0x1
+ 2386 00a7 54       		.byte	0x54
+ 2387 00a8 52010000 		.4byte	.LVL25
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 48
+
+
+ 2388 00ac 7C010000 		.4byte	.LVL26
+ 2389 00b0 0100     		.2byte	0x1
+ 2390 00b2 54       		.byte	0x54
+ 2391 00b3 7E010000 		.4byte	.LVL27
+ 2392 00b7 A0010000 		.4byte	.LVL28
+ 2393 00bb 0100     		.2byte	0x1
+ 2394 00bd 54       		.byte	0x54
+ 2395 00be A2010000 		.4byte	.LVL29
+ 2396 00c2 C4010000 		.4byte	.LVL30
+ 2397 00c6 0100     		.2byte	0x1
+ 2398 00c8 54       		.byte	0x54
+ 2399 00c9 C6010000 		.4byte	.LVL31
+ 2400 00cd F0010000 		.4byte	.LVL32
+ 2401 00d1 0100     		.2byte	0x1
+ 2402 00d3 54       		.byte	0x54
+ 2403 00d4 F2010000 		.4byte	.LVL33
+ 2404 00d8 14020000 		.4byte	.LVL34
+ 2405 00dc 0100     		.2byte	0x1
+ 2406 00de 54       		.byte	0x54
+ 2407 00df 16020000 		.4byte	.LVL35
+ 2408 00e3 38020000 		.4byte	.LVL36
+ 2409 00e7 0100     		.2byte	0x1
+ 2410 00e9 54       		.byte	0x54
+ 2411 00ea 3A020000 		.4byte	.LVL37
+ 2412 00ee 64020000 		.4byte	.LVL38
+ 2413 00f2 0100     		.2byte	0x1
+ 2414 00f4 54       		.byte	0x54
+ 2415 00f5 66020000 		.4byte	.LVL39
+ 2416 00f9 88020000 		.4byte	.LVL40
+ 2417 00fd 0100     		.2byte	0x1
+ 2418 00ff 54       		.byte	0x54
+ 2419 0100 8A020000 		.4byte	.LVL41
+ 2420 0104 AC020000 		.4byte	.LVL42
+ 2421 0108 0100     		.2byte	0x1
+ 2422 010a 54       		.byte	0x54
+ 2423 010b AE020000 		.4byte	.LVL43
+ 2424 010f C8020000 		.4byte	.LVL44
+ 2425 0113 0100     		.2byte	0x1
+ 2426 0115 54       		.byte	0x54
+ 2427 0116 CA020000 		.4byte	.LVL45
+ 2428 011a F4020000 		.4byte	.LVL46
+ 2429 011e 0100     		.2byte	0x1
+ 2430 0120 54       		.byte	0x54
+ 2431 0121 F6020000 		.4byte	.LVL47
+ 2432 0125 F8020000 		.4byte	.LVL48
+ 2433 0129 0100     		.2byte	0x1
+ 2434 012b 54       		.byte	0x54
+ 2435 012c 00000000 		.4byte	0
+ 2436 0130 00000000 		.4byte	0
+ 2437              	.LLST2:
+ 2438 0134 30000000 		.4byte	.LVL52
+ 2439 0138 34000000 		.4byte	.LVL53
+ 2440 013c 0100     		.2byte	0x1
+ 2441 013e 50       		.byte	0x50
+ 2442 013f 00000000 		.4byte	0
+ 2443 0143 00000000 		.4byte	0
+ 2444              	.LLST3:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 49
+
+
+ 2445 0147 46000000 		.4byte	.LVL57
+ 2446 014b 4B000000 		.4byte	.LVL58-1
+ 2447 014f 0100     		.2byte	0x1
+ 2448 0151 51       		.byte	0x51
+ 2449 0152 00000000 		.4byte	0
+ 2450 0156 00000000 		.4byte	0
+ 2451              	.LLST4:
+ 2452 015a 4C000000 		.4byte	.LVL58
+ 2453 015e 5A000000 		.4byte	.LVL59
+ 2454 0162 0200     		.2byte	0x2
+ 2455 0164 31       		.byte	0x31
+ 2456 0165 9F       		.byte	0x9f
+ 2457 0166 5A000000 		.4byte	.LVL59
+ 2458 016a 68000000 		.4byte	.LVL60
+ 2459 016e 0200     		.2byte	0x2
+ 2460 0170 34       		.byte	0x34
+ 2461 0171 9F       		.byte	0x9f
+ 2462 0172 68000000 		.4byte	.LVL60
+ 2463 0176 78000000 		.4byte	.LVL61
+ 2464 017a 0200     		.2byte	0x2
+ 2465 017c 36       		.byte	0x36
+ 2466 017d 9F       		.byte	0x9f
+ 2467 017e 78000000 		.4byte	.LVL61
+ 2468 0182 96000000 		.4byte	.LVL62
+ 2469 0186 0200     		.2byte	0x2
+ 2470 0188 38       		.byte	0x38
+ 2471 0189 9F       		.byte	0x9f
+ 2472 018a 96000000 		.4byte	.LVL62
+ 2473 018e B4000000 		.4byte	.LVL63
+ 2474 0192 0200     		.2byte	0x2
+ 2475 0194 3C       		.byte	0x3c
+ 2476 0195 9F       		.byte	0x9f
+ 2477 0196 B4000000 		.4byte	.LVL63
+ 2478 019a 08010000 		.4byte	.LVL77
+ 2479 019e 0200     		.2byte	0x2
+ 2480 01a0 40       		.byte	0x40
+ 2481 01a1 9F       		.byte	0x9f
+ 2482 01a2 00000000 		.4byte	0
+ 2483 01a6 00000000 		.4byte	0
+ 2484              	.LLST5:
+ 2485 01aa B4000000 		.4byte	.LVL63
+ 2486 01ae B8000000 		.4byte	.LVL64
+ 2487 01b2 0100     		.2byte	0x1
+ 2488 01b4 55       		.byte	0x55
+ 2489 01b5 B8000000 		.4byte	.LVL64
+ 2490 01b9 E4000000 		.4byte	.LVL67
+ 2491 01bd 0400     		.2byte	0x4
+ 2492 01bf 91       		.byte	0x91
+ 2493 01c0 987F     		.sleb128 -104
+ 2494 01c2 9F       		.byte	0x9f
+ 2495 01c3 E4000000 		.4byte	.LVL67
+ 2496 01c7 E6000000 		.4byte	.LVL68
+ 2497 01cb 0100     		.2byte	0x1
+ 2498 01cd 51       		.byte	0x51
+ 2499 01ce E6000000 		.4byte	.LVL68
+ 2500 01d2 08010000 		.4byte	.LVL77
+ 2501 01d6 0400     		.2byte	0x4
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 50
+
+
+ 2502 01d8 91       		.byte	0x91
+ 2503 01d9 987F     		.sleb128 -104
+ 2504 01db 9F       		.byte	0x9f
+ 2505 01dc 00000000 		.4byte	0
+ 2506 01e0 00000000 		.4byte	0
+ 2507              	.LLST6:
+ 2508 01e4 B4000000 		.4byte	.LVL63
+ 2509 01e8 BA000000 		.4byte	.LVL65
+ 2510 01ec 0200     		.2byte	0x2
+ 2511 01ee 30       		.byte	0x30
+ 2512 01ef 9F       		.byte	0x9f
+ 2513 01f0 BA000000 		.4byte	.LVL65
+ 2514 01f4 EC000000 		.4byte	.LVL69
+ 2515 01f8 0100     		.2byte	0x1
+ 2516 01fa 55       		.byte	0x55
+ 2517 01fb EE000000 		.4byte	.LVL70
+ 2518 01ff 08010000 		.4byte	.LVL77
+ 2519 0203 0100     		.2byte	0x1
+ 2520 0205 55       		.byte	0x55
+ 2521 0206 00000000 		.4byte	0
+ 2522 020a 00000000 		.4byte	0
+ 2523              	.LLST7:
+ 2524 020e B4000000 		.4byte	.LVL63
+ 2525 0212 BA000000 		.4byte	.LVL65
+ 2526 0216 0200     		.2byte	0x2
+ 2527 0218 30       		.byte	0x30
+ 2528 0219 9F       		.byte	0x9f
+ 2529 021a BA000000 		.4byte	.LVL65
+ 2530 021e 02010000 		.4byte	.LVL75
+ 2531 0222 0100     		.2byte	0x1
+ 2532 0224 54       		.byte	0x54
+ 2533 0225 04010000 		.4byte	.LVL76
+ 2534 0229 08010000 		.4byte	.LVL77
+ 2535 022d 0100     		.2byte	0x1
+ 2536 022f 54       		.byte	0x54
+ 2537 0230 00000000 		.4byte	0
+ 2538 0234 00000000 		.4byte	0
+ 2539              	.LLST8:
+ 2540 0238 D4000000 		.4byte	.LVL66
+ 2541 023c F0000000 		.4byte	.LVL71
+ 2542 0240 0100     		.2byte	0x1
+ 2543 0242 52       		.byte	0x52
+ 2544 0243 F2000000 		.4byte	.LVL72
+ 2545 0247 F8000000 		.4byte	.LVL73
+ 2546 024b 0100     		.2byte	0x1
+ 2547 024d 52       		.byte	0x52
+ 2548 024e 00000000 		.4byte	0
+ 2549 0252 00000000 		.4byte	0
+ 2550              		.section	.debug_aranges,"",%progbits
+ 2551 0000 24000000 		.4byte	0x24
+ 2552 0004 0200     		.2byte	0x2
+ 2553 0006 00000000 		.4byte	.Ldebug_info0
+ 2554 000a 04       		.byte	0x4
+ 2555 000b 00       		.byte	0
+ 2556 000c 0000     		.2byte	0
+ 2557 000e 0000     		.2byte	0
+ 2558 0010 00000000 		.4byte	.LFB37
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 51
+
+
+ 2559 0014 04030000 		.4byte	.LFE37-.LFB37
+ 2560 0018 00000000 		.4byte	.LFB36
+ 2561 001c 20010000 		.4byte	.LFE36-.LFB36
+ 2562 0020 00000000 		.4byte	0
+ 2563 0024 00000000 		.4byte	0
+ 2564              		.section	.debug_ranges,"",%progbits
+ 2565              	.Ldebug_ranges0:
+ 2566 0000 24000000 		.4byte	.LBB2
+ 2567 0004 C6000000 		.4byte	.LBE2
+ 2568 0008 CA000000 		.4byte	.LBB7
+ 2569 000c 08010000 		.4byte	.LBE7
+ 2570 0010 00000000 		.4byte	0
+ 2571 0014 00000000 		.4byte	0
+ 2572 0018 B4000000 		.4byte	.LBB3
+ 2573 001c B6000000 		.4byte	.LBE3
+ 2574 0020 B8000000 		.4byte	.LBB5
+ 2575 0024 C6000000 		.4byte	.LBE5
+ 2576 0028 CA000000 		.4byte	.LBB6
+ 2577 002c 08010000 		.4byte	.LBE6
+ 2578 0030 00000000 		.4byte	0
+ 2579 0034 00000000 		.4byte	0
+ 2580 0038 00000000 		.4byte	.LFB37
+ 2581 003c 04030000 		.4byte	.LFE37
+ 2582 0040 00000000 		.4byte	.LFB36
+ 2583 0044 20010000 		.4byte	.LFE36
+ 2584 0048 00000000 		.4byte	0
+ 2585 004c 00000000 		.4byte	0
+ 2586              		.section	.debug_line,"",%progbits
+ 2587              	.Ldebug_line0:
+ 2588 0000 1A030000 		.section	.debug_str,"MS",%progbits,1
+ 2588      02006001 
+ 2588      00000201 
+ 2588      FB0E0D00 
+ 2588      01010101 
+ 2589              	.LASF82:
+ 2590 0000 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_RX_CREDIT_IND\000"
+ 2590      455F4556 
+ 2590      545F4C32 
+ 2590      4341505F 
+ 2590      43424643 
+ 2591              	.LASF23:
+ 2592 0023 4359424C 		.ascii	"CYBLE_EVT_STACK_BUSY_STATUS\000"
+ 2592      455F4556 
+ 2592      545F5354 
+ 2592      41434B5F 
+ 2592      42555359 
+ 2593              	.LASF10:
+ 2594 003f 75696E74 		.ascii	"uint16\000"
+ 2594      313600
+ 2595              	.LASF93:
+ 2596 0046 4359424C 		.ascii	"CYBLE_CONN_HANDLE_T\000"
+ 2596      455F434F 
+ 2596      4E4E5F48 
+ 2596      414E444C 
+ 2596      455F5400 
+ 2597              	.LASF35:
+ 2598 005a 4359424C 		.ascii	"CYBLE_EVT_GAP_CONNECTION_UPDATE_COMPLETE\000"
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 52
+
+
+ 2598      455F4556 
+ 2598      545F4741 
+ 2598      505F434F 
+ 2598      4E4E4543 
+ 2599              	.LASF80:
+ 2600 0083 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DISCONN_CNF\000"
+ 2600      455F4556 
+ 2600      545F4C32 
+ 2600      4341505F 
+ 2600      43424643 
+ 2601              	.LASF40:
+ 2602 00a4 4359424C 		.ascii	"CYBLE_EVT_GAP_OOB_GENERATED_NOTIFICATION\000"
+ 2602      455F4556 
+ 2602      545F4741 
+ 2602      505F4F4F 
+ 2602      425F4745 
+ 2603              	.LASF138:
+ 2604 00cd 4765745F 		.ascii	"Get_Ended_Data_SessionID\000"
+ 2604      456E6465 
+ 2604      645F4461 
+ 2604      74615F53 
+ 2604      65737369 
+ 2605              	.LASF60:
+ 2606 00e6 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_MULTI_RSP\000"
+ 2606      455F4556 
+ 2606      545F4741 
+ 2606      5454435F 
+ 2606      52454144 
+ 2607              	.LASF65:
+ 2608 0105 4359424C 		.ascii	"CYBLE_EVT_GATTS_EXEC_WRITE_REQ\000"
+ 2608      455F4556 
+ 2608      545F4741 
+ 2608      5454535F 
+ 2608      45584543 
+ 2609              	.LASF100:
+ 2610 0124 48656164 		.ascii	"Header\000"
+ 2610      657200
+ 2611              	.LASF109:
+ 2612 012b 4E756D62 		.ascii	"NumberOfAwakenings\000"
+ 2612      65724F66 
+ 2612      4177616B 
+ 2612      656E696E 
+ 2612      677300
+ 2613              	.LASF20:
+ 2614 013e 4359424C 		.ascii	"CYBLE_EVT_TIMEOUT\000"
+ 2614      455F4556 
+ 2614      545F5449 
+ 2614      4D454F55 
+ 2614      5400
+ 2615              	.LASF4:
+ 2616 0150 6C6F6E67 		.ascii	"long int\000"
+ 2616      20696E74 
+ 2616      00
+ 2617              	.LASF152:
+ 2618 0159 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 2618      43313120 
+ 2618      352E342E 
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 53
+
+
+ 2618      31203230 
+ 2618      31363036 
+ 2619 018c 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m0 -mthumb -g -O"
+ 2619      20726576 
+ 2619      6973696F 
+ 2619      6E203233 
+ 2619      37373135 
+ 2620 01bf 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 2620      66756E63 
+ 2620      74696F6E 
+ 2620      2D736563 
+ 2620      74696F6E 
+ 2621              	.LASF148:
+ 2622 01e7 7072696E 		.ascii	"printf\000"
+ 2622      746600
+ 2623              	.LASF7:
+ 2624 01ee 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 2624      206C6F6E 
+ 2624      6720756E 
+ 2624      7369676E 
+ 2624      65642069 
+ 2625              	.LASF95:
+ 2626 0205 4359424C 		.ascii	"CYBLE_GATT_VALUE_T\000"
+ 2626      455F4741 
+ 2626      54545F56 
+ 2626      414C5545 
+ 2626      5F5400
+ 2627              	.LASF22:
+ 2628 0218 4359424C 		.ascii	"CYBLE_EVT_HCI_STATUS\000"
+ 2628      455F4556 
+ 2628      545F4843 
+ 2628      495F5354 
+ 2628      41545553 
+ 2629              	.LASF142:
+ 2630 022d 70616D46 		.ascii	"pamFeature\000"
+ 2630      65617475 
+ 2630      726500
+ 2631              	.LASF85:
+ 2632 0238 4359424C 		.ascii	"CYBLE_EVT_PENDING_FLASH_WRITE\000"
+ 2632      455F4556 
+ 2632      545F5045 
+ 2632      4E44494E 
+ 2632      475F464C 
+ 2633              	.LASF120:
+ 2634 0256 41766572 		.ascii	"AverageUVLightLevel\000"
+ 2634      61676555 
+ 2634      564C6967 
+ 2634      68744C65 
+ 2634      76656C00 
+ 2635              	.LASF74:
+ 2636 026a 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CONN_PARAM_UPDATE_REQ\000"
+ 2636      455F4556 
+ 2636      545F4C32 
+ 2636      4341505F 
+ 2636      434F4E4E 
+ 2637              	.LASF34:
+ 2638 0290 4359424C 		.ascii	"CYBLE_EVT_GAP_ENCRYPT_CHANGE\000"
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 54
+
+
+ 2638      455F4556 
+ 2638      545F4741 
+ 2638      505F454E 
+ 2638      43525950 
+ 2639              	.LASF117:
+ 2640 02ad 41766572 		.ascii	"AverageVisibleLightLevel\000"
+ 2640      61676556 
+ 2640      69736962 
+ 2640      6C654C69 
+ 2640      6768744C 
+ 2641              	.LASF38:
+ 2642 02c6 4359424C 		.ascii	"CYBLE_EVT_GAP_NUMERIC_COMPARISON_REQUEST\000"
+ 2642      455F4556 
+ 2642      545F4741 
+ 2642      505F4E55 
+ 2642      4D455249 
+ 2643              	.LASF105:
+ 2644 02ef 53657175 		.ascii	"SequenceNumber\000"
+ 2644      656E6365 
+ 2644      4E756D62 
+ 2644      657200
+ 2645              	.LASF6:
+ 2646 02fe 6C6F6E67 		.ascii	"long long int\000"
+ 2646      206C6F6E 
+ 2646      6720696E 
+ 2646      7400
+ 2647              	.LASF0:
+ 2648 030c 7369676E 		.ascii	"signed char\000"
+ 2648      65642063 
+ 2648      68617200 
+ 2649              	.LASF19:
+ 2650 0318 4359424C 		.ascii	"CYBLE_EVT_STACK_ON\000"
+ 2650      455F4556 
+ 2650      545F5354 
+ 2650      41434B5F 
+ 2650      4F4E00
+ 2651              	.LASF154:
+ 2652 032b 433A5C55 		.ascii	"C:\\Users\\310309623\\Desktop\\Graduation-Project\\"
+ 2652      73657273 
+ 2652      5C333130 
+ 2652      33303936 
+ 2652      32335C44 
+ 2653 0359 53657276 		.ascii	"Service\\Philips\\Physical Activity Monitor Service"
+ 2653      6963655C 
+ 2653      5068696C 
+ 2653      6970735C 
+ 2653      50687973 
+ 2654 038a 2E637964 		.ascii	".cydsn\000"
+ 2654      736E00
+ 2655              	.LASF141:
+ 2656 0391 73656E64 		.ascii	"send_Deleted_Sessions\000"
+ 2656      5F44656C 
+ 2656      65746564 
+ 2656      5F536573 
+ 2656      73696F6E 
+ 2657              	.LASF36:
+ 2658 03a7 4359424C 		.ascii	"CYBLE_EVT_GAPC_SCAN_START_STOP\000"
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 55
+
+
+ 2658      455F4556 
+ 2658      545F4741 
+ 2658      50435F53 
+ 2658      43414E5F 
+ 2659              	.LASF94:
+ 2660 03c6 61637475 		.ascii	"actualLen\000"
+ 2660      616C4C65 
+ 2660      6E00
+ 2661              	.LASF26:
+ 2662 03d0 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_REQ\000"
+ 2662      455F4556 
+ 2662      545F4741 
+ 2662      505F4155 
+ 2662      54485F52 
+ 2663              	.LASF58:
+ 2664 03e7 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_RSP\000"
+ 2664      455F4556 
+ 2664      545F4741 
+ 2664      5454435F 
+ 2664      52454144 
+ 2665              	.LASF63:
+ 2666 0400 4359424C 		.ascii	"CYBLE_EVT_GATTS_WRITE_CMD_REQ\000"
+ 2666      455F4556 
+ 2666      545F4741 
+ 2666      5454535F 
+ 2666      57524954 
+ 2667              	.LASF145:
+ 2668 041e 736C6565 		.ascii	"sleepactivitysummarydataIndicate\000"
+ 2668      70616374 
+ 2668      69766974 
+ 2668      7973756D 
+ 2668      6D617279 
+ 2669              	.LASF104:
+ 2670 043f 52656C61 		.ascii	"RelativeTimestamp\000"
+ 2670      74697665 
+ 2670      54696D65 
+ 2670      7374616D 
+ 2670      7000
+ 2671              	.LASF9:
+ 2672 0451 75696E74 		.ascii	"uint8\000"
+ 2672      3800
+ 2673              	.LASF66:
+ 2674 0457 4359424C 		.ascii	"CYBLE_EVT_GATTC_EXEC_WRITE_RSP\000"
+ 2674      455F4556 
+ 2674      545F4741 
+ 2674      5454435F 
+ 2674      45584543 
+ 2675              	.LASF126:
+ 2676 0476 50414D5F 		.ascii	"PAM_SASD_VALUE_T\000"
+ 2676      53415344 
+ 2676      5F56414C 
+ 2676      55455F54 
+ 2676      00
+ 2677              	.LASF79:
+ 2678 0487 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DISCONN_IND\000"
+ 2678      455F4556 
+ 2678      545F4C32 
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 56
+
+
+ 2678      4341505F 
+ 2678      43424643 
+ 2679              	.LASF11:
+ 2680 04a8 75696E74 		.ascii	"uint32\000"
+ 2680      333200
+ 2681              	.LASF89:
+ 2682 04af 4359424C 		.ascii	"CYBLE_EVT_MAX\000"
+ 2682      455F4556 
+ 2682      545F4D41 
+ 2682      5800
+ 2683              	.LASF114:
+ 2684 04bd 54696D65 		.ascii	"TimeOfAwakeningAfterAlarm\000"
+ 2684      4F664177 
+ 2684      616B656E 
+ 2684      696E6741 
+ 2684      66746572 
+ 2685              	.LASF84:
+ 2686 04d7 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DATA_WRITE_IND\000"
+ 2686      455F4556 
+ 2686      545F4C32 
+ 2686      4341505F 
+ 2686      43424643 
+ 2687              	.LASF97:
+ 2688 04fb 61747472 		.ascii	"attrHandle\000"
+ 2688      48616E64 
+ 2688      6C6500
+ 2689              	.LASF96:
+ 2690 0506 76616C75 		.ascii	"value\000"
+ 2690      6500
+ 2691              	.LASF151:
+ 2692 050c 4379426C 		.ascii	"CyBle_GattsWriteAttributeValue\000"
+ 2692      655F4761 
+ 2692      74747357 
+ 2692      72697465 
+ 2692      41747472 
+ 2693              	.LASF71:
+ 2694 052b 4359424C 		.ascii	"CYBLE_EVT_GATTC_STOP_CMD_COMPLETE\000"
+ 2694      455F4556 
+ 2694      545F4741 
+ 2694      5454435F 
+ 2694      53544F50 
+ 2695              	.LASF8:
+ 2696 054d 756E7369 		.ascii	"unsigned int\000"
+ 2696      676E6564 
+ 2696      20696E74 
+ 2696      00
+ 2697              	.LASF86:
+ 2698 055a 4359424C 		.ascii	"CYBLE_EVT_LE_PING_AUTH_TIMEOUT\000"
+ 2698      455F4556 
+ 2698      545F4C45 
+ 2698      5F50494E 
+ 2698      475F4155 
+ 2699              	.LASF118:
+ 2700 0579 4D696E69 		.ascii	"MinimumUVLightLevel\000"
+ 2700      6D756D55 
+ 2700      564C6967 
+ 2700      68744C65 
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 57
+
+
+ 2700      76656C00 
+ 2701              	.LASF119:
+ 2702 058d 4D617869 		.ascii	"MaximumUVLightLevel\000"
+ 2702      6D756D55 
+ 2702      564C6967 
+ 2702      68744C65 
+ 2702      76656C00 
+ 2703              	.LASF115:
+ 2704 05a1 4D696E69 		.ascii	"MinimumVisibleLightLevel\000"
+ 2704      6D756D56 
+ 2704      69736962 
+ 2704      6C654C69 
+ 2704      6768744C 
+ 2705              	.LASF5:
+ 2706 05ba 6C6F6E67 		.ascii	"long unsigned int\000"
+ 2706      20756E73 
+ 2706      69676E65 
+ 2706      6420696E 
+ 2706      7400
+ 2707              	.LASF45:
+ 2708 05cc 4359424C 		.ascii	"CYBLE_EVT_GAP_CONN_ESTB\000"
+ 2708      455F4556 
+ 2708      545F4741 
+ 2708      505F434F 
+ 2708      4E4E5F45 
+ 2709              	.LASF61:
+ 2710 05e4 4359424C 		.ascii	"CYBLE_EVT_GATTS_WRITE_REQ\000"
+ 2710      455F4556 
+ 2710      545F4741 
+ 2710      5454535F 
+ 2710      57524954 
+ 2711              	.LASF53:
+ 2712 05fe 4359424C 		.ascii	"CYBLE_EVT_GATTC_XCHNG_MTU_RSP\000"
+ 2712      455F4556 
+ 2712      545F4741 
+ 2712      5454435F 
+ 2712      5843484E 
+ 2713              	.LASF70:
+ 2714 061c 4359424C 		.ascii	"CYBLE_EVT_GATTS_DATA_SIGNED_CMD_REQ\000"
+ 2714      455F4556 
+ 2714      545F4741 
+ 2714      5454535F 
+ 2714      44415441 
+ 2715              	.LASF73:
+ 2716 0640 4359424C 		.ascii	"CYBLE_EVT_GATTC_LONG_PROCEDURE_END\000"
+ 2716      455F4556 
+ 2716      545F4741 
+ 2716      5454435F 
+ 2716      4C4F4E47 
+ 2717              	.LASF3:
+ 2718 0663 73686F72 		.ascii	"short unsigned int\000"
+ 2718      7420756E 
+ 2718      7369676E 
+ 2718      65642069 
+ 2718      6E7400
+ 2719              	.LASF18:
+ 2720 0676 4359424C 		.ascii	"CYBLE_EVT_HOST_INVALID\000"
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 58
+
+
+ 2720      455F4556 
+ 2720      545F484F 
+ 2720      53545F49 
+ 2720      4E56414C 
+ 2721              	.LASF56:
+ 2722 068d 4359424C 		.ascii	"CYBLE_EVT_GATTC_FIND_INFO_RSP\000"
+ 2722      455F4556 
+ 2722      545F4741 
+ 2722      5454435F 
+ 2722      46494E44 
+ 2723              	.LASF24:
+ 2724 06ab 4359424C 		.ascii	"CYBLE_EVT_MEMORY_REQUEST\000"
+ 2724      455F4556 
+ 2724      545F4D45 
+ 2724      4D4F5259 
+ 2724      5F524551 
+ 2725              	.LASF81:
+ 2726 06c4 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_DATA_READ\000"
+ 2726      455F4556 
+ 2726      545F4C32 
+ 2726      4341505F 
+ 2726      43424643 
+ 2727              	.LASF27:
+ 2728 06e3 4359424C 		.ascii	"CYBLE_EVT_GAP_PASSKEY_ENTRY_REQUEST\000"
+ 2728      455F4556 
+ 2728      545F4741 
+ 2728      505F5041 
+ 2728      53534B45 
+ 2729              	.LASF32:
+ 2730 0707 4359424C 		.ascii	"CYBLE_EVT_GAP_DEVICE_CONNECTED\000"
+ 2730      455F4556 
+ 2730      545F4741 
+ 2730      505F4445 
+ 2730      56494345 
+ 2731              	.LASF130:
+ 2732 0726 70726573 		.ascii	"presentDataLength\000"
+ 2732      656E7444 
+ 2732      6174614C 
+ 2732      656E6774 
+ 2732      6800
+ 2733              	.LASF47:
+ 2734 0738 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_REQ_REPLY_ERR\000"
+ 2734      455F4556 
+ 2734      545F4741 
+ 2734      505F4155 
+ 2734      54485F52 
+ 2735              	.LASF125:
+ 2736 0759 576F726E 		.ascii	"WornDuration\000"
+ 2736      44757261 
+ 2736      74696F6E 
+ 2736      00
+ 2737              	.LASF28:
+ 2738 0766 4359424C 		.ascii	"CYBLE_EVT_GAP_PASSKEY_DISPLAY_REQUEST\000"
+ 2738      455F4556 
+ 2738      545F4741 
+ 2738      505F5041 
+ 2738      53534B45 
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 59
+
+
+ 2739              	.LASF50:
+ 2740 078c 4359424C 		.ascii	"CYBLE_EVT_GATT_CONNECT_IND\000"
+ 2740      455F4556 
+ 2740      545F4741 
+ 2740      54545F43 
+ 2740      4F4E4E45 
+ 2741              	.LASF121:
+ 2742 07a7 4D696E69 		.ascii	"MinimumIRLightLevel\000"
+ 2742      6D756D49 
+ 2742      524C6967 
+ 2742      68744C65 
+ 2742      76656C00 
+ 2743              	.LASF124:
+ 2744 07bb 41766572 		.ascii	"AverageSleepingHeartRate\000"
+ 2744      61676553 
+ 2744      6C656570 
+ 2744      696E6748 
+ 2744      65617274 
+ 2745              	.LASF76:
+ 2746 07d4 4359424C 		.ascii	"CYBLE_EVT_L2CAP_COMMAND_REJ\000"
+ 2746      455F4556 
+ 2746      545F4C32 
+ 2746      4341505F 
+ 2746      434F4D4D 
+ 2747              	.LASF122:
+ 2748 07f0 4D617869 		.ascii	"MaximumIRLightLevel\000"
+ 2748      6D756D49 
+ 2748      524C6967 
+ 2748      68744C65 
+ 2748      76656C00 
+ 2749              	.LASF25:
+ 2750 0804 4359424C 		.ascii	"CYBLE_EVT_GAPC_SCAN_PROGRESS_RESULT\000"
+ 2750      455F4556 
+ 2750      545F4741 
+ 2750      50435F53 
+ 2750      43414E5F 
+ 2751              	.LASF92:
+ 2752 0828 61747449 		.ascii	"attId\000"
+ 2752      6400
+ 2753              	.LASF139:
+ 2754 082e 4765745F 		.ascii	"Get_Ended_Data_Sub_SessionID\000"
+ 2754      456E6465 
+ 2754      645F4461 
+ 2754      74615F53 
+ 2754      75625F53 
+ 2755              	.LASF155:
+ 2756 084b 67657450 		.ascii	"getPresentSasdFields\000"
+ 2756      72657365 
+ 2756      6E745361 
+ 2756      73644669 
+ 2756      656C6473 
+ 2757              	.LASF77:
+ 2758 0860 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_CONN_IND\000"
+ 2758      455F4556 
+ 2758      545F4C32 
+ 2758      4341505F 
+ 2758      43424643 
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 60
+
+
+ 2759              	.LASF55:
+ 2760 087e 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BY_TYPE_RSP\000"
+ 2760      455F4556 
+ 2760      545F4741 
+ 2760      5454435F 
+ 2760      52454144 
+ 2761              	.LASF113:
+ 2762 089f 4E756D62 		.ascii	"NumberOfTossNturnEvents\000"
+ 2762      65724F66 
+ 2762      546F7373 
+ 2762      4E747572 
+ 2762      6E457665 
+ 2763              	.LASF102:
+ 2764 08b7 53657373 		.ascii	"SessionID\000"
+ 2764      696F6E49 
+ 2764      4400
+ 2765              	.LASF17:
+ 2766 08c1 73697A65 		.ascii	"sizetype\000"
+ 2766      74797065 
+ 2766      00
+ 2767              	.LASF132:
+ 2768 08ca 6D795F73 		.ascii	"my_struct_in_bytes\000"
+ 2768      74727563 
+ 2768      745F696E 
+ 2768      5F627974 
+ 2768      657300
+ 2769              	.LASF99:
+ 2770 08dd 4359424C 		.ascii	"CYBLE_GATTS_HANDLE_VALUE_NTF_T\000"
+ 2770      455F4741 
+ 2770      5454535F 
+ 2770      48414E44 
+ 2770      4C455F56 
+ 2771              	.LASF149:
+ 2772 08fc 63616C63 		.ascii	"calculateNumberOfMessages\000"
+ 2772      756C6174 
+ 2772      654E756D 
+ 2772      6265724F 
+ 2772      664D6573 
+ 2773              	.LASF30:
+ 2774 0916 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_FAILED\000"
+ 2774      455F4556 
+ 2774      545F4741 
+ 2774      505F4155 
+ 2774      54485F46 
+ 2775              	.LASF135:
+ 2776 0930 6379426C 		.ascii	"cyBle_connHandle\000"
+ 2776      655F636F 
+ 2776      6E6E4861 
+ 2776      6E646C65 
+ 2776      00
+ 2777              	.LASF62:
+ 2778 0941 4359424C 		.ascii	"CYBLE_EVT_GATTC_WRITE_RSP\000"
+ 2778      455F4556 
+ 2778      545F4741 
+ 2778      5454435F 
+ 2778      57524954 
+ 2779              	.LASF43:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 61
+
+
+ 2780 095b 4359424C 		.ascii	"CYBLE_EVT_GAPC_DIRECT_ADV_REPORT\000"
+ 2780      455F4556 
+ 2780      545F4741 
+ 2780      50435F44 
+ 2780      49524543 
+ 2781              	.LASF41:
+ 2782 097c 4359424C 		.ascii	"CYBLE_EVT_GAP_DATA_LENGTH_CHANGE\000"
+ 2782      455F4556 
+ 2782      545F4741 
+ 2782      505F4441 
+ 2782      54415F4C 
+ 2783              	.LASF46:
+ 2784 099d 4359424C 		.ascii	"CYBLE_EVT_GAP_SCAN_REQ_RECVD\000"
+ 2784      455F4556 
+ 2784      545F4741 
+ 2784      505F5343 
+ 2784      414E5F52 
+ 2785              	.LASF29:
+ 2786 09ba 4359424C 		.ascii	"CYBLE_EVT_GAP_AUTH_COMPLETE\000"
+ 2786      455F4556 
+ 2786      545F4741 
+ 2786      505F4155 
+ 2786      54485F43 
+ 2787              	.LASF123:
+ 2788 09d6 41766572 		.ascii	"AverageIRLightLevel\000"
+ 2788      61676549 
+ 2788      524C6967 
+ 2788      68744C65 
+ 2788      76656C00 
+ 2789              	.LASF67:
+ 2790 09ea 4359424C 		.ascii	"CYBLE_EVT_GATTC_HANDLE_VALUE_NTF\000"
+ 2790      455F4556 
+ 2790      545F4741 
+ 2790      5454435F 
+ 2790      48414E44 
+ 2791              	.LASF98:
+ 2792 0a0b 4359424C 		.ascii	"CYBLE_GATT_HANDLE_VALUE_PAIR_T\000"
+ 2792      455F4741 
+ 2792      54545F48 
+ 2792      414E444C 
+ 2792      455F5641 
+ 2793              	.LASF153:
+ 2794 0a2a 70616D53 		.ascii	"pamSasd.c\000"
+ 2794      6173642E 
+ 2794      6300
+ 2795              	.LASF78:
+ 2796 0a34 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_CONN_CNF\000"
+ 2796      455F4556 
+ 2796      545F4C32 
+ 2796      4341505F 
+ 2796      43424643 
+ 2797              	.LASF110:
+ 2798 0a52 536C6565 		.ascii	"SleepLatency\000"
+ 2798      704C6174 
+ 2798      656E6379 
+ 2798      00
+ 2799              	.LASF137:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 62
+
+
+ 2800 0a5f 456E7175 		.ascii	"Enquire_Sub_Sessions_Requested_For_ID\000"
+ 2800      6972655F 
+ 2800      5375625F 
+ 2800      53657373 
+ 2800      696F6E73 
+ 2801              	.LASF54:
+ 2802 0a85 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BY_GROUP_TYPE_RSP\000"
+ 2802      455F4556 
+ 2802      545F4741 
+ 2802      5454435F 
+ 2802      52454144 
+ 2803              	.LASF12:
+ 2804 0aac 666C6F61 		.ascii	"float\000"
+ 2804      7400
+ 2805              	.LASF128:
+ 2806 0ab2 74656D70 		.ascii	"tempHandle\000"
+ 2806      48616E64 
+ 2806      6C6500
+ 2807              	.LASF1:
+ 2808 0abd 756E7369 		.ascii	"unsigned char\000"
+ 2808      676E6564 
+ 2808      20636861 
+ 2808      7200
+ 2809              	.LASF39:
+ 2810 0acb 4359424C 		.ascii	"CYBLE_EVT_GAP_KEYPRESS_NOTIFICATION\000"
+ 2810      455F4556 
+ 2810      545F4741 
+ 2810      505F4B45 
+ 2810      59505245 
+ 2811              	.LASF14:
+ 2812 0aef 75696E74 		.ascii	"uint64\000"
+ 2812      363400
+ 2813              	.LASF2:
+ 2814 0af6 73686F72 		.ascii	"short int\000"
+ 2814      7420696E 
+ 2814      7400
+ 2815              	.LASF68:
+ 2816 0b00 4359424C 		.ascii	"CYBLE_EVT_GATTC_HANDLE_VALUE_IND\000"
+ 2816      455F4556 
+ 2816      545F4741 
+ 2816      5454435F 
+ 2816      48414E44 
+ 2817              	.LASF87:
+ 2818 0b21 4359424C 		.ascii	"CYBLE_EVT_HCI_PKT\000"
+ 2818      455F4556 
+ 2818      545F4843 
+ 2818      495F504B 
+ 2818      5400
+ 2819              	.LASF156:
+ 2820 0b33 55706461 		.ascii	"UpdateSasd\000"
+ 2820      74655361 
+ 2820      736400
+ 2821              	.LASF103:
+ 2822 0b3e 53756253 		.ascii	"SubSessionID\000"
+ 2822      65737369 
+ 2822      6F6E4944 
+ 2822      00
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 63
+
+
+ 2823              	.LASF131:
+ 2824 0b4b 62797465 		.ascii	"byteCount\000"
+ 2824      436F756E 
+ 2824      7400
+ 2825              	.LASF64:
+ 2826 0b55 4359424C 		.ascii	"CYBLE_EVT_GATTS_PREP_WRITE_REQ\000"
+ 2826      455F4556 
+ 2826      545F4741 
+ 2826      5454535F 
+ 2826      50524550 
+ 2827              	.LASF69:
+ 2828 0b74 4359424C 		.ascii	"CYBLE_EVT_GATTS_HANDLE_VALUE_CNF\000"
+ 2828      455F4556 
+ 2828      545F4741 
+ 2828      5454535F 
+ 2828      48414E44 
+ 2829              	.LASF49:
+ 2830 0b95 4359424C 		.ascii	"CYBLE_EVT_GATTC_ERROR_RSP\000"
+ 2830      455F4556 
+ 2830      545F4741 
+ 2830      5454435F 
+ 2830      4552524F 
+ 2831              	.LASF44:
+ 2832 0baf 4359424C 		.ascii	"CYBLE_EVT_GAP_SMP_NEGOTIATED_AUTH_INFO\000"
+ 2832      455F4556 
+ 2832      545F4741 
+ 2832      505F534D 
+ 2832      505F4E45 
+ 2833              	.LASF150:
+ 2834 0bd6 4379426C 		.ascii	"CyBle_Set32ByPtr\000"
+ 2834      655F5365 
+ 2834      74333242 
+ 2834      79507472 
+ 2834      00
+ 2835              	.LASF129:
+ 2836 0be7 50726573 		.ascii	"PresentData\000"
+ 2836      656E7444 
+ 2836      61746100 
+ 2837              	.LASF16:
+ 2838 0bf3 6C6F6E67 		.ascii	"long double\000"
+ 2838      20646F75 
+ 2838      626C6500 
+ 2839              	.LASF88:
+ 2840 0bff 4359424C 		.ascii	"CYBLE_EVT_FLASH_CORRUPT\000"
+ 2840      455F4556 
+ 2840      545F464C 
+ 2840      4153485F 
+ 2840      434F5252 
+ 2841              	.LASF15:
+ 2842 0c17 63686172 		.ascii	"char\000"
+ 2842      00
+ 2843              	.LASF33:
+ 2844 0c1c 4359424C 		.ascii	"CYBLE_EVT_GAP_DEVICE_DISCONNECTED\000"
+ 2844      455F4556 
+ 2844      545F4741 
+ 2844      505F4445 
+ 2844      56494345 
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 64
+
+
+ 2845              	.LASF72:
+ 2846 0c3e 4359424C 		.ascii	"CYBLE_EVT_GATTS_READ_CHAR_VAL_ACCESS_REQ\000"
+ 2846      455F4556 
+ 2846      545F4741 
+ 2846      5454535F 
+ 2846      52454144 
+ 2847              	.LASF133:
+ 2848 0c67 4D657373 		.ascii	"Message\000"
+ 2848      61676500 
+ 2849              	.LASF140:
+ 2850 0c6f 4765745F 		.ascii	"Get_Ended_Data_Value\000"
+ 2850      456E6465 
+ 2850      645F4461 
+ 2850      74615F56 
+ 2850      616C7565 
+ 2851              	.LASF101:
+ 2852 0c84 466C6167 		.ascii	"Flags\000"
+ 2852      7300
+ 2853              	.LASF83:
+ 2854 0c8a 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CBFC_TX_CREDIT_IND\000"
+ 2854      455F4556 
+ 2854      545F4C32 
+ 2854      4341505F 
+ 2854      43424643 
+ 2855              	.LASF146:
+ 2856 0cad 4379426C 		.ascii	"CyBle_Set16ByPtr\000"
+ 2856      655F5365 
+ 2856      74313642 
+ 2856      79507472 
+ 2856      00
+ 2857              	.LASF21:
+ 2858 0cbe 4359424C 		.ascii	"CYBLE_EVT_HARDWARE_ERROR\000"
+ 2858      455F4556 
+ 2858      545F4841 
+ 2858      52445741 
+ 2858      52455F45 
+ 2859              	.LASF107:
+ 2860 0cd7 546F7461 		.ascii	"TotalWakeTime\000"
+ 2860      6C57616B 
+ 2860      6554696D 
+ 2860      6500
+ 2861              	.LASF127:
+ 2862 0ce5 6C656E67 		.ascii	"length\000"
+ 2862      746800
+ 2863              	.LASF116:
+ 2864 0cec 4D617869 		.ascii	"MaximumVisibleLightLevel\000"
+ 2864      6D756D56 
+ 2864      69736962 
+ 2864      6C654C69 
+ 2864      6768744C 
+ 2865              	.LASF31:
+ 2866 0d05 4359424C 		.ascii	"CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP\000"
+ 2866      455F4556 
+ 2866      545F4741 
+ 2866      50505F41 
+ 2866      44564552 
+ 2867              	.LASF112:
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 65
+
+
+ 2868 0d2d 536E6F6F 		.ascii	"SnoozeTime\000"
+ 2868      7A655469 
+ 2868      6D6500
+ 2869              	.LASF52:
+ 2870 0d38 4359424C 		.ascii	"CYBLE_EVT_GATTS_XCNHG_MTU_REQ\000"
+ 2870      455F4556 
+ 2870      545F4741 
+ 2870      5454535F 
+ 2870      58434E48 
+ 2871              	.LASF134:
+ 2872 0d56 4D657373 		.ascii	"MessageSize\000"
+ 2872      61676553 
+ 2872      697A6500 
+ 2873              	.LASF147:
+ 2874 0d62 626C655F 		.ascii	"ble_SendIndication\000"
+ 2874      53656E64 
+ 2874      496E6469 
+ 2874      63617469 
+ 2874      6F6E00
+ 2875              	.LASF106:
+ 2876 0d75 546F7461 		.ascii	"TotalSleepTime\000"
+ 2876      6C536C65 
+ 2876      65705469 
+ 2876      6D6500
+ 2877              	.LASF59:
+ 2878 0d84 4359424C 		.ascii	"CYBLE_EVT_GATTC_READ_BLOB_RSP\000"
+ 2878      455F4556 
+ 2878      545F4741 
+ 2878      5454435F 
+ 2878      52454144 
+ 2879              	.LASF143:
+ 2880 0da2 73657373 		.ascii	"sessionDescriptorIndicate\000"
+ 2880      696F6E44 
+ 2880      65736372 
+ 2880      6970746F 
+ 2880      72496E64 
+ 2881              	.LASF111:
+ 2882 0dbc 536C6565 		.ascii	"SleepEfficiency\000"
+ 2882      70456666 
+ 2882      69636965 
+ 2882      6E637900 
+ 2883              	.LASF136:
+ 2884 0dcc 456E7175 		.ascii	"Enquire_Sessions_Requested\000"
+ 2884      6972655F 
+ 2884      53657373 
+ 2884      696F6E73 
+ 2884      5F526571 
+ 2885              	.LASF57:
+ 2886 0de7 4359424C 		.ascii	"CYBLE_EVT_GATTC_FIND_BY_TYPE_VALUE_RSP\000"
+ 2886      455F4556 
+ 2886      545F4741 
+ 2886      5454435F 
+ 2886      46494E44 
+ 2887              	.LASF37:
+ 2888 0e0e 4359424C 		.ascii	"CYBLE_EVT_GAP_KEYINFO_EXCHNGE_CMPLT\000"
+ 2888      455F4556 
+ 2888      545F4741 
+ARM GAS  C:\Users\310309~1\AppData\Local\Temp\cczv1s0P.s 			page 66
+
+
+ 2888      505F4B45 
+ 2888      59494E46 
+ 2889              	.LASF91:
+ 2890 0e32 62644861 		.ascii	"bdHandle\000"
+ 2890      6E646C65 
+ 2890      00
+ 2891              	.LASF144:
+ 2892 0e3b 53617344 		.ascii	"SasData\000"
+ 2892      61746100 
+ 2893              	.LASF48:
+ 2894 0e43 4359424C 		.ascii	"CYBLE_EVT_GAP_SMP_LOC_P256_KEYS_GEN_AND_SET_COMPLET"
+ 2894      455F4556 
+ 2894      545F4741 
+ 2894      505F534D 
+ 2894      505F4C4F 
+ 2895 0e76 4500     		.ascii	"E\000"
+ 2896              	.LASF75:
+ 2897 0e78 4359424C 		.ascii	"CYBLE_EVT_L2CAP_CONN_PARAM_UPDATE_RSP\000"
+ 2897      455F4556 
+ 2897      545F4C32 
+ 2897      4341505F 
+ 2897      434F4E4E 
+ 2898              	.LASF42:
+ 2899 0e9e 4359424C 		.ascii	"CYBLE_EVT_GAP_ENHANCE_CONN_COMPLETE\000"
+ 2899      455F4556 
+ 2899      545F4741 
+ 2899      505F454E 
+ 2899      48414E43 
+ 2900              	.LASF90:
+ 2901 0ec2 4359424C 		.ascii	"CYBLE_GATT_DB_ATTR_HANDLE_T\000"
+ 2901      455F4741 
+ 2901      54545F44 
+ 2901      425F4154 
+ 2901      54525F48 
+ 2902              	.LASF13:
+ 2903 0ede 646F7562 		.ascii	"double\000"
+ 2903      6C6500
+ 2904              	.LASF51:
+ 2905 0ee5 4359424C 		.ascii	"CYBLE_EVT_GATT_DISCONNECT_IND\000"
+ 2905      455F4556 
+ 2905      545F4741 
+ 2905      54545F44 
+ 2905      4953434F 
+ 2906              	.LASF108:
+ 2907 0f03 546F7461 		.ascii	"TotalBedTime\000"
+ 2907      6C426564 
+ 2907      54696D65 
+ 2907      00
+ 2908              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
