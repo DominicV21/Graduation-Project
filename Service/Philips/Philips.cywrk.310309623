@@ -188,6 +188,42 @@
 <VisibleNodeIds>
 <v>Philips</v>
 <v>Philips\Physical Activity Monitor Service</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\advertising_LED.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\advertising_LED_PM.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_bless_isr.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_custom.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_eventHandler.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_gatt.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_HAL_INT.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_HAL_PVT.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Clock_1.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Cm0Start.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\connected_LED.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\connected_LED_PM.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\CyBootAsmGnu.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\cyfitter_cfg.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\CyFlash.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\CyLFClk.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\CyLib.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\cymetadata.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\cyPm.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\cyutils.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\debug.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\disconnected_LED.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\disconnected_LED_PM.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\isr_timer.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\main.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamControlPoint.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamCraid.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamCrasd.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamCurrSess.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamGaid.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamGasd.lst</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 </TreeStates>
