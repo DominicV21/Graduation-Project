@@ -198,6 +198,52 @@
 <VisibleNodeIds>
 <v>Philips</v>
 <v>Philips\Physical Activity Monitor Service</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\advertising_LED.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\advertising_LED_PM.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_bless_isr.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_custom.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_eventHandler.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_gatt.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_HAL_INT.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_HAL_PVT.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Clock_1.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Cm0Start.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\connected_LED.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\connected_LED_PM.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\CyBootAsmGnu.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\cyfitter_cfg.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\CyFlash.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\CyLFClk.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\CyLib.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\cymetadata.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\cyPm.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\cyutils.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\debug.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\disconnected_LED.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\disconnected_LED_PM.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\isr_timer.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\main.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamControlPoint.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamCraid.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamCrasd.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamCurrSess.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamGaid.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamGasd.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pams.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamSaid.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamSasd.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamScasd.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pamSessDescr.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Pin_SW2.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Pin_SW2_Int.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Pin_SW2_PM.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pwm.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pwm_PM.lst</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 </TreeStates>
@@ -262,14 +308,16 @@
 </userData>
 </CyGuid_fdba8dfd-b15b-4469-9bbb-9e40c3e70997>
 <Unloaded />
-<OpenDocs />
+<OpenDocs>
+<name v=".\Physical Activity Monitor Service.cydsn\common.h" />
+</OpenDocs>
 <OpenDocsLayout><![CDATA[<?xml version="1.0"?><!--
 
   Actipro Docking/MDI for WinForms
   Copyright (c) 2001-2016 Actipro Software LLC.  All rights reserved.
   http://www.actiprosoftware.com
 
---><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Vertical"><TabbedMdiContainer Size="1458, 520" SelectedTabbedMdiWindow="1f17988e-f9fe-41a1-b927-80f247e4a394"><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="1f17988e-f9fe-41a1-b927-80f247e4a394" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
+--><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Vertical"><TabbedMdiContainer Size="1188, 706" SelectedTabbedMdiWindow="ea3c4961-0e14-4185-ba60-f5faa422527c"><DocumentWindow Key="C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\common.h" Guid="ea3c4961-0e14-4185-ba60-f5faa422527c" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
 <config v="" />
 <AutoUpdate v="true" />
 </CyGuid_843a90a4-0c4b-4e44-991d-05e7fb117a21>
