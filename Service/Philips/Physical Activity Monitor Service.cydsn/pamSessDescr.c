@@ -13,7 +13,7 @@
 #include "pamSessDescr.h"
 
 
-void UpdateSessionDescriptor(PAM_SESSIONDESCRIPTOR_VALUE_T session)
+CYBIT UpdateSessionDescriptor(PAM_SESSIONDESCRIPTOR_VALUE_T session)
 {
     CYBLE_GATTS_HANDLE_VALUE_IND_T tempHandle;
     
@@ -77,15 +77,14 @@ void UpdateSessionDescriptor(PAM_SESSIONDESCRIPTOR_VALUE_T session)
                 //Do not include extra fields
         }
         
-        CyBle_Set16ByPtr(&Message[byteCount], session.PredominantActivityType);
-        byteCount += 2u;
-        
         //if third flag is set to 1 it is a "DELETED" session
         //if third flag is set to 0 it is NOT "DELETED" session
     
         DBG_PRINTF("SESSION DESCRIPTOR SIZE = %i \r\n", byteCount);
         ble_SendIndication(CYBLE_PHYSICAL_ACTIVITY_MONITOR_SESSION_DESCRIPTOR_CHAR_HANDLE, Message, byteCount);
     }
+    
+    return FALSE;
 }
 
 /* [] END OF FILE */

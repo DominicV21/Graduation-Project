@@ -11,11 +11,11 @@ import java.nio.ByteOrder;
 import chdsw.philips.com.haraldlib.HBLogger;
 
 public class HBPhysicalActivityMonitorGaid {
-    private byte[] Flags;
+    private Long Flags = -1L;
     private int SessionID = 0;
     private int SubSessionID = 0;
-    private int RelativeTimestamp;
-    private int SequenceNumber;
+    private Long RelativeTimestamp = -1L;
+    private Long SequenceNumber = -1L;
     private int NormalWalkingEnergyExpenditurePerHour = -1;
     private int IntensityEnergyExpenditurePerHour = -1;
     private int TotalEnergyExpenditurePerHour = -1;
@@ -48,74 +48,71 @@ public class HBPhysicalActivityMonitorGaid {
     private static final int BIT6 = 0x20;
     private static final int BIT7 = 0x40;
     private static final int BIT8 = 0x80;
+    private static final int BIT9 = 0x100;
+    private static final int BIT10 = 0x200;
+    private static final int BIT11 = 0x400;
 
     public HBPhysicalActivityMonitorGaid(byte[] data){
-        int offset = 1; //starts at 1 because 0 is a message header
+        int offset = 0;
         ByteBuffer buffer;
-        Flags = new byte[3];
-        Flags[0] |= data[offset];
-        Flags[1] |= (data[offset + 1]);
-        Flags[2] |= (data[offset + 2]);
+        byte[] dataForLong1 = {0, 0, 0, 0, 0, 0, 0, 0};
+        System.arraycopy(data, offset, dataForLong1, 0, 3);
+        buffer = ByteBuffer.wrap(dataForLong1, 0, 8);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        Flags = buffer.getLong();
         offset += 3;
 
-        normalWalkingEnergyExpenditurePerHourPresent = ((Flags[0] & BIT1) == BIT1);
-        intensityEnergyExpenditurePerHourPresent = ((Flags[0] & BIT2) == BIT2);
-        totalEnergyExpenditurePerHourPresent = ((Flags[0] & BIT3) == BIT3);
-        fatBurnedPerHourPresent = ((Flags[0] & BIT4) == BIT4);
-        metabolicEquivalentPresent = ((Flags[0] & BIT5) == BIT5);
-        speedPresent = ((Flags[0] & BIT6) == BIT6);
-        motionCadencePresent = ((Flags[0] & BIT7) == BIT7);
-        elevationPresent = ((Flags[0] & BIT8) == BIT8);
-        activityCountPerMinutePresent = ((Flags[1] & BIT1) == BIT1);
-        activityLevelPresent = ((Flags[1] & BIT2) == BIT2);
-        activityTypePresent = ((Flags[1] & BIT3) == BIT3);
 
-        //buffer = ByteBuffer.wrap(data, offset, 2);
-        //buffer.order(ByteOrder.LITTLE_ENDIAN);
-        SessionID = (((data[offset] & 0xFF) << 8) | (((data[offset + 1]) & 0xFF)));
+        normalWalkingEnergyExpenditurePerHourPresent = ((Flags & BIT1) == BIT1);
+        intensityEnergyExpenditurePerHourPresent = ((Flags & BIT2) == BIT2);
+        totalEnergyExpenditurePerHourPresent = ((Flags & BIT3) == BIT3);
+        fatBurnedPerHourPresent = ((Flags & BIT4) == BIT4);
+        metabolicEquivalentPresent = ((Flags & BIT5) == BIT5);
+        speedPresent = ((Flags & BIT6) == BIT6);
+        motionCadencePresent = ((Flags & BIT7) == BIT7);
+        elevationPresent = ((Flags & BIT8) == BIT8);
+        activityCountPerMinutePresent = ((Flags & BIT9) == BIT9);
+        activityLevelPresent = ((Flags & BIT10) == BIT10);
+        activityTypePresent = ((Flags & BIT11) == BIT11);
+
+        SessionID = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
         offset+=2;
 
-        SubSessionID = ((data[offset] & 0xFF) << 8) | (data[offset + 1] & 0xFF);
+        SubSessionID = ((data[offset + 1] & 0xFF) << 8) | (data[offset] & 0xFF);
         offset+=2;
 
-        /*
-        int mySessionID = Integer.parseInt(pamControlPointGetEndedSessionID.getText().toString());
-        int mySubSessionID = Integer.parseInt(pamControlPointGetEndedSubSessionID.getText().toString());
-        int swappedSessionID = 0;
-        int swappedSubSessionID = 0;
-
-        swappedSessionID = ((byte)(mySessionID & 0xFF) << 8) + (byte)((mySessionID >> 8) & 0xFF);
-        swappedSubSessionID = ((byte)(mySubSessionID & 0xFF) << 8) + (byte)((mySessionID >> 8) & 0xFF);*/
-
-        int test = ( (data[offset + 3] << 24) | (data[offset + 2] << 16) | (data[offset + 1] << 8) | data[offset]);
-        RelativeTimestamp = test;
+        byte[] dataForLong = {0, 0, 0, 0, 0, 0, 0, 0};
+        System.arraycopy(data, offset, dataForLong, 0, 4);
+        buffer = ByteBuffer.wrap(dataForLong, 0, 8);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        RelativeTimestamp = buffer.getLong();
         offset += 4;
 
         byte[] dataForLong2 = {0, 0, 0, 0, 0, 0, 0, 0};
         System.arraycopy(data, offset, dataForLong2, 0, 4);
         buffer = ByteBuffer.wrap(dataForLong2, 0, 8);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
-        SequenceNumber = buffer.getInt();
+        SequenceNumber = buffer.getLong();
         offset += 4;
 
         if(normalWalkingEnergyExpenditurePerHourPresent)
         {
-            NormalWalkingEnergyExpenditurePerHour = data[offset] + data[offset + 1];
+            NormalWalkingEnergyExpenditurePerHour = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
         if(intensityEnergyExpenditurePerHourPresent)
         {
-            IntensityEnergyExpenditurePerHour = data[offset];
+            IntensityEnergyExpenditurePerHour = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
         if(totalEnergyExpenditurePerHourPresent)
         {
-            TotalEnergyExpenditurePerHour = data[offset];
+            TotalEnergyExpenditurePerHour = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
         if(fatBurnedPerHourPresent)
         {
-            FatBurnedPerHour = data[offset];
+            FatBurnedPerHour = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
         if(metabolicEquivalentPresent)
@@ -124,32 +121,32 @@ public class HBPhysicalActivityMonitorGaid {
         }
         if(speedPresent)
         {
-            Speed = data[offset];
+            Speed = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
         if(motionCadencePresent)
         {
-            MotionCadence = data[offset];
+            MotionCadence = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
         if(elevationPresent)
         {
-            Elevation = data[offset] | (data[offset + 1] << 8) + (data[offset + 2] << 16);
+            Elevation = (((data[offset + 2] & 0xFF) << 16) | ((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 3;
         }
         if(activityCountPerMinutePresent)
         {
-            ActivityCountPerMinute = data[offset];
+            ActivityCountPerMinute = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
         if(activityLevelPresent)
         {
-            ActivityLevel = data[offset];
+            ActivityLevel = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
         if(activityTypePresent)
         {
-            ActivityType = data[offset];
+            ActivityType = (((data[offset + 1] & 0xFF) << 8) | (((data[offset]) & 0xFF)));
             offset += 2;
         }
     }
@@ -157,11 +154,11 @@ public class HBPhysicalActivityMonitorGaid {
 
 
 
-    public byte[] getFlags() { return Flags; }
+    public Long getFlags() { return Flags; }
     public int getSessionID() { return SessionID; }
     public int getSubSessionID() { return SubSessionID; }
-    public int getRelativeTimestamp() {return RelativeTimestamp; }
-    public int getSequenceNumber() {return SequenceNumber; }
+    public Long getRelativeTimestamp() {return RelativeTimestamp; }
+    public Long getSequenceNumber() {return SequenceNumber; }
     public int getNormalWalkingEnergyExpenditurePerHour() {return NormalWalkingEnergyExpenditurePerHour; }
     public int getIntensityEnergyExpenditurePerHour() {return IntensityEnergyExpenditurePerHour; }
     public int getTotalEnergyExpenditurePerHour() {return TotalEnergyExpenditurePerHour; }
@@ -174,11 +171,11 @@ public class HBPhysicalActivityMonitorGaid {
     public int getActivityLevel() {return ActivityLevel; }
     public int getActivityType() {return ActivityType; }
 
-    public void setFlags(byte[] Flags){this.Flags=Flags;}
+    public void setFlags(Long Flags){this.Flags=Flags;}
     public void setSessionID(int SessionID){this.SessionID=SessionID;}
     public void setSubSessionID(int SubSessionID){this.SubSessionID=SubSessionID;}
-    public void setRelativeTimestamp(int RelativeTimestamp){this.RelativeTimestamp=RelativeTimestamp;}
-    public void setSequenceNumber(int SequenceNumber){this.SequenceNumber=SequenceNumber;}
+    public void setRelativeTimestamp(Long RelativeTimestamp){this.RelativeTimestamp=RelativeTimestamp;}
+    public void setSequenceNumber(Long SequenceNumber){this.SequenceNumber=SequenceNumber;}
     public void setNormalWalkingEnergyExpenditurePerHour(int NormalWalkingEnergyExpenditurePerHour){this.NormalWalkingEnergyExpenditurePerHour=NormalWalkingEnergyExpenditurePerHour;}
     public void setIntensityEnergyExpenditurePerHour(int IntensityEnergyExpenditurePerHour){this.IntensityEnergyExpenditurePerHour=IntensityEnergyExpenditurePerHour;}
     public void setTotalEnergyExpenditurePerHour(int TotalEnergyExpenditurePerHour){this.TotalEnergyExpenditurePerHour=TotalEnergyExpenditurePerHour;}

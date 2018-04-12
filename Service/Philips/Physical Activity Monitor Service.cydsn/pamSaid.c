@@ -87,25 +87,25 @@ uint8 getPresentSaidFields(uint8 *PresentData)
     if(CHECK_BIT(SaiData.Flags, 1/*VISIBLE LIGHT LEVEL PRESENT*/) &&
        CHECK_BIT(pamFeature, VISIBLE_LIGHT_LEVEL_SUPPORTED))
     {
-        PresentData[length] = SaiData.VisibleLightLevel[0];
+        PresentData[length] = SaiData.VisibleLightLevel[2];
         PresentData[length+1] = SaiData.VisibleLightLevel[1];
-        PresentData[length+2] = SaiData.VisibleLightLevel[2];
+        PresentData[length+2] = SaiData.VisibleLightLevel[0];
         length += sizeof(SaiData.VisibleLightLevel);
     }
     if(CHECK_BIT(SaiData.Flags, 1/*UV LIGHT LEVEL PRESENT*/) &&
        CHECK_BIT(pamFeature, UV_LIGHT_LEVEL_SUPPORTED))
     {
-        PresentData[length] = SaiData.UVLightLevel[0];
+        PresentData[length] = SaiData.UVLightLevel[2];
         PresentData[length+1] = SaiData.UVLightLevel[1];
-        PresentData[length+2] = SaiData.UVLightLevel[2];
+        PresentData[length+2] = SaiData.UVLightLevel[0];
         length += sizeof(SaiData.UVLightLevel);
     }
     if(CHECK_BIT(SaiData.Flags, 1/*IR LIGHT LEVEL PRESENT*/) &&
        CHECK_BIT(pamFeature, IR_LIGHT_LEVEL_SUPPORTED))
     {
-        PresentData[length] = SaiData.IRLightLevel[0];
+        PresentData[length] = SaiData.IRLightLevel[2];
         PresentData[length+1] = SaiData.IRLightLevel[1];
-        PresentData[length+2] = SaiData.IRLightLevel[2];
+        PresentData[length+2] = SaiData.IRLightLevel[0];
         length += sizeof(SaiData.IRLightLevel);
     }
     if(CHECK_BIT(SaiData.Flags, 1/*SLEEP STAGE PRESENT*/) &&

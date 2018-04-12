@@ -9,8 +9,16 @@ import android.os.Handler;
 
 import chdsw.philips.com.haraldlib.services.HBServiceListener;
 import chdsw.philips.com.haraldlib.services.HBServiceListenerHandler;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorControlPoint;
 import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorFeature;
 import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorGaid;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorGasd;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorCraid;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorCrasd;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorScasd;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorSaid;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorSasd;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorCurrSess;
 import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorSessDescriptor;
 
 /**
@@ -45,6 +53,86 @@ public class HBPhysicalActivityMonitorListenerHandler implements HBPhysicalActiv
             @Override
             public void run() {
                 listener.onPamGaid(deviceAddress, pamGaid);
+            }
+        });
+    }
+
+    @Override
+    public void onPamGasd(final String deviceAddress, final HBPhysicalActivityMonitorGasd pamGasd) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPamGasd(deviceAddress, pamGasd);
+            }
+        });
+    }
+
+    @Override
+    public void onPamCraid(final String deviceAddress, final HBPhysicalActivityMonitorCraid pamCraid) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPamCraid(deviceAddress, pamCraid);
+            }
+        });
+    }
+
+    @Override
+    public void onPamCrasd(final String deviceAddress, final HBPhysicalActivityMonitorCrasd pamCrasd) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPamCrasd(deviceAddress, pamCrasd);
+            }
+        });
+    }
+
+    @Override
+    public void onPamScasd(final String deviceAddress, final HBPhysicalActivityMonitorScasd pamScasd) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPamScasd(deviceAddress, pamScasd);
+            }
+        });
+    }
+
+    @Override
+    public void onPamSaid(final String deviceAddress, final HBPhysicalActivityMonitorSaid pamSaid) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPamSaid(deviceAddress, pamSaid);
+            }
+        });
+    }
+
+    @Override
+    public void onPamSasd(final String deviceAddress, final HBPhysicalActivityMonitorSasd pamSasd) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPamSasd(deviceAddress, pamSasd);
+            }
+        });
+    }
+
+    @Override
+    public void onPamCP(final String deviceAddress, final HBPhysicalActivityMonitorControlPoint pamCP) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPamCP(deviceAddress, pamCP);
+            }
+        });
+    }
+
+    @Override
+    public void onPamCurrSess(final String deviceAddress, final HBPhysicalActivityMonitorCurrSess pamCurrSess) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onPamCurrSess(deviceAddress, pamCurrSess);
             }
         });
     }

@@ -39,29 +39,37 @@ CY_ISR ( isr_timer_Handler )
 CY_ISR( Pin_SW2_Handler )
 {
     DBG_PRINTF("BUTTON PRESS \r\n");
+
+    CraiData.RelativeTimestamp++;
+    UpdateCraid();
     
-    GaiData.SessionID = 32766;
-    GaiData.RelativeTimestamp = 32766;
-    GaiData.SequenceNumber = 32766;
+    
+    CrasData.RelativeTimestamp++;
+    UpdateCrasd();
+    
+    
+    GaiData.RelativeTimestamp++;
+    GaiData.SessionID = 0xABCD;
     UpdateGaid();
     
-    //GasData.RelativeTimestamp++;
-    //UpdateGasd();
-    //
-    //CraiData.RelativeTimestamp++;
-    //UpdateCraid();
-    //
-    //CrasData.RelativeTimestamp++;
-    //UpdateCrasd();
-    //
-    //ScasData.RelativeTimestamp++;
-    //UpdateScasd();
-    //
-    //SaiData.RelativeTimestamp++;
-    //UpdateSaid();
-    //
-    //SasData.RelativeTimestamp++;
-    //UpdateSasd();
+    GasData.RelativeTimestamp++;
+    GasData.SessionID = 0xABCD;
+    UpdateGasd();
+    
+    
+    
+    
+    SaiData.RelativeTimestamp++;
+    UpdateSaid();
+    
+    
+    SasData.RelativeTimestamp++;
+    UpdateSasd();
+    
+    
+    ScasData.RelativeTimestamp++;
+    UpdateScasd();
+    
     
     Pin_SW2_ClearInterrupt();
 }
@@ -79,6 +87,7 @@ void BleEventHandler(uint32 event, void* eventParam)
     {
         case CYBLE_EVT_STACK_ON:
         case CYBLE_EVT_GAP_DEVICE_DISCONNECTED:
+        {
             CyBle_GappStartAdvertisement(CYBLE_ADVERTISING_FAST);
             DBG_PRINTF("Start Advertisement with addr: ");
             CYBLE_GAP_BD_ADDR_T localAddr;
@@ -103,14 +112,16 @@ void BleEventHandler(uint32 event, void* eventParam)
             currentsessionIndicate = DISABLED;
             sessionDescriptorIndicate = DISABLED;
             break;
-            
+        }
         case CYBLE_EVT_GAP_DEVICE_CONNECTED:
+        {
             /* BLE link is established */
             DBG_PRINTF("CYBLE_EVT_GAP_DEVICE_CONNECTED \r\n");
             HandleLeds();
             break;
-        
+        }
         case CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP:
+        {
             HandleLeds();
             DBG_PRINTF("CYBLE_EVT_GAPP_ADVERTISEMENT_START_STOP \r\n");
             if(CyBle_GetState() == CYBLE_STATE_DISCONNECTED)
@@ -122,196 +133,209 @@ void BleEventHandler(uint32 event, void* eventParam)
                 CySysPmStop();
             }
             break;
-            
+        }
         case CYBLE_EVT_GATTS_HANDLE_VALUE_CNF:
+        {
             DBG_PRINTF("indication confirmation \r\n");
             break;
-            
+        }
         case CYBLE_EVT_GAP_PASSKEY_DISPLAY_REQUEST:
+        {
             DBG_PRINTF("\r\n");
             DBG_PRINTF("CYBLE_EVT_GAP_PASSKEY_DISPLAY_REQUEST. Passkey is: %lu.\r\n",
                 *(uint32 *)eventParam);
             break;
-            
+        }
         case CYBLE_EVT_GAP_ENCRYPT_CHANGE:
+        {
             DBG_PRINTF("CYBLE_EVT_GAP_ENCRYPT_CHANGE: %d \r\n", *(uint8 *)eventParam);
             break;
-        
+        }
         case CYBLE_EVT_GATT_CONNECT_IND:
+        {
             DBG_PRINTF("CYBLE_EVT_GATT_CONNECT_IND: attId %x, bdHandle %x \r\n", 
                 ((CYBLE_CONN_HANDLE_T *)eventParam)->attId, ((CYBLE_CONN_HANDLE_T *)eventParam)->bdHandle);
             break;
-            
+        }
         case CYBLE_EVT_GAP_AUTH_COMPLETE:
+        {
             DBG_PRINTF("CYBLE_EVT_GAP_AUTH_COMPLETE: security:%x, bonding:%x, ekeySize:%x, authErr %x \r\n",
                         ((CYBLE_GAP_AUTH_INFO_T *)eventParam)->security,
                         ((CYBLE_GAP_AUTH_INFO_T *)eventParam)->bonding, 
                         ((CYBLE_GAP_AUTH_INFO_T *)eventParam)->ekeySize, 
                         ((CYBLE_GAP_AUTH_INFO_T *)eventParam)->authErr);
             break;
-            
-            
-            
+        }
         case CYBLE_EVT_GATTS_WRITE_REQ:
+        {
             wrReqParam = (CYBLE_GATTS_WRITE_REQ_PARAM_T *) eventParam;
-
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_GENERAL_ACTIVITY_INSTANTANEOUS_DATA_GENERALACTIVITYINSTANTANEOUSDATACCCD_DESC_HANDLE)
+            //CCCD Region
             {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                generalinstantaneousdataNotify = wrReqParam->handleValPair.value.val[0] & 0x01;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop GENERAL ACTIVITY INSTANTANEOUS DATA Notifications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_GENERAL_ACTIVITY_SUMMARY_DATA_GENERALACTIVITYSUMMARYDATACCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                generalsummarydataIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop GENERAL ACTIVITY SUMMARY DATA Indications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_CARDIORESPIRATORY_ACTIVITY_INSTANTANEOUS_DATA_CARDIORESPIRATORYAVTIVITYINSTANTANEOUSDATACCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                cardiorespiratoryactivityinstantaneousdataNotify = wrReqParam->handleValPair.value.val[0] & 0x01;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop CARDIORESPIRATORY ACTIVITY INSTANTANEOUS DATA Notifications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_CARDIORESPIRATORY_ACTIVITY_SUMMARY_DATA_CARDIORESPIRATORYACTIVITYSUMMARYDATACCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                cardiorespiratoryactivitysummarydataIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop CARDIORESPIRATORY ACTIVITY SUMMARY DATA Indications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_STEP_COUNTER_ACTIVITY_SUMMARY_DATA_STEPCOUNTERACTIVITYSUMMARYDATACCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                stepcounteractivitysummarydataIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop STEP COUNTER ACTIVITY SUMMARY DATA Indications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_SLEEP_ACTIVITY_INSTANTANEOUS_DATA_SLEEPACTIVITYINSTANTANEOUSDATACCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                sleepactivityinstantaneousdataNotify = wrReqParam->handleValPair.value.val[0] & 0x01;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop SLEEP ACTIVITY INSTANTANEOUS DATA Notifications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_SLEEP_ACTIVITY_SUMMARY_DATA_SLEEPACTIVITYSUMMARYDATACCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                sleepactivitysummarydataIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop SLEEP ACTIVITY SUMMARY DATA Indications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_PHYSICALACTIVITYMONITORCONTROLPOINTCCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                controlpointIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop CONTROL POINT Indications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_CURRENT_SESSION_CURRENTSESSIONCCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                currentsessionIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop CURRENT SESSION Indications \r\n");
-            }
-            
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_SESSION_DESCRIPTOR_SESSIONDESCRIPTORCCCD_DESC_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                sessionDescriptorIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
-                CyBle_GattsWriteRsp(cyBle_connHandle);
-                DBG_PRINTF("Start/stop SESSION DESCRIPTOR Indications \r\n");
-            }
-            
-            //User control point write handler
-            if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE)
-            {
-                CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
-                CYBLE_GATTS_ERR_PARAM_T err;
-                err.attrHandle = wrReqParam->handleValPair.attrHandle;
-                err.opcode = CYBLE_GATT_WRITE_REQ;
-                
-                DBG_PRINTF("Control point write request with: %i \r\n", wrReqParam->handleValPair.value.val[0]);
-                
-                switch(wrReqParam->handleValPair.value.val[0])
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_GENERAL_ACTIVITY_INSTANTANEOUS_DATA_GENERALACTIVITYINSTANTANEOUSDATACCCD_DESC_HANDLE)
                 {
-                    case ENQUIRE_SESSIONS:
-                        DBG_PRINTF("Enquire Sessions \r\n");
-                        if(!controlpointIndicate || !sessionDescriptorIndicate)
-                        {
-                            DBG_PRINTF("Client not subscribed to control point or session descriptor indications \r\n");
-                            err.errorCode = CYBLE_GATT_ERR_CCCD_IMPROPERLY_CONFIGURED;
-                            (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
-                            return;
-                            
-                        }
-                        else if(totalSessionCount > 0)
-                        {
-                            Enquire_Sessions_Requested = YES;
-                        }
-                        else
-                        {
-                            DBG_PRINTF("There are no sessions in the database \r\n");
-                            //this is going to be an indication via CP
-                        }
-                        break;
-                    case ENQUIRE_SUB_SESSIONS:
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    generalinstantaneousdataNotify = wrReqParam->handleValPair.value.val[0] & 0x01;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop GENERAL ACTIVITY INSTANTANEOUS DATA Notifications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_GENERAL_ACTIVITY_SUMMARY_DATA_GENERALACTIVITYSUMMARYDATACCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    generalsummarydataIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop GENERAL ACTIVITY SUMMARY DATA Indications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_CARDIORESPIRATORY_ACTIVITY_INSTANTANEOUS_DATA_CARDIORESPIRATORYAVTIVITYINSTANTANEOUSDATACCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    cardiorespiratoryactivityinstantaneousdataNotify = wrReqParam->handleValPair.value.val[0] & 0x01;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop CARDIORESPIRATORY ACTIVITY INSTANTANEOUS DATA Notifications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_CARDIORESPIRATORY_ACTIVITY_SUMMARY_DATA_CARDIORESPIRATORYACTIVITYSUMMARYDATACCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    cardiorespiratoryactivitysummarydataIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop CARDIORESPIRATORY ACTIVITY SUMMARY DATA Indications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_STEP_COUNTER_ACTIVITY_SUMMARY_DATA_STEPCOUNTERACTIVITYSUMMARYDATACCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    stepcounteractivitysummarydataIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop STEP COUNTER ACTIVITY SUMMARY DATA Indications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_SLEEP_ACTIVITY_INSTANTANEOUS_DATA_SLEEPACTIVITYINSTANTANEOUSDATACCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    sleepactivityinstantaneousdataNotify = wrReqParam->handleValPair.value.val[0] & 0x01;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop SLEEP ACTIVITY INSTANTANEOUS DATA Notifications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_SLEEP_ACTIVITY_SUMMARY_DATA_SLEEPACTIVITYSUMMARYDATACCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    sleepactivitysummarydataIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop SLEEP ACTIVITY SUMMARY DATA Indications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_PHYSICALACTIVITYMONITORCONTROLPOINTCCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    controlpointIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop CONTROL POINT Indications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_CURRENT_SESSION_CURRENTSESSIONCCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    currentsessionIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop CURRENT SESSION Indications \r\n");
+                }
+                
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_SESSION_DESCRIPTOR_SESSIONDESCRIPTORCCCD_DESC_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    sessionDescriptorIndicate = wrReqParam->handleValPair.value.val[0] & 0x02;
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
+                    DBG_PRINTF("Start/stop SESSION DESCRIPTOR Indications \r\n");
+                }
+            }
+            //User control point write handler region
+            {
+                if(wrReqParam->handleValPair.attrHandle == CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE)
+                {
+                    CyBle_GattsWriteAttributeValue(&wrReqParam->handleValPair, 0, &cyBle_connHandle, CYBLE_GATT_DB_PEER_INITIATED);
+                    CYBLE_GATTS_ERR_PARAM_T err;
+                    err.attrHandle = wrReqParam->handleValPair.attrHandle;
+                    err.opcode = CYBLE_GATT_WRITE_REQ;
+                    
+                    DBG_PRINTF("Control point write request with: %i \r\n", wrReqParam->handleValPair.value.val[0]);
+                    
+                    switch(wrReqParam->handleValPair.value.val[0])
                     {
-                        uint16 subSessionIDBuffer = 0;
-                        if(wrReqParam->handleValPair.value.val[2] == 0) { subSessionIDBuffer = wrReqParam->handleValPair.value.val[1]; }
-                            else if(wrReqParam->handleValPair.value.val[1] == 0) { subSessionIDBuffer = wrReqParam->handleValPair.value.val[2] * 255; }
-                            else { subSessionIDBuffer = wrReqParam->handleValPair.value.val[2] * 256 + wrReqParam->handleValPair.value.val[1]; }
-                            
-                        DBG_PRINTF("Enquire Sub-Sessions with with session ID: %i \r\n", subSessionIDBuffer);
-                        
-                        if(!controlpointIndicate || !sessionDescriptorIndicate)
+                        case ENQUIRE_SESSIONS:
                         {
-                            DBG_PRINTF("Client not subscribed to control point or session descriptor indications \r\n");
-                            err.errorCode = CYBLE_GATT_ERR_CCCD_IMPROPERLY_CONFIGURED;
-                            (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
-                            return;
-                        }
-                        else if(totalSessionCount == 0)
-                        {
-                            DBG_PRINTF("There are no sessions in the database \r\n");
-                            //this is going to be an indication via CP
-                        }
-                        else 
-                        {
-                            Enquire_Sub_Sessions_Requested_For_ID = subSessionIDBuffer;
-                            
-                            CYBIT foundSubSession = NO;
-                            for(int i = 0; i < totalSubSessionCount; i++)
+                            DBG_PRINTF("Enquire Sessions \r\n");
+                            if(!controlpointIndicate || !sessionDescriptorIndicate)
                             {
-                                if(Enquire_Sub_Sessions_Requested_For_ID == mySubSessions[i].SessionID)
-                                {
-                                    foundSubSession = YES;
-                                }
+                                DBG_PRINTF("Client not subscribed to control point or session descriptor indications \r\n");
+                                err.errorCode = CYBLE_GATT_ERR_CCCD_IMPROPERLY_CONFIGURED;
+                                (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
+                                return;
+                                
                             }
-                            if(!foundSubSession)
+                            else if(totalSessionCount > 0)
                             {
-                                Enquire_Sub_Sessions_Requested_For_ID = 0;
-                                DBG_PRINTF("There are no Sessions with this ID thus no sub sessions can be enquired \r\n");
-                                err.errorCode = 0x81;
+                                Enquire_Sessions_Requested = YES;
+                            }
+                            else
+                            {
+                                DBG_PRINTF("There are no sessions in the database \r\n");
+                                err.errorCode = 0x85;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
+                            break;
                         }
-                        break;
-                    }
-                    case GET_ENDED_SESSION_DATA:
+                        case ENQUIRE_SUB_SESSIONS:
+                        {
+                            uint16 subSessionIDBuffer = 0;
+                            if(wrReqParam->handleValPair.value.val[2] == 0) { subSessionIDBuffer = wrReqParam->handleValPair.value.val[1]; }
+                                else if(wrReqParam->handleValPair.value.val[1] == 0) { subSessionIDBuffer = wrReqParam->handleValPair.value.val[2] * 255; }
+                                else { subSessionIDBuffer = wrReqParam->handleValPair.value.val[2] * 256 + wrReqParam->handleValPair.value.val[1]; }
+                                
+                            DBG_PRINTF("Enquire Sub-Sessions with with session ID: %i \r\n", subSessionIDBuffer);
+                            
+                            if(!controlpointIndicate || !sessionDescriptorIndicate)
+                            {
+                                DBG_PRINTF("Client not subscribed to control point or session descriptor indications \r\n");
+                                err.errorCode = CYBLE_GATT_ERR_CCCD_IMPROPERLY_CONFIGURED;
+                                (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
+                                return;
+                            }
+                            else if(totalSessionCount == 0)
+                            {
+                                DBG_PRINTF("There are no sessions in the database \r\n");
+                                err.errorCode = 0x85;
+                                (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
+                                return;
+                            }
+                            else 
+                            {
+                                Enquire_Sub_Sessions_Requested_For_ID = subSessionIDBuffer;
+                                
+                                CYBIT foundSubSession = NO;
+                                for(int i = 0; i < totalSubSessionCount; i++)
+                                {
+                                    if(Enquire_Sub_Sessions_Requested_For_ID == mySubSessions[i].SessionID)
+                                    {
+                                        foundSubSession = YES;
+                                    }
+                                }
+                                if(!foundSubSession)
+                                {
+                                    Enquire_Sub_Sessions_Requested_For_ID = 0;
+                                    DBG_PRINTF("There are no Sessions with this ID thus no sub sessions can be enquired \r\n");
+                                    err.errorCode = 0x81;
+                                    (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
+                                    return;
+                                }
+                            }
+                            break;
+                        }
+                        case GET_ENDED_SESSION_DATA:
+                        {
                         if(!controlpointIndicate)
                         {
                             DBG_PRINTF("Client not subscribed to control point indications \r\n");
@@ -397,7 +421,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                                 DBG_PRINTF("There are no Sub-Sessions with this ID: %i \r\n", Get_Ended_Data_Sub_SessionID);
                                 Get_Ended_Data_SessionID = 0;
                                 Get_Ended_Data_Sub_SessionID = 0;
-                                err.errorCode = 0x81;
+                                err.errorCode = 0x82;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
@@ -410,7 +434,9 @@ void BleEventHandler(uint32 event, void* eventParam)
                             }
                         }
                         break;
-                    case START_SESSION_SUB_SESSION:
+                    }
+                        case START_SESSION_SUB_SESSION:
+                        {
                         if(wrReqParam->handleValPair.value.val[1] == 0x00)
                         {
                             sessionCount++;
@@ -433,7 +459,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                             else
                             {
                                 DBG_PRINTF("Cannot start new Sub-Session need to start a session first\r\n");
-                                err.errorCode = 0x86;
+                                err.errorCode = 0x87;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
@@ -441,12 +467,14 @@ void BleEventHandler(uint32 event, void* eventParam)
                         else
                         {
                             DBG_PRINTF("Unknown Command\r\n Specify '0400' to start a session and '0401' to start sub-session \r\n");
-                            err.errorCode = 0x88;
+                            err.errorCode = 0x89;
                             (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                             return;
                         }
                         break;
-                    case STOP_SESSION:
+                    }
+                        case STOP_SESSION:
+                        {
                         DBG_PRINTF("Stop Session\r\n");
                         if (stop_session(mySessions, &totalSessionCount))
                         {
@@ -456,13 +484,14 @@ void BleEventHandler(uint32 event, void* eventParam)
                         else
                         {
                             DBG_PRINTF("Can't stop session, No running session\r\n");
-                            err.errorCode = 0x87;
+                            err.errorCode = 0x88;
                             (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                             return;
                         }
                         break;
-                    case DELETE_SESSION:
-                    {
+                    }
+                        case DELETE_SESSION:
+                        {
                         uint16 sessionIDBuffer = 0;
                         if(wrReqParam->handleValPair.value.val[2] == 0) { sessionIDBuffer = wrReqParam->handleValPair.value.val[1]; }
                             else if(wrReqParam->handleValPair.value.val[1] == 0) { sessionIDBuffer = wrReqParam->handleValPair.value.val[2] * 255; }
@@ -501,13 +530,65 @@ void BleEventHandler(uint32 event, void* eventParam)
                         }
                         break;
                     }
-                    default:
-                        DBG_PRINTF("Unknown Command\r\n");
-                        err.errorCode = CYBLE_GATT_ERR_OP_CODE_NOT_SUPPORTED;
-                        (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
-                        return;
+                        case SET_AVERAGE_ACTIVITY_TYPE:
+                        {
+                            DBG_PRINTF("Set Average Activity Type Requested\r\n");
+                            if(!controlpointIndicate)
+                            {
+                                DBG_PRINTF("Client not subscribed to control point indications \r\n");
+                                err.errorCode = CYBLE_GATT_ERR_CCCD_IMPROPERLY_CONFIGURED;
+                                (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
+                                return;
+                            }
+                            else if(totalSessionCount == 0)
+                            {
+                                DBG_PRINTF("There are no sessions in the database \r\n");
+                                
+                                //this is going to be a indication via CP
+                            }
+                            
+                            int scope = wrReqParam->handleValPair.value.val[1];
+                            uint8 UserDefinedActivityType = wrReqParam->handleValPair.value.val[2];
+                            
+                            switch(scope)
+                            {
+                                case CURRENT_SUB_SESSION:
+                                {
+                                    UserDefinedActivityTypeAllSubSessions[CurrSession.SessionID][CurrSession.SubSessionID] = UserDefinedActivityType;
+                                    GasData.AverageActivityType = ((UserDefinedActivityTypeAllSubSessions[CurrSession.SessionID][CurrSession.SubSessionID] & 0xFF) << 8) | (GasData.AverageActivityType & 0xFF);
+                                    break;
+                                }
+                                case ALL_SUB_SESSIONS_IN_SESSION:
+                                {
+                                    for(int i = 0; i < totalSubSessionCount; i++)
+                                    {
+                                        if(mySubSessions[i].SessionID == CurrSession.SessionID)
+                                        {
+                                            UserDefinedActivityTypeAllSubSessions[CurrSession.SessionID][mySubSessions[i].SubSessionID] = UserDefinedActivityType;
+                                            DBG_PRINTF("Value Set for: \r\n Sess ID: %i \r\n Sub Ses ID: %i \r\n Value(HEX): %x \r\n", CurrSession.SessionID, mySubSessions[i].SubSessionID, UserDefinedActivityType);
+                                        }
+                                    }  
+                                    break;
+                                }
+                                default:
+                                {
+                                    DBG_PRINTF("Invalid Parameter\r\n");
+                                    //INVALID PARAMETER
+                                    return;
+                                }
+                            }
+                            break;
+                        }
+                        default:
+                        {
+                            DBG_PRINTF("Unknown Command\r\n");
+                            err.errorCode = CYBLE_GATT_ERR_OP_CODE_NOT_SUPPORTED;
+                            (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
+                            return;
+                        }
+                    }
+                    CyBle_GattsWriteRsp(cyBle_connHandle);
                 }
-                CyBle_GattsWriteRsp(cyBle_connHandle);
             }
             
         case CYBLE_EVT_GATTS_READ_CHAR_VAL_ACCESS_REQ:
@@ -516,6 +597,7 @@ void BleEventHandler(uint32 event, void* eventParam)
         
         default:
             break;
+        }
     }
 }
 
@@ -535,7 +617,7 @@ int main(void)
     TCPWM_Start();
     isr_timer_StartEx( isr_timer_Handler );
     
-    
+    CYBIT procedureFailed = FALSE;
     
     apiResult = CyBle_Start(BleEventHandler);
     
@@ -568,21 +650,33 @@ int main(void)
         {
             for(int i = 0; i < totalSessionCount; i++)
             {
-                UpdateSessionDescriptor(mySessions[i]);
+                procedureFailed = UpdateSessionDescriptor(mySessions[i]);
             }
+            if(procedureFailed) { updateControlPointEnquireSucces(0xFF, 0xFF); }
+            else                { updateControlPointEnquireSucces(0xFC, totalSessionCount); }
+            
             Enquire_Sessions_Requested = NO;
+            procedureFailed = FALSE;
+            
         }
         
         if(Enquire_Sub_Sessions_Requested_For_ID > 0)
         {
+            uint16 count = 0;
             for(int i = 0; i < totalSubSessionCount; i++)
             {
                 if(Enquire_Sub_Sessions_Requested_For_ID == mySubSessions[i].SessionID)
                 {
-                    UpdateSessionDescriptor(mySubSessions[i]);
+                    procedureFailed = UpdateSessionDescriptor(mySubSessions[i]);
+                    count++;
                 }
             }
+            
+            if(procedureFailed) { updateControlPointEnquireSucces(0xFE, 0xFF); }
+            else                { updateControlPointEnquireSucces(0xFB, count); }
+            
             Enquire_Sub_Sessions_Requested_For_ID = NO;
+            procedureFailed = FALSE;
         }
         
         if(send_Deleted_Sessions)
@@ -598,6 +692,7 @@ int main(void)
         
         if(Get_Ended_Data_SessionID > 0)
         {
+            uint32 count = 0;
             if(Get_Ended_Data_Sub_SessionID == 0xFFFF)
             {
                 for(int i = 0; i < totalSubSessionCount; i++)
@@ -605,15 +700,19 @@ int main(void)
                     if(Get_Ended_Data_SessionID == mySubSessions[i].SessionID)
                     {
                         uint16 subSessionID = mySubSessions[i].SubSessionID;
-                        SimulateValues(&Get_Ended_Data_SessionID, &subSessionID);
+                        count += SimulateValues(&Get_Ended_Data_SessionID, &subSessionID);
                         
                     }
                 }
             }
             else
             {
-                SimulateValues(&Get_Ended_Data_SessionID, &Get_Ended_Data_Sub_SessionID);
+                count += SimulateValues(&Get_Ended_Data_SessionID, &Get_Ended_Data_Sub_SessionID);
             }
+            
+            if(procedureFailed) { updateControlPointEnquireSucces(0xFD, 0xFF); }
+            else                { updateControlPointGetEndedDataSucces(0xFA, count); }
+            
             
             Get_Ended_Data_SessionID = 0;
             Get_Ended_Data_Sub_SessionID = 0;
@@ -623,269 +722,277 @@ int main(void)
     }
 }
 
-void SimulateValues(uint16* SessionID, uint16* SubSessionID)
+uint32 SimulateValues(uint16* SessionID, uint16* SubSessionID)
 {
     //GaiData
     {
-            GaiData.SessionID = *SessionID;
-            GaiData.SubSessionID = *SubSessionID;
-            GaiData.ActivityCountPerMinute = *SessionID * 10 + *SubSessionID;
-            GaiData.ActivityLevel = *SessionID * 10 + *SubSessionID;
-            GaiData.ActivityType = *SessionID * 10 + *SubSessionID;
-            GaiData.Elevation[0] = *SessionID * 10 + *SubSessionID;
-            GaiData.Elevation[1] = *SessionID * 10 + *SubSessionID;
-            GaiData.Elevation[2] = *SessionID * 10 + *SubSessionID;
-            GaiData.FatBurnedPerHour = *SessionID * 10 + *SubSessionID;
-            GaiData.IntensityEnergyExpenditurePerHour = *SessionID * 10 + *SubSessionID;
-            GaiData.MetabolicEquivalent = *SessionID * 10 + *SubSessionID;
-            GaiData.MotionCadence = *SessionID * 10 + *SubSessionID;
-            GaiData.NormalWalkingEnergyExpenditurePerHour = *SessionID * 10 + *SubSessionID;
-            GaiData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
-            GaiData.SequenceNumber = *SessionID * 10 + *SubSessionID;
-            GaiData.Speed = *SessionID * 10 + *SubSessionID;
-            GaiData.TotalEnergyExpenditurePerHour = *SessionID * 10 + *SubSessionID;
-        }
+        GaiData.SessionID = *SessionID;
+        GaiData.SubSessionID = *SubSessionID;
+        GaiData.ActivityCountPerMinute = *SessionID * 10 + *SubSessionID;
+        GaiData.ActivityLevel = *SessionID * 10 + *SubSessionID;
+        GaiData.ActivityType = *SessionID * 10 + *SubSessionID;
+        GaiData.Elevation[0] = *SessionID * 10 + *SubSessionID;
+        GaiData.Elevation[1] = *SessionID * 10 + *SubSessionID;
+        GaiData.Elevation[2] = *SessionID * 10 + *SubSessionID;
+        GaiData.FatBurnedPerHour = *SessionID * 10 + *SubSessionID;
+        GaiData.IntensityEnergyExpenditurePerHour = *SessionID * 10 + *SubSessionID;
+        GaiData.MetabolicEquivalent = *SessionID * 10 + *SubSessionID;
+        GaiData.MotionCadence = *SessionID * 10 + *SubSessionID;
+        GaiData.NormalWalkingEnergyExpenditurePerHour = *SessionID * 10 + *SubSessionID;
+        GaiData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
+        GaiData.SequenceNumber = *SessionID * 10 + *SubSessionID;
+        GaiData.Speed = *SessionID * 10 + *SubSessionID;
+        GaiData.TotalEnergyExpenditurePerHour = *SessionID * 10 + *SubSessionID;
+    }
     //CraiData
     {
-            CraiData.SessionID = *SessionID;
-            CraiData.SubSessionID = *SubSessionID;
-            CraiData.HeartRate = *SessionID * 10 + *SubSessionID;
-            CraiData.HeartRateVariability = *SessionID * 10 + *SubSessionID;
-            CraiData.PulseInterBeatInterval = *SessionID * 10 + *SubSessionID;
-            CraiData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
-            CraiData.RespirationRate = *SessionID * 10 + *SubSessionID;
-            CraiData.RestingHeartRate = *SessionID * 10 + *SubSessionID;
-            CraiData.RestingRespirationRate = *SessionID * 10 + *SubSessionID;
-            CraiData.SequenceNumber = *SessionID * 10 + *SubSessionID;
-            CraiData.VO2Max = *SessionID * 10 + *SubSessionID;
-        }
+        CraiData.SessionID = *SessionID;
+        CraiData.SubSessionID = *SubSessionID;
+        CraiData.HeartRate = *SessionID * 10 + *SubSessionID;
+        CraiData.HeartRateVariability = *SessionID * 10 + *SubSessionID;
+        CraiData.PulseInterBeatInterval = *SessionID * 10 + *SubSessionID;
+        CraiData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
+        CraiData.RespirationRate = *SessionID * 10 + *SubSessionID;
+        CraiData.RestingHeartRate = *SessionID * 10 + *SubSessionID;
+        CraiData.RestingRespirationRate = *SessionID * 10 + *SubSessionID;
+        CraiData.SequenceNumber = *SessionID * 10 + *SubSessionID;
+        CraiData.VO2Max = *SessionID * 10 + *SubSessionID;
+    }
     //SaiData
     {
-            SaiData.SessionID = *SessionID;
-            SaiData.SubSessionID = *SubSessionID;
-            SaiData.IRLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SaiData.IRLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SaiData.IRLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SaiData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
-            SaiData.SequenceNumber = *SessionID * 10 + *SubSessionID;
-            SaiData.SleepingHeartRate = *SessionID * 10 + *SubSessionID;
-            SaiData.SleepStage = *SessionID * 10 + *SubSessionID;
-            SaiData.UVLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SaiData.UVLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SaiData.UVLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SaiData.VisibleLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SaiData.VisibleLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SaiData.VisibleLightLevel[2] = *SessionID * 10 + *SubSessionID;
-        }
+        SaiData.SessionID = *SessionID;
+        SaiData.SubSessionID = *SubSessionID;
+        SaiData.IRLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SaiData.IRLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SaiData.IRLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SaiData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
+        SaiData.SequenceNumber = *SessionID * 10 + *SubSessionID;
+        SaiData.SleepingHeartRate = *SessionID * 10 + *SubSessionID;
+        SaiData.SleepStage = *SessionID * 10 + *SubSessionID;
+        SaiData.UVLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SaiData.UVLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SaiData.UVLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SaiData.VisibleLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SaiData.VisibleLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SaiData.VisibleLightLevel[2] = *SessionID * 10 + *SubSessionID;
+    }
     //GasData
     {
-            GasData.SessionID = *SessionID;
-            GasData.SubSessionID = *SubSessionID;
-            GasData.ActivityCount = *SessionID * 10 + *SubSessionID;
-            GasData.AverageActivityLevel = *SessionID * 10 + *SubSessionID;
-            GasData.AverageActivityType = *SessionID * 10 + *SubSessionID;
-            GasData.AverageMetabolicEquivalent = *SessionID * 10 + *SubSessionID;
-            GasData.AverageMotionCadence = *SessionID * 10 + *SubSessionID;
-            GasData.AverageSpeed = *SessionID * 10 + *SubSessionID;
-            GasData.Distance[0] = *SessionID * 10 + *SubSessionID;
-            GasData.Distance[1] = *SessionID * 10 + *SubSessionID;
-            GasData.Distance[2] = *SessionID * 10 + *SubSessionID;
-            GasData.DurationOfIntensityWalkingEpisodes[0] = *SessionID * 10 + *SubSessionID;
-            GasData.DurationOfIntensityWalkingEpisodes[1] = *SessionID * 10 + *SubSessionID;
-            GasData.DurationOfIntensityWalkingEpisodes[2] = *SessionID * 10 + *SubSessionID;
-            GasData.DurationOfNormalWalkingEpisodes[0] = *SessionID * 10 + *SubSessionID;
-            GasData.DurationOfNormalWalkingEpisodes[1] = *SessionID * 10 + *SubSessionID;
-            GasData.DurationOfNormalWalkingEpisodes[2] = *SessionID * 10 + *SubSessionID;
-            GasData.FatBurned = *SessionID * 10 + *SubSessionID;
-            GasData.Floors = *SessionID * 10 + *SubSessionID;
-            GasData.IntensityEnergyExpenditure = *SessionID * 10 + *SubSessionID;
-            GasData.MaximumActivityLevel = *SessionID * 10 + *SubSessionID;
-            GasData.MaximumMetabolicEquivalent = *SessionID * 10 + *SubSessionID;
-            GasData.MaximumMotionCadence = *SessionID * 10 + *SubSessionID;
-            GasData.MaximumSpeed = *SessionID * 10 + *SubSessionID;
-            GasData.MinimumActivityLevel = *SessionID * 10 + *SubSessionID;
-            GasData.MinimumMetabolicEquivalent = *SessionID * 10 + *SubSessionID;
-            GasData.MinimumMotionCadence = *SessionID * 10 + *SubSessionID;
-            GasData.MinimumSpeed = *SessionID * 10 + *SubSessionID;
-            GasData.NegativeElevationGain[0] = *SessionID * 10 + *SubSessionID;
-            GasData.NegativeElevationGain[1] = *SessionID * 10 + *SubSessionID;
-            GasData.NegativeElevationGain[2] = *SessionID * 10 + *SubSessionID;
-            GasData.NormalWalkingEnergyExpenditure = *SessionID * 10 + *SubSessionID;
-            GasData.PositiveElevationGain[0] = *SessionID * 10 + *SubSessionID;
-            GasData.PositiveElevationGain[1] = *SessionID * 10 + *SubSessionID;
-            GasData.PositiveElevationGain[2] = *SessionID * 10 + *SubSessionID;
-            GasData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
-            GasData.SequenceNumber = *SessionID * 10 + *SubSessionID;
-            GasData.TotalEnergyExpenditure = *SessionID * 10 + *SubSessionID;
-            GasData.WornDuration[0] = *SessionID * 10 + *SubSessionID;
-            GasData.WornDuration[1] = *SessionID * 10 + *SubSessionID;
-            GasData.WornDuration[2] = *SessionID * 10 + *SubSessionID;
-        }
+        GasData.SessionID = *SessionID;
+        GasData.SubSessionID = *SubSessionID;
+        GasData.ActivityCount = *SessionID * 10 + *SubSessionID;
+        GasData.AverageActivityLevel = *SessionID * 10 + *SubSessionID;
+        GasData.AverageActivityType = ((UserDefinedActivityTypeAllSubSessions[*SessionID][*SubSessionID] & 0xFF) << 8) | (GasData.AverageActivityType & 0xFF);
+        GasData.AverageMetabolicEquivalent = *SessionID * 10 + *SubSessionID;
+        GasData.AverageMotionCadence = *SessionID * 10 + *SubSessionID;
+        GasData.AverageSpeed = *SessionID * 10 + *SubSessionID;
+        GasData.Distance[0] = *SessionID * 10 + *SubSessionID;
+        GasData.Distance[1] = *SessionID * 10 + *SubSessionID;
+        GasData.Distance[2] = *SessionID * 10 + *SubSessionID;
+        GasData.DurationOfIntensityWalkingEpisodes[0] = *SessionID * 10 + *SubSessionID;
+        GasData.DurationOfIntensityWalkingEpisodes[1] = *SessionID * 10 + *SubSessionID;
+        GasData.DurationOfIntensityWalkingEpisodes[2] = *SessionID * 10 + *SubSessionID;
+        GasData.DurationOfNormalWalkingEpisodes[0] = *SessionID * 10 + *SubSessionID;
+        GasData.DurationOfNormalWalkingEpisodes[1] = *SessionID * 10 + *SubSessionID;
+        GasData.DurationOfNormalWalkingEpisodes[2] = *SessionID * 10 + *SubSessionID;
+        GasData.FatBurned = *SessionID * 10 + *SubSessionID;
+        GasData.Floors = *SessionID * 10 + *SubSessionID;
+        GasData.IntensityEnergyExpenditure = *SessionID * 10 + *SubSessionID;
+        GasData.MaximumActivityLevel = *SessionID * 10 + *SubSessionID;
+        GasData.MaximumMetabolicEquivalent = *SessionID * 10 + *SubSessionID;
+        GasData.MaximumMotionCadence = *SessionID * 10 + *SubSessionID;
+        GasData.MaximumSpeed = *SessionID * 10 + *SubSessionID;
+        GasData.MinimumActivityLevel = *SessionID * 10 + *SubSessionID;
+        GasData.MinimumMetabolicEquivalent = *SessionID * 10 + *SubSessionID;
+        GasData.MinimumMotionCadence = *SessionID * 10 + *SubSessionID;
+        GasData.MinimumSpeed = *SessionID * 10 + *SubSessionID;
+        GasData.NegativeElevationGain[0] = *SessionID * 10 + *SubSessionID;
+        GasData.NegativeElevationGain[1] = *SessionID * 10 + *SubSessionID;
+        GasData.NegativeElevationGain[2] = *SessionID * 10 + *SubSessionID;
+        GasData.NormalWalkingEnergyExpenditure = *SessionID * 10 + *SubSessionID;
+        GasData.PositiveElevationGain[0] = *SessionID * 10 + *SubSessionID;
+        GasData.PositiveElevationGain[1] = *SessionID * 10 + *SubSessionID;
+        GasData.PositiveElevationGain[2] = *SessionID * 10 + *SubSessionID;
+        GasData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
+        GasData.SequenceNumber = *SessionID * 10 + *SubSessionID;
+        GasData.TotalEnergyExpenditure = *SessionID * 10 + *SubSessionID;
+        GasData.WornDuration[0] = *SessionID * 10 + *SubSessionID;
+        GasData.WornDuration[1] = *SessionID * 10 + *SubSessionID;
+        GasData.WornDuration[2] = *SessionID * 10 + *SubSessionID;
+    }
     //CrasData
     {
-            CrasData.SessionID = *SessionID;
-            CrasData.SubSessionID = *SubSessionID;
-            CrasData.AverageHeartRate = *SessionID * 10 + *SubSessionID;
-            CrasData.AverageHeartRateVariability = *SessionID * 10 + *SubSessionID;
-            CrasData.AveragePulseInterbeatInterval = *SessionID * 10 + *SubSessionID;
-            CrasData.AverageRespirationRate = *SessionID * 10 + *SubSessionID;
-            CrasData.AverageRestingHeartRate = *SessionID * 10 + *SubSessionID;
-            CrasData.AverageRestingRespirationRate = *SessionID * 10 + *SubSessionID;
-            CrasData.AverageVO2Max = *SessionID * 10 + *SubSessionID;
-            CrasData.MaximumHeartRate = *SessionID * 10 + *SubSessionID;
-            CrasData.MaximumHeartRateVariability = *SessionID * 10 + *SubSessionID;
-            CrasData.MaximumPulseInterbeatInterval = *SessionID * 10 + *SubSessionID;
-            CrasData.MaximumRespirationRate = *SessionID * 10 + *SubSessionID;
-            CrasData.MaximumRestingHeartRate = *SessionID * 10 + *SubSessionID;
-            CrasData.MaximumRestingRespirationRate = *SessionID * 10 + *SubSessionID;
-            CrasData.MaximumVO2Max = *SessionID * 10 + *SubSessionID;
-            CrasData.MinimumHeartRate = *SessionID * 10 + *SubSessionID;
-            CrasData.MinimumHeartRateVariability = *SessionID * 10 + *SubSessionID;
-            CrasData.MinimumPulseInterbeatInterval = *SessionID * 10 + *SubSessionID;
-            CrasData.MinimumRespirationRate = *SessionID * 10 + *SubSessionID;
-            CrasData.MinimumRestingHeartRate = *SessionID * 10 + *SubSessionID;
-            CrasData.MinimumRestingRespirationRate = *SessionID * 10 + *SubSessionID;
-            CrasData.MinimumVO2Max = *SessionID * 10 + *SubSessionID;
-            CrasData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
-            CrasData.SequenceNumber = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone1[0] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone1[1] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone1[2] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone2[0] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone2[1] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone2[2] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone3[0] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone3[1] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone3[2] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone4[0] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone4[1] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone4[2] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone5[0] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone5[1] = *SessionID * 10 + *SubSessionID;
-            CrasData.TimeInHeartRateZone5[2] = *SessionID * 10 + *SubSessionID;
-            CrasData.WornDuration[0] = *SessionID * 10 + *SubSessionID;
-            CrasData.WornDuration[1] = *SessionID * 10 + *SubSessionID;
-            CrasData.WornDuration[2] = *SessionID * 10 + *SubSessionID;
-        }
+        CrasData.SessionID = *SessionID;
+        CrasData.SubSessionID = *SubSessionID;
+        CrasData.AverageHeartRate = *SessionID * 10 + *SubSessionID;
+        CrasData.AverageHeartRateVariability = *SessionID * 10 + *SubSessionID;
+        CrasData.AveragePulseInterbeatInterval = *SessionID * 10 + *SubSessionID;
+        CrasData.AverageRespirationRate = *SessionID * 10 + *SubSessionID;
+        CrasData.AverageRestingHeartRate = *SessionID * 10 + *SubSessionID;
+        CrasData.AverageRestingRespirationRate = *SessionID * 10 + *SubSessionID;
+        CrasData.AverageVO2Max = *SessionID * 10 + *SubSessionID;
+        CrasData.MaximumHeartRate = *SessionID * 10 + *SubSessionID;
+        CrasData.MaximumHeartRateVariability = *SessionID * 10 + *SubSessionID;
+        CrasData.MaximumPulseInterbeatInterval = *SessionID * 10 + *SubSessionID;
+        CrasData.MaximumRespirationRate = *SessionID * 10 + *SubSessionID;
+        CrasData.MaximumRestingHeartRate = *SessionID * 10 + *SubSessionID;
+        CrasData.MaximumRestingRespirationRate = *SessionID * 10 + *SubSessionID;
+        CrasData.MaximumVO2Max = *SessionID * 10 + *SubSessionID;
+        CrasData.MinimumHeartRate = *SessionID * 10 + *SubSessionID;
+        CrasData.MinimumHeartRateVariability = *SessionID * 10 + *SubSessionID;
+        CrasData.MinimumPulseInterbeatInterval = *SessionID * 10 + *SubSessionID;
+        CrasData.MinimumRespirationRate = *SessionID * 10 + *SubSessionID;
+        CrasData.MinimumRestingHeartRate = *SessionID * 10 + *SubSessionID;
+        CrasData.MinimumRestingRespirationRate = *SessionID * 10 + *SubSessionID;
+        CrasData.MinimumVO2Max = *SessionID * 10 + *SubSessionID;
+        CrasData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
+        CrasData.SequenceNumber = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone1[0] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone1[1] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone1[2] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone2[0] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone2[1] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone2[2] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone3[0] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone3[1] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone3[2] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone4[0] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone4[1] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone4[2] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone5[0] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone5[1] = *SessionID * 10 + *SubSessionID;
+        CrasData.TimeInHeartRateZone5[2] = *SessionID * 10 + *SubSessionID;
+        CrasData.WornDuration[0] = *SessionID * 10 + *SubSessionID;
+        CrasData.WornDuration[1] = *SessionID * 10 + *SubSessionID;
+        CrasData.WornDuration[2] = *SessionID * 10 + *SubSessionID;
+    }
     //ScasData
     {
-            ScasData.SessionID = *SessionID;
-            ScasData.SubSessionID = *SubSessionID;
-            ScasData.Distance[0] = *SessionID * 10 + *SubSessionID;
-            ScasData.Distance[1] = *SessionID * 10 + *SubSessionID;
-            ScasData.Distance[2] = *SessionID * 10 + *SubSessionID;
-            ScasData.FloorSteps[0] = *SessionID * 10 + *SubSessionID;
-            ScasData.FloorSteps[1] = *SessionID * 10 + *SubSessionID;
-            ScasData.FloorSteps[2] = *SessionID * 10 + *SubSessionID;
-            ScasData.IntensitySteps[0] = *SessionID * 10 + *SubSessionID;
-            ScasData.IntensitySteps[1] = *SessionID * 10 + *SubSessionID;
-            ScasData.IntensitySteps[2] = *SessionID * 10 + *SubSessionID;
-            ScasData.NormalWalkingSteps[0] = *SessionID * 10 + *SubSessionID;
-            ScasData.NormalWalkingSteps[1] = *SessionID * 10 + *SubSessionID;
-            ScasData.NormalWalkingSteps[2] = *SessionID * 10 + *SubSessionID;
-            ScasData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
-            ScasData.SequenceNumber = *SessionID * 10 + *SubSessionID;
-            ScasData.WornDuration[0] = *SessionID * 10 + *SubSessionID;
-            ScasData.WornDuration[1] = *SessionID * 10 + *SubSessionID;
-            ScasData.WornDuration[2] = *SessionID * 10 + *SubSessionID;
-        }
+        ScasData.SessionID = *SessionID;
+        ScasData.SubSessionID = *SubSessionID;
+        ScasData.Distance[0] = *SessionID * 10 + *SubSessionID;
+        ScasData.Distance[1] = *SessionID * 10 + *SubSessionID;
+        ScasData.Distance[2] = *SessionID * 10 + *SubSessionID;
+        ScasData.FloorSteps[0] = *SessionID * 10 + *SubSessionID;
+        ScasData.FloorSteps[1] = *SessionID * 10 + *SubSessionID;
+        ScasData.FloorSteps[2] = *SessionID * 10 + *SubSessionID;
+        ScasData.IntensitySteps[0] = *SessionID * 10 + *SubSessionID;
+        ScasData.IntensitySteps[1] = *SessionID * 10 + *SubSessionID;
+        ScasData.IntensitySteps[2] = *SessionID * 10 + *SubSessionID;
+        ScasData.NormalWalkingSteps[0] = *SessionID * 10 + *SubSessionID;
+        ScasData.NormalWalkingSteps[1] = *SessionID * 10 + *SubSessionID;
+        ScasData.NormalWalkingSteps[2] = *SessionID * 10 + *SubSessionID;
+        ScasData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
+        ScasData.SequenceNumber = *SessionID * 10 + *SubSessionID;
+        ScasData.WornDuration[0] = *SessionID * 10 + *SubSessionID;
+        ScasData.WornDuration[1] = *SessionID * 10 + *SubSessionID;
+        ScasData.WornDuration[2] = *SessionID * 10 + *SubSessionID;
+    }
     //SasData
     {
-            
-            SasData.AverageIRLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.AverageIRLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.AverageIRLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.AverageSleepingHeartRate = *SessionID * 10 + *SubSessionID;
-            SasData.AverageUVLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.AverageUVLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.AverageUVLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.AverageVisibleLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.AverageVisibleLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.AverageVisibleLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumIRLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumIRLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumIRLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumUVLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumUVLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumUVLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumVisibleLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumVisibleLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.MaximumVisibleLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumIRLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumIRLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumIRLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumUVLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumUVLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumUVLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumVisibleLightLevel[0] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumVisibleLightLevel[1] = *SessionID * 10 + *SubSessionID;
-            SasData.MinimumVisibleLightLevel[2] = *SessionID * 10 + *SubSessionID;
-            SasData.NumberOfAwakenings = *SessionID * 10 + *SubSessionID;
-            SasData.NumberOfTossNturnEvents = *SessionID * 10 + *SubSessionID;
-            SasData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
-            SasData.SequenceNumber = *SessionID * 10 + *SubSessionID;
-            SasData.SessionID = *SessionID * 10 + *SubSessionID;
-            SasData.SleepEfficiency = *SessionID * 10 + *SubSessionID;
-            SasData.SleepLatency = *SessionID * 10 + *SubSessionID;
-            SasData.SnoozeTime = *SessionID * 10 + *SubSessionID;
-            SasData.SubSessionID = *SessionID * 10 + *SubSessionID;
-            SasData.TimeOfAwakeningAfterAlarm[0] = *SessionID * 10 + *SubSessionID;
-            SasData.TimeOfAwakeningAfterAlarm[1] = *SessionID * 10 + *SubSessionID;
-            SasData.TimeOfAwakeningAfterAlarm[2] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalBedTime[0] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalBedTime[1] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalBedTime[2] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalSleepTime[0] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalSleepTime[1] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalSleepTime[2] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalWakeTime[0] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalWakeTime[1] = *SessionID * 10 + *SubSessionID;
-            SasData.TotalWakeTime[2] = *SessionID * 10 + *SubSessionID;
-            SasData.WornDuration[0] = *SessionID * 10 + *SubSessionID;
-            SasData.WornDuration[1] = *SessionID * 10 + *SubSessionID;
-            SasData.WornDuration[2] = *SessionID * 10 + *SubSessionID;
-        }
-        
+        SasData.AverageIRLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.AverageIRLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.AverageIRLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.AverageSleepingHeartRate = *SessionID * 10 + *SubSessionID;
+        SasData.AverageUVLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.AverageUVLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.AverageUVLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.AverageVisibleLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.AverageVisibleLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.AverageVisibleLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumIRLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumIRLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumIRLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumUVLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumUVLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumUVLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumVisibleLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumVisibleLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.MaximumVisibleLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumIRLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumIRLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumIRLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumUVLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumUVLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumUVLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumVisibleLightLevel[0] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumVisibleLightLevel[1] = *SessionID * 10 + *SubSessionID;
+        SasData.MinimumVisibleLightLevel[2] = *SessionID * 10 + *SubSessionID;
+        SasData.NumberOfAwakenings = *SessionID * 10 + *SubSessionID;
+        SasData.NumberOfTossNturnEvents = *SessionID * 10 + *SubSessionID;
+        SasData.RelativeTimestamp = *SessionID * 10 + *SubSessionID;
+        SasData.SequenceNumber = *SessionID * 10 + *SubSessionID;
+        SasData.SessionID = *SessionID * 10 + *SubSessionID;
+        SasData.SleepEfficiency = *SessionID * 10 + *SubSessionID;
+        SasData.SleepLatency = *SessionID * 10 + *SubSessionID;
+        SasData.SnoozeTime = *SessionID * 10 + *SubSessionID;
+        SasData.SubSessionID = *SessionID * 10 + *SubSessionID;
+        SasData.TimeOfAwakeningAfterAlarm[0] = *SessionID * 10 + *SubSessionID;
+        SasData.TimeOfAwakeningAfterAlarm[1] = *SessionID * 10 + *SubSessionID;
+        SasData.TimeOfAwakeningAfterAlarm[2] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalBedTime[0] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalBedTime[1] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalBedTime[2] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalSleepTime[0] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalSleepTime[1] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalSleepTime[2] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalWakeTime[0] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalWakeTime[1] = *SessionID * 10 + *SubSessionID;
+        SasData.TotalWakeTime[2] = *SessionID * 10 + *SubSessionID;
+        SasData.WornDuration[0] = *SessionID * 10 + *SubSessionID;
+        SasData.WornDuration[1] = *SessionID * 10 + *SubSessionID;
+        SasData.WornDuration[2] = *SessionID * 10 + *SubSessionID;
+    }
+    
+    uint32 count = 0;
+    
     switch(Get_Ended_Data_Value)
     {
         case GENERAL_ACTIVITY_INSTANTANEOUS:
         {
             UpdateGaid();
+            count++;
             break;
         }
         case GENERAL_ACTIVITY_SUMMARY:
         {
             UpdateGasd();
+            count++;
             break;
         }
         case CARDIORESPIRATORY_ACTIVITY_INSTANTANEOUS:
         {
             UpdateCraid();
+            count++;
             break;
         }
         case CARDIORESPIRATORY_ACTIVITY_SUMMARY:
         {
             UpdateCrasd();
+            count++;
             break;
         }
         case STEP_COUNTER_ACTIVITY_SUMMARY:
         {
             UpdateScasd();
+            count++;
             break;
         }
         case SLEEP_ACTIVITY_INSTANTANEOUS:
         {
             UpdateSaid();
+            count++;
             break;
         }
         case SLEEP_ACTIVITY_SUMMARY:
         {
             UpdateSasd();
+            count++;
             break;
         }
     }
+    return count;
 }
-
 
 void InitializePhisicalActivityMonitor()
 {
@@ -898,66 +1005,60 @@ void InitializePhisicalActivityMonitor()
     totalDeletedSessions = 0;
     
     //init features
-    pamFeature = getChosenFeatures();
+    //pamFeature = getChosenFeatures();
     
-    //pamFeature = 0xFFFFFFFFFFFFFFFF;
+    pamFeature = 0xFFFFFFFFFFFFFFFF;
     UpdateFeatureList();
-    
-    if(CHECK_BIT(pamFeature, NORMAL_WALKING_ENERGY_EXPENDITURE_PER_HOUR_SUPPORTED)){ GaiData.Flags[0] |= ( 1 << NORMAL_WALKING_ENERGY_EXPENDITURE_PER_HOUR_PRESENT ); }
-    if(CHECK_BIT(pamFeature, INTENSITY_ENERGY_EXPENDITURE_PER_HOUR_SUPPORTED)){ GaiData.Flags[0] |= ( 1 << INTENSITY_ENERGY_EXPENDITURE_PER_HOUR_PRESENT ); }
-    if(CHECK_BIT(pamFeature, TOTAL_ENERGY_EXPENDITURE_PER_HOUR_SUPPORTED)){ GaiData.Flags[0] |= ( 1 << TOTAL_ENERGY_EXPENDITURE_PER_HOUR_PRESENT ); }
-    if(CHECK_BIT(pamFeature, FAT_BURNED_PER_HOUR_SUPPORTED)){ GaiData.Flags[0] |= ( 1 << FAT_BURNED_PER_HOUR_PRESENT ); }
-    if(CHECK_BIT(pamFeature, METABOLIC_EQUIVALENT_SUPPORTED)){ GaiData.Flags[0] |= ( 1 << METABOLIC_EQUIVALENT_PRESENT ); }
-    if(CHECK_BIT(pamFeature, SPEED_SUPPORTED)){ GaiData.Flags[0] |= ( 1 << SPEED_PRESENT ); }
-    if(CHECK_BIT(pamFeature, MOTION_CADENCE_SUPPORTED)){ GaiData.Flags[0] |= ( 1 <<  MOTION_CADENCE_PRESENT); }
-    if(CHECK_BIT(pamFeature, ELEVATION_SUPPORTED)){ GaiData.Flags[0] |= ( 1 <<  ELEVATION_PRESENT); }
-    if(CHECK_BIT(pamFeature, ACTIVITY_COUNT_PER_MINUTE_SUPPORTED)){ GaiData.Flags[1] |= ( 1 <<  (ACTIVITY_COUNT_PER_MINUTE_PRESENT - 8)); }
-    if(CHECK_BIT(pamFeature, ACTIVITY_LEVEL_SUPPORTED)){ GaiData.Flags[1] |= ( 1 <<  (ACTIVITY_LEVEL_PRESENT - 8)); }
-    if(CHECK_BIT(pamFeature, ACTIVITY_TYPE_SUPPORTED)){ GaiData.Flags[1] |= ( 1 <<  (ACTIVITY_TYPE_PRESENT - 8)); }
-    
     
         
     //init GAI Data
-    
-    GaiData.SessionID = 0x02; 
-    GaiData.SubSessionID = 0x03; 
-    GaiData.NormalWalkingEnergyExpenditurePerHour = 0x01; 
-    GaiData.IntensityEnergyExpenditurePerHour = 0x02; 
-    GaiData.TotalEnergyExpenditurePerHour = 0x03;
-    GaiData.FatBurnedPerHour = 0x04; 
-    GaiData.MetabolicEquivalent = 0x05; 
-    GaiData.Speed = 0x6; 
-    GaiData.MotionCadence = 0x07;
-    GaiData.Elevation[0] = 0x08;
-    GaiData.Elevation[1] = 0x08;
-    GaiData.Elevation[2] = 0x08;
-    GaiData.ActivityCountPerMinute = 0x09;
-    GaiData.ActivityLevel = 0x0A;
-    GaiData.ActivityType = 0x0B;
-    
+    GaiData.Flags[0] = 0x02;
+    GaiData.Flags[1] = 0x02;
+    GaiData.Flags[2] = 0x02;
     UpdateGaid();
    
     //init GAS Data
     GasData.Flags = 0xFFFFFFFF;
+    GasData.AverageActivityType = 0xAA;
     UpdateGasd();
 
     //init CRAI Data
+    //DO NOT CHANGE THE FLAGS BEFORE THE SPECIFICATION FLAGS HAVE BEEN DEFINED AND IMPLEMENTED IN:
+    // SERVER -> pamCraid.h & pamCraid.c
+    // CLIENT -> HBPhysicalActivityMonitorCraid.java
+    // IF YOU CHANGE FLAGS YOU MIGHT GET AN ARRAY OUT OF BOUNDS EXCEPTION
     CraiData.Flags = 0xFFFF;
     UpdateCraid();
     
     //init CRAS Data
-    CrasData.Flags = 0xFFFF;
+    //DO NOT CHANGE THE FLAGS BEFORE THE SPECIFICATION FLAGS HAVE BEEN DEFINED AND IMPLEMENTED IN:
+    // SERVER -> pamCrasd.h & pamCrasd.c
+    // CLIENT -> HBPhysicalActivityMonitorCrasd.java
+    // IF YOU CHANGE FLAGS YOU MIGHT GET AN ARRAY OUT OF BOUNDS EXCEPTION
+    CrasData.Flags = 0xFFFFFFFF;
     UpdateCrasd();
     
     //init SCAS Data
+    //DO NOT CHANGE THE FLAGS BEFORE THE SPECIFICATION FLAGS HAVE BEEN DEFINED AND IMPLEMENTED IN:
+    // SERVER -> pamScasd.h & pamScasd.c
+    // CLIENT -> HBPhysicalActivityMonitorScasd.java
+    // IF YOU CHANGE FLAGS YOU MIGHT GET AN ARRAY OUT OF BOUNDS EXCEPTION
     ScasData.Flags = 0xFF;
     UpdateScasd();
     
     //init SAI Data
+    //DO NOT CHANGE THE FLAGS BEFORE THE SPECIFICATION FLAGS HAVE BEEN DEFINED AND IMPLEMENTED IN:
+    // SERVER -> pamSaid.h & pamSaid.c
+    // CLIENT -> HBPhysicalActivityMonitorSaid.java
+    // IF YOU CHANGE FLAGS YOU MIGHT GET AN ARRAY OUT OF BOUNDS EXCEPTION
     SaiData.Flags = 0xFFFF;
     UpdateSaid();
     
     //init SAS Data
+    //DO NOT CHANGE THE FLAGS BEFORE THE SPECIFICATION FLAGS HAVE BEEN DEFINED AND IMPLEMENTED IN:
+    // SERVER -> pamSasd.h & pamSasd.c
+    // CLIENT -> HBPhysicalActivityMonitorSasd.java
+    // IF YOU CHANGE FLAGS YOU MIGHT GET AN ARRAY OUT OF BOUNDS EXCEPTION
     SasData.Flags[0] = 0xFF;
     SasData.Flags[1] = 0xFF;
     SasData.Flags[2] = 0xFF;

@@ -127,60 +127,60 @@ uint8 getPresentGasdFields(uint8 *PresentData)
     if(CHECK_BIT(GasData.Flags, DISTANCE_PRESENT) &&
        CHECK_BIT(pamFeature, DISTANCE_SUPPORTED))
     {
-        PresentData[length] = GasData.Distance[0];
+        PresentData[length] = GasData.Distance[2];
         PresentData[length + 1] = GasData.Distance[1];
-        PresentData[length + 2] = GasData.Distance[2];
+        PresentData[length + 2] = GasData.Distance[0];
         length += sizeof(GasData.Distance);
     }
     if(CHECK_BIT(pamFeature, SPEED_SUPPORTED))
     {
         if(CHECK_BIT(GasData.Flags, MINIMUM_SPEED_PRESENT))
         {
-            PresentData[length] = GasData.MinimumSpeed;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.MinimumSpeed);
             length += sizeof(GasData.MinimumSpeed);
         }
         if(CHECK_BIT(GasData.Flags, MAXIMUM_SPEED_PRESENT))
         {
-            PresentData[length] = GasData.MaximumSpeed;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.MaximumSpeed);
             length += sizeof(GasData.MaximumSpeed);
         }
         if(CHECK_BIT(GasData.Flags, AVERAGE_SPEED_PRESENT))
         {
-            PresentData[length] = GasData.AverageSpeed;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.AverageSpeed);
             length += sizeof(GasData.AverageSpeed);
         }
     }
     if(CHECK_BIT(GasData.Flags, DURATION_OF_NORMAL_WALKING_EPISODES_PRESENT) &&
        CHECK_BIT(pamFeature, DURATION_OF_NORMAL_WALKING_EPISODES_SUPPORTED))
     {
-        PresentData[length] = GasData.DurationOfNormalWalkingEpisodes[0];
+        PresentData[length] = GasData.DurationOfNormalWalkingEpisodes[2];
         PresentData[length + 1] = GasData.DurationOfNormalWalkingEpisodes[1];
-        PresentData[length + 2] = GasData.DurationOfNormalWalkingEpisodes[2];
+        PresentData[length + 2] = GasData.DurationOfNormalWalkingEpisodes[0];
         length += sizeof(GasData.DurationOfNormalWalkingEpisodes);
     }
     if(CHECK_BIT(GasData.Flags, DURATION_OF_INTENSITY_WALKING_EPISODES_PRESENT) &&
        CHECK_BIT(pamFeature, DURATION_OF_INTENSITY_WALKING_EPISODES_SUPPORTED))
     {
-        PresentData[length] = GasData.DurationOfIntensityWalkingEpisodes[0];
+        PresentData[length] = GasData.DurationOfIntensityWalkingEpisodes[2];
         PresentData[length + 1] = GasData.DurationOfIntensityWalkingEpisodes[1];
-        PresentData[length + 2] = GasData.DurationOfIntensityWalkingEpisodes[2];
+        PresentData[length + 2] = GasData.DurationOfIntensityWalkingEpisodes[0];
         length += sizeof(GasData.DurationOfIntensityWalkingEpisodes);
     }
     if(CHECK_BIT(pamFeature, MOTION_CADENCE_SUPPORTED))
     {
         if(CHECK_BIT(GasData.Flags, MINIMUM_MOTION_CADENCE_PRESENT))
         {
-            PresentData[length] = GasData.MinimumMotionCadence;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.MinimumMotionCadence);
             length += sizeof(GasData.MinimumMotionCadence);
         }
         if(CHECK_BIT(GasData.Flags, MAXIMUM_MOTION_CADENCE_PRESENT))
         {
-            PresentData[length] = GasData.MaximumMotionCadence;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.MaximumMotionCadence);
             length += sizeof(GasData.MaximumMotionCadence);
         }
         if(CHECK_BIT(GasData.Flags, AVERAGE_MOTION_CADENCE_PRESENT))
         {
-            PresentData[length] = GasData.AverageMotionCadence;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.AverageMotionCadence);
             length += sizeof(GasData.AverageMotionCadence);
         }
     }
@@ -193,17 +193,17 @@ uint8 getPresentGasdFields(uint8 *PresentData)
     if(CHECK_BIT(GasData.Flags, POSITIVE_ELEVATION_GAIN_PRESENT) &&
        CHECK_BIT(pamFeature, POSITIVE_ELEVATION_GAIN_SUPPORTED))
     {
-        PresentData[length] = GasData.PositiveElevationGain[0];
+        PresentData[length] = GasData.PositiveElevationGain[2];
         PresentData[length + 1] = GasData.PositiveElevationGain[1];
-        PresentData[length + 2] = GasData.PositiveElevationGain[2];
+        PresentData[length + 2] = GasData.PositiveElevationGain[0];
         length += sizeof(GasData.PositiveElevationGain);
     }
     if(CHECK_BIT(GasData.Flags, NEGATIVE_ELEVATION_GAIN_PRESENT) &&
        CHECK_BIT(pamFeature, NEGATIVE_ELEVATION_GAIN_SUPPORTED))
     {
-        PresentData[length] = GasData.NegativeElevationGain[0];
+        PresentData[length] = GasData.NegativeElevationGain[2];
         PresentData[length + 1] = GasData.NegativeElevationGain[1];
-        PresentData[length + 2] = GasData.NegativeElevationGain[2];
+        PresentData[length + 2] = GasData.NegativeElevationGain[0];
         length += sizeof(GasData.NegativeElevationGain);
     }
     if(CHECK_BIT(GasData.Flags, ACTIVITY_COUNT_PRESENT) &&
@@ -216,17 +216,17 @@ uint8 getPresentGasdFields(uint8 *PresentData)
     {
         if(CHECK_BIT(GasData.Flags, MINIMUM_ACTIVITY_LEVEL_PRESENT))
         {
-            PresentData[length] = GasData.MinimumActivityLevel;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.MinimumActivityLevel);
             length += sizeof(GasData.MinimumActivityLevel);
         }
         if(CHECK_BIT(GasData.Flags, MAXIMUM_ACTIVITY_LEVEL_PRESENT))
         {
-            PresentData[length] = GasData.MaximumActivityLevel;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.MaximumActivityLevel);
             length += sizeof(GasData.MaximumActivityLevel);
         }
         if(CHECK_BIT(GasData.Flags, AVERAGE_ACTIVITY_LEVEL_PRESENT))
         {
-            PresentData[length] = GasData.AverageActivityLevel;
+            CyBle_Set16ByPtr(&PresentData[length], GasData.AverageActivityLevel);
             length += sizeof(GasData.AverageActivityLevel);
         }
     }
@@ -239,9 +239,9 @@ uint8 getPresentGasdFields(uint8 *PresentData)
     if(CHECK_BIT(GasData.Flags, WORN_DURATION_PRESENT) &&
        CHECK_BIT(pamFeature, WORN_DURATION_SUPPORTED))
     {
-        PresentData[length] = GasData.WornDuration[0];
+        PresentData[length] = GasData.WornDuration[2];
         PresentData[length + 1] = GasData.WornDuration[1];
-        PresentData[length + 2] = GasData.WornDuration[2];
+        PresentData[length + 2] = GasData.WornDuration[0];
         length += sizeof(GasData.WornDuration);
     }
     

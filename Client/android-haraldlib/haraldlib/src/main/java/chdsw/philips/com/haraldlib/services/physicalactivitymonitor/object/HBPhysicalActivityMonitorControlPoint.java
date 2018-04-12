@@ -15,6 +15,24 @@ public class HBPhysicalActivityMonitorControlPoint {
     private int parameter2 = 0;
     private int parameter3 = 0;
 
+    private byte response = 0;
+    private int value;
+
+    public HBPhysicalActivityMonitorControlPoint(byte[] data) {
+        int maxOffset = data.length;
+        int offset = 0;
+
+        response = data[offset++];
+        HBLogger.v("akdsfjh", "maxoffset" + maxOffset);
+        HBLogger.v("akdsfjh", "value" + value);
+        for(; offset < maxOffset; offset++)
+        {
+            value |= data[offset]  << ((offset-1) * 8);
+        }
+        HBLogger.v("akdsfjh", "valueafter" + value);
+
+    }
+
     public HBPhysicalActivityMonitorControlPoint(HBControlPointOperation operation) {
         this.operation = operation;
     }
@@ -22,6 +40,12 @@ public class HBPhysicalActivityMonitorControlPoint {
     public HBPhysicalActivityMonitorControlPoint(HBControlPointOperation operation, int parameter1) {
         this.operation = operation;
         this.parameter1 = parameter1;
+    }
+
+    public HBPhysicalActivityMonitorControlPoint(HBControlPointOperation operation, int parameter1, int parameter2) {
+        this.operation = operation;
+        this.parameter1 = parameter1;
+        this.parameter2 = parameter2;
     }
 
     public HBPhysicalActivityMonitorControlPoint(HBControlPointOperation operation, int parameter1, int parameter2, int parameter3) {
@@ -46,4 +70,8 @@ public class HBPhysicalActivityMonitorControlPoint {
     public int getParameter3() {
         return parameter3;
     }
+
+    public byte getResponse() { return response; }
+
+    public int getValue() { return value; }
 }

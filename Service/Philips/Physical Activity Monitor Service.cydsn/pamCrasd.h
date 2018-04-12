@@ -18,7 +18,7 @@
 
 //Flags field needs to be specified in specification
 
-#define ALWAYS_PRESENT_CRAID_FIELD_LENGTH           15u
+#define ALWAYS_PRESENT_CRASD_FIELD_LENGTH           17u
 
 /***************************************
 *       Data Struct Definition
@@ -27,7 +27,7 @@
 CYBLE_CYPACKED typedef struct
 {
     uint8	Header;
-    uint16	Flags;
+    uint32	Flags;
     uint16	SessionID;
     uint16	SubSessionID;
     uint32	RelativeTimestamp;

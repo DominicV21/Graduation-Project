@@ -26,7 +26,6 @@ CYBLE_CYPACKED typedef struct
     uint16 SubSessionID;
     uint32 SubSessionStartBaseTime;
     int16  SubSessionStartTimeOffset;
-    uint16 PredominantActivityType;
     
 }CYBLE_CYPACKED_ATTR PAM_CURRSESSION_VALUE_T;
 

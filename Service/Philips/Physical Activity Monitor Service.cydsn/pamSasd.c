@@ -32,9 +32,9 @@ void UpdateSasd(void)
         
         uint8 byteCount = 1u;//Starts at 1 because 0 is the header field
         
-        PresentData[byteCount] = SasData.Flags[0];
+        PresentData[byteCount] = SasData.Flags[2];
         PresentData[byteCount + 1] = SasData.Flags[1];
-        PresentData[byteCount + 2] = SasData.Flags[2];
+        PresentData[byteCount + 2] = SasData.Flags[0];
         byteCount += sizeof(SasData.Flags);
         
         CyBle_Set16ByPtr(&PresentData[byteCount], SasData.SessionID);
@@ -89,25 +89,25 @@ uint8 getPresentSasdFields(uint8 *PresentData)
     if(CHECK_BIT(SasData.Flags[0], 1/*TOTAL SLEEP TIME PRESENT*/) &&
        CHECK_BIT(pamFeature, TOTAL_SLEEP_TIME_SUPPORTED))
     {
-        PresentData[length] = SasData.TotalSleepTime[0];
+        PresentData[length] = SasData.TotalSleepTime[2];
         PresentData[length+1] = SasData.TotalSleepTime[1];
-        PresentData[length+2] = SasData.TotalSleepTime[2];
+        PresentData[length+2] = SasData.TotalSleepTime[0];
         length += sizeof(SasData.TotalSleepTime);
     }
     if(CHECK_BIT(SasData.Flags[0], 1/*TOTAL WAKE TIME PRESENT*/) &&
        CHECK_BIT(pamFeature, TOTAL_WAKE_TIME_SUPPORTED))
     {
-        PresentData[length] = SasData.TotalWakeTime[0];
+        PresentData[length] = SasData.TotalWakeTime[2];
         PresentData[length+1] = SasData.TotalWakeTime[1];
-        PresentData[length+2] = SasData.TotalWakeTime[2];
+        PresentData[length+2] = SasData.TotalWakeTime[0];
         length += sizeof(SasData.TotalWakeTime);
     }
     if(CHECK_BIT(SasData.Flags[0], 1/*TOTAL BED TIME PRESENT*/) &&
        CHECK_BIT(pamFeature, TOTAL_BED_TIME_SUPPORTED))
     {
-        PresentData[length] = SasData.TotalBedTime[0];
+        PresentData[length] = SasData.TotalBedTime[2];
         PresentData[length+1] = SasData.TotalBedTime[1];
-        PresentData[length+2] = SasData.TotalBedTime[2];
+        PresentData[length+2] = SasData.TotalBedTime[0];
         length += sizeof(SasData.TotalBedTime);
     }
     if(CHECK_BIT(SasData.Flags[0], 1/*NR OF AWAKENINGS PRESENT*/) &&
@@ -122,7 +122,7 @@ uint8 getPresentSasdFields(uint8 *PresentData)
         CyBle_Set16ByPtr(&PresentData[length], SasData.SleepLatency);
         length += sizeof(SasData.SleepLatency);
     }
-    if(CHECK_BIT(SasData.Flags[0], 1/*SLEEP EDDICIENCY PRESENT*/) &&
+    if(CHECK_BIT(SasData.Flags[0], 1/*SLEEP EFFICIENCY PRESENT*/) &&
        CHECK_BIT(pamFeature, SLEEP_EFFICIENCY_SUPPORTED))
     {
         PresentData[length] = SasData.SleepEfficiency;
@@ -143,32 +143,32 @@ uint8 getPresentSasdFields(uint8 *PresentData)
     if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*TIME OF AWEKENING AFTER ALARM PRESENT*/) &&
        CHECK_BIT(pamFeature, TIME_OF_AWAKENING_AFTER_ALARM_SUPPORTED))
     {
-        PresentData[length] = SasData.TimeOfAwakeningAfterAlarm[0];
+        PresentData[length] = SasData.TimeOfAwakeningAfterAlarm[2];
         PresentData[length+1] = SasData.TimeOfAwakeningAfterAlarm[1];
-        PresentData[length+2] = SasData.TimeOfAwakeningAfterAlarm[2];
+        PresentData[length+2] = SasData.TimeOfAwakeningAfterAlarm[0];
         length += sizeof(SasData.TimeOfAwakeningAfterAlarm);
     }
     if(CHECK_BIT(pamFeature, VISIBLE_LIGHT_LEVEL_SUPPORTED))
     {
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MinimumVisibleLightLevel PRESENT*/))
         {
-            PresentData[length] = SasData.MinimumVisibleLightLevel[0];
+            PresentData[length] = SasData.MinimumVisibleLightLevel[2];
             PresentData[length+1] = SasData.MinimumVisibleLightLevel[1];
-            PresentData[length+2] = SasData.MinimumVisibleLightLevel[2];
+            PresentData[length+2] = SasData.MinimumVisibleLightLevel[0];
             length += sizeof(SasData.MinimumVisibleLightLevel);
         }
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MAXIMUMVisibleLightLevel PRESENT*/))
         {
-            PresentData[length] = SasData.MaximumVisibleLightLevel[0];
+            PresentData[length] = SasData.MaximumVisibleLightLevel[2];
             PresentData[length+1] = SasData.MaximumVisibleLightLevel[1];
-            PresentData[length+2] = SasData.MaximumVisibleLightLevel[2];
+            PresentData[length+2] = SasData.MaximumVisibleLightLevel[0];
             length += sizeof(SasData.MaximumVisibleLightLevel);
         }
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*AVERAGEVisibleLightLevel PRESENT*/))
         {
-            PresentData[length] = SasData.AverageVisibleLightLevel[0];
+            PresentData[length] = SasData.AverageVisibleLightLevel[2];
             PresentData[length+1] = SasData.AverageVisibleLightLevel[1];
-            PresentData[length+2] = SasData.AverageVisibleLightLevel[2];
+            PresentData[length+2] = SasData.AverageVisibleLightLevel[0];
             length += sizeof(SasData.AverageVisibleLightLevel);
         }
     }
@@ -176,23 +176,23 @@ uint8 getPresentSasdFields(uint8 *PresentData)
     {
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*Minimumuvlight PRESENT*/))
         {
-            PresentData[length] = SasData.MinimumUVLightLevel[0];
+            PresentData[length] = SasData.MinimumUVLightLevel[2];
             PresentData[length+1] = SasData.MinimumUVLightLevel[1];
-            PresentData[length+2] = SasData.MinimumUVLightLevel[2];
+            PresentData[length+2] = SasData.MinimumUVLightLevel[0];
             length += sizeof(SasData.MinimumUVLightLevel);
         }
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MAXIMUMuvlight PRESENT*/))
         {
-            PresentData[length] = SasData.MaximumUVLightLevel[0];
+            PresentData[length] = SasData.MaximumUVLightLevel[2];
             PresentData[length+1] = SasData.MaximumUVLightLevel[1];
-            PresentData[length+2] = SasData.MaximumUVLightLevel[2];
+            PresentData[length+2] = SasData.MaximumUVLightLevel[0];
             length += sizeof(SasData.MaximumUVLightLevel);
         }
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*AVERAGEuvlight PRESENT*/))
         {
-            PresentData[length] = SasData.AverageUVLightLevel[0];
+            PresentData[length] = SasData.AverageUVLightLevel[2];
             PresentData[length+1] = SasData.AverageUVLightLevel[1];
-            PresentData[length+2] = SasData.AverageUVLightLevel[2];
+            PresentData[length+2] = SasData.AverageUVLightLevel[0];
             length += sizeof(SasData.AverageUVLightLevel);
         }
     }
@@ -200,23 +200,23 @@ uint8 getPresentSasdFields(uint8 *PresentData)
     {
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MinimumIRlight PRESENT*/))
         {
-            PresentData[length] = SasData.MinimumIRLightLevel[0];
+            PresentData[length] = SasData.MinimumIRLightLevel[2];
             PresentData[length+1] = SasData.MinimumIRLightLevel[1];
-            PresentData[length+2] = SasData.MinimumIRLightLevel[2];
+            PresentData[length+2] = SasData.MinimumIRLightLevel[0];
             length += sizeof(SasData.MinimumIRLightLevel);
         }
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MAXIMUMIRlight PRESENT*/))
         {
-            PresentData[length] = SasData.MaximumIRLightLevel[0];
+            PresentData[length] = SasData.MaximumIRLightLevel[2];
             PresentData[length+1] = SasData.MaximumIRLightLevel[1];
-            PresentData[length+2] = SasData.MaximumIRLightLevel[2];
+            PresentData[length+2] = SasData.MaximumIRLightLevel[0];
             length += sizeof(SasData.MaximumIRLightLevel);
         }
         if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*AVERAGEIRlight PRESENT*/))
         {
-            PresentData[length] = SasData.AverageIRLightLevel[0];
+            PresentData[length] = SasData.AverageIRLightLevel[2];
             PresentData[length+1] = SasData.AverageIRLightLevel[1];
-            PresentData[length+2] = SasData.AverageIRLightLevel[2];
+            PresentData[length+2] = SasData.AverageIRLightLevel[0];
             length += sizeof(SasData.AverageIRLightLevel);
         }
     }
@@ -229,9 +229,9 @@ uint8 getPresentSasdFields(uint8 *PresentData)
     if(CHECK_BIT(SasData.Flags[1], 8 - ONE_BYTE/*MinimumIRlight PRESENT*/) &&
        CHECK_BIT(pamFeature, WORN_DURATION_SUPPORTED))
     {
-        PresentData[length] = SasData.WornDuration[0];
+        PresentData[length] = SasData.WornDuration[2];
         PresentData[length+1] = SasData.WornDuration[1];
-        PresentData[length+2] = SasData.WornDuration[2];
+        PresentData[length+2] = SasData.WornDuration[0];
         length += sizeof(SasData.WornDuration);
     }
    

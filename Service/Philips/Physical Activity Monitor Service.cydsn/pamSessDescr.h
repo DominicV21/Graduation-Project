@@ -32,11 +32,10 @@ CYBLE_CYPACKED typedef struct
     int16  SubSessionStartTimeOffset;
     uint32 SubSessionEndBaseTime;
     int16  SubSessionEndTimeOffset;
-    uint16 PredominantActivityType;
     
 } CYBLE_CYPACKED_ATTR PAM_SESSIONDESCRIPTOR_VALUE_T;
 
-void UpdateSessionDescriptor(PAM_SESSIONDESCRIPTOR_VALUE_T session);
+CYBIT UpdateSessionDescriptor(PAM_SESSIONDESCRIPTOR_VALUE_T session);
 uint8 sessionDescriptorIndicate;
 
 #endif /* PAMSESSDESCR_H__ */

@@ -12,17 +12,52 @@
 
 #include "pamControlPoint.h"
 
-void updateControlPoint(uint8 opCode, uint8 param)
+void updateControlPointError(uint8 opCode, uint8 param)
 {
-    CYBLE_GATTS_HANDLE_VALUE_NTF_T tempHandle;
-    uint8 myIndication[2] = { opCode, param };
+    PAM_CP_ERROR_RSP_T myIndication;
+    myIndication.opCode = opCode;
+    myIndication.parameter = param;
     
-    tempHandle.attrHandle = CYBLE_PHYSICAL_ACTIVITY_MONITOR_GENERAL_ACTIVITY_INSTANTANEOUS_DATA_CHAR_HANDLE;
+    CYBLE_GATTS_HANDLE_VALUE_NTF_T tempHandle;
+
+    tempHandle.attrHandle = CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE;
     tempHandle.value.val = (uint8 *)&myIndication;
     tempHandle.value.len = sizeof(myIndication);
     CyBle_GattsWriteAttributeValue(&tempHandle, 0, &cyBle_connHandle, 0);
     
-    ble_SendIndication(CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE, myIndication, sizeof(myIndication));
+    ble_SendIndication(CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE, (uint8*)&myIndication, sizeof(myIndication));
+}
+
+void updateControlPointEnquireSucces(uint8 opCode, uint16 param)
+{
+    PAM_CP_ENQUIRE_SUCCES_RSP_T myIndication;
+    myIndication.opCode = opCode;
+    myIndication.parameter = param;
+    
+    CYBLE_GATTS_HANDLE_VALUE_NTF_T tempHandle;
+
+    tempHandle.attrHandle = CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE;
+    tempHandle.value.val = (uint8 *)&myIndication;
+    tempHandle.value.len = sizeof(myIndication);
+    CyBle_GattsWriteAttributeValue(&tempHandle, 0, &cyBle_connHandle, 0);
+    
+    ble_SendIndication(CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE, (uint8*)&myIndication, sizeof(myIndication));
+}
+
+void updateControlPointGetEndedDataSucces(uint8 opCode, uint32 param)
+{
+    PAM_CP_GETENDED_SUCCES_RSP_T myIndication;
+    myIndication.opCode = opCode;
+    CyBle_Set24ByPtr(myIndication.parameter, param);
+    
+    CYBLE_GATTS_HANDLE_VALUE_NTF_T tempHandle;
+
+    tempHandle.attrHandle = CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE;
+    tempHandle.value.val = (uint8 *)&myIndication;
+    tempHandle.value.len = sizeof(myIndication);
+    CyBle_GattsWriteAttributeValue(&tempHandle, 0, &cyBle_connHandle, 0);
+    
+    ble_SendIndication(CYBLE_PHYSICAL_ACTIVITY_MONITOR_PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHAR_HANDLE, (uint8*)&myIndication, sizeof(myIndication));
 }
 
 CYBIT stop_session(PAM_SESSIONDESCRIPTOR_VALUE_T *p, uint16* totalcount)
@@ -164,9 +199,8 @@ PAM_SESSIONDESCRIPTOR_VALUE_T buildNewSession(uint16 sessionID, uint16 subSessio
         session.SessionEndTimeOffset = 0x4444;
         session.SubSessionStartBaseTime = 0x12345678;
         session.SubSessionStartTimeOffset = 0x4444;
-        session.SubSessionEndBaseTime = 87654321;
-        session.SubSessionEndTimeOffset = 5555;
-        session.PredominantActivityType = 0xAA;
+        session.SubSessionEndBaseTime = 0x87654321;
+        session.SubSessionEndTimeOffset = 0x5555;
     }
     else
     {
@@ -179,7 +213,6 @@ PAM_SESSIONDESCRIPTOR_VALUE_T buildNewSession(uint16 sessionID, uint16 subSessio
         session.SubSessionStartTimeOffset = 0x8888;
         session.SubSessionEndBaseTime = 0xEDCBA987;
         session.SubSessionEndTimeOffset = 0x9999;
-        session.PredominantActivityType = 0xAA;
     }
     
     return session;

@@ -11,7 +11,8 @@ public enum HBControlPointOperation {
     GetEndedSessionData(3),
     StartSessionSubSession(4),
     StopSession(5),
-    DeleteSession(6);
+    DeleteSession(6),
+    SetAverageActivityType(7);
 
 
     HBControlPointOperation(int value) {this.value = value; }
@@ -33,6 +34,8 @@ public enum HBControlPointOperation {
             return 0;
         } else if (this.value == 3){
             return 3;
+        } else if (this.value == 7){
+            return 2;
         } else {
             return 1;
         }

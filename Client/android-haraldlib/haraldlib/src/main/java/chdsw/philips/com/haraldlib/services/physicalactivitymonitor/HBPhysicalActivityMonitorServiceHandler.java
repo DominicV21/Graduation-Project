@@ -28,8 +28,15 @@ import chdsw.philips.com.haraldlib.HBReadCommand;
 import chdsw.philips.com.haraldlib.HBWriteCommand;
 import chdsw.philips.com.haraldlib.services.HBServiceHandler;
 import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorControlPoint;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorCurrSess;
 import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorFeature;
 import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorGaid;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorGasd;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorCraid;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorCrasd;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorScasd;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorSaid;
+import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorSasd;
 import chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object.HBPhysicalActivityMonitorSessDescriptor;
 
 import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_FLOAT;
@@ -55,7 +62,7 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
             UUID.fromString("00007F14-0000-1000-8000-00805f9b34fb");
     private static final UUID PHYSICAL_ACTIVITY_MONITOR_CRASD_CHARACTERISTIC_UUID =
             UUID.fromString("00007F15-0000-1000-8000-00805f9b34fb");
-    private static final UUID PHYSICAL_ACTIVITY_MONITOR_SCAS_CHARACTERISTIC_UUID =
+    private static final UUID PHYSICAL_ACTIVITY_MONITOR_SCASD_CHARACTERISTIC_UUID =
             UUID.fromString("00007F16-0000-1000-8000-00805f9b34fb");
     private static final UUID PHYSICAL_ACTIVITY_MONITOR_SAID_CHARACTERISTIC_UUID =
             UUID.fromString("00007F17-0000-1000-8000-00805f9b34fb");
@@ -70,8 +77,12 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
 
     private HBPhysicalActivityMonitorFeature pamFeature;
     private byte[] firstMessageBuffer;
+    private byte[] secondMessageBuffer;
+    private byte[] thirdMessageBuffer;
     private byte[] totalDataBuffer;
     private boolean receivedAllMessages;
+    private int nrOfMessages;
+    private int currentMessage = 1;
 
     public HBPhysicalActivityMonitorServiceHandler(Context context) {
         super(context);
@@ -91,16 +102,47 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
             }
         }
 
-        if (characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_GAID_CHARACTERISTIC_UUID))
+        if (    characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_GAID_CHARACTERISTIC_UUID) ||
+                characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_GASD_CHARACTERISTIC_UUID) ||
+                characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_CRAID_CHARACTERISTIC_UUID) ||
+                characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_CRASD_CHARACTERISTIC_UUID) ||
+                characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_SCASD_CHARACTERISTIC_UUID) ||
+                characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_SAID_CHARACTERISTIC_UUID) ||
+                characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_SASD_CHARACTERISTIC_UUID))
         {
-            HBLogger.v(TAG, "PHYSICAL_ACTIVITY_MONITOR_GAID_UUID");
-            getPamGaid(deviceAddress, characteristic);
+            HBLogger.v(TAG, String.format("%s", characteristic.getUuid()));
+            getPamValue(deviceAddress, characteristic, characteristicUUID);
+        }
+
+        if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHARACTERISTIC_UUID)) {
+            HBLogger.v(TAG, "PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHARACTERISTIC_UUID");
+            HBLogger.v(TAG, String.format("getCPValue,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
+            HBPhysicalActivityMonitorControlPoint hbPhysicalActivityMonitorControlPoint = new HBPhysicalActivityMonitorControlPoint(characteristic.getValue());
+            HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+            if (listener != null) {
+                listener.onPamCP(deviceAddress, hbPhysicalActivityMonitorControlPoint);
+            }
+        }
+
+        if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_CURR_SESS_CHARACTERISTIC_UUID)) {
+            HBLogger.v(TAG, "PHYSICAL_ACTIVITY_MONITOR_CURR_SESS_CHARACTERISTIC_UUID");
+            HBLogger.v(TAG, String.format("getCurrentSession,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
+            HBPhysicalActivityMonitorCurrSess hbPhysicalActivityMonitorCurrSess = new HBPhysicalActivityMonitorCurrSess(characteristic.getValue());
+            HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+            if (listener != null) {
+                listener.onPamCurrSess(deviceAddress, hbPhysicalActivityMonitorCurrSess);
+            }
         }
 
         if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_SESS_DESCR_CHARACTERISTIC_UUID))
         {
             HBLogger.v(TAG, "PHYSICAL_ACTIVITY_MONITOR_SESS_DESCR_CHARACTERISTIC_UUID");
-            getPamSessDescriptor(deviceAddress, characteristic);
+            HBLogger.v(TAG, String.format("getPamSessDescriptor,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
+            HBPhysicalActivityMonitorSessDescriptor hbPhysicalActivityMonitorSessDescriptor = new HBPhysicalActivityMonitorSessDescriptor(characteristic.getValue());
+            HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+            if (listener != null) {
+                listener.onPamSessDescriptor(deviceAddress, hbPhysicalActivityMonitorSessDescriptor);
+            }
         }
     }
 
@@ -116,58 +158,130 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
         HBLogger.v(TAG, String.format("characteristicErrorResponse device: %s, characteristic: %s, status: %d", deviceAddress, characteristic.getUuid(), status));
     }
 
-
-    public void getPamFeature(HBDevice device) {
-        HBLogger.v(TAG, String.format("getPamFeature device: %s", device.getAddress()));
-        device.readCharacteristic(new HBReadCommand(SERVICE_UUID, PHYSICAL_ACTIVITY_MONITOR_FEATURE_CHARACTERISTIC_UUID));
-    }
-
-    private void getPamGaid(String deviceAddress, BluetoothGattCharacteristic characteristic){
-        HBLogger.v(TAG, String.format("getPamGaid,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
+    private void getPamValue(String deviceAddress, BluetoothGattCharacteristic characteristic, UUID characteristicUUID){
+        HBLogger.v(TAG, String.format("getPamValue,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
 
         receivedAllMessages = false;
-        int offset = 0;
+        int HeaderPos = 0;
         byte[] messageData = characteristic.getValue();
 
-        int nrOfMessages = (messageData[offset] & 0x7F) + 1;
-        int currentMessage = messageData[offset] & 0x7F;
         boolean firstMessage = false;
 
-        if((messageData[offset] & 0x80) == 0x80)
+        if((messageData[HeaderPos] & 0x80) == 0x80)
         {
             firstMessage = true;
+            nrOfMessages  = (messageData[HeaderPos] & 0x7F) + 1;
+            HBLogger.v(TAG, String.format("Check message numbers, message %d of %s This is the first Message", currentMessage, nrOfMessages ));
         }
-
-        HBLogger.v(TAG, String.format("Check message numbers, message %d of %s ", currentMessage, nrOfMessages ));
+        else
+        {
+            currentMessage = nrOfMessages - (messageData[HeaderPos] & 0x7F);
+            HBLogger.v(TAG, String.format("Check message numbers, message %d of %s ", currentMessage, nrOfMessages ));
+        }
 
         if(firstMessage && nrOfMessages == 1)
         {
             totalDataBuffer = new byte[messageData.length];
-            System.arraycopy(messageData, 0, totalDataBuffer, 0, messageData.length);
+            System.arraycopy(messageData, 1, totalDataBuffer, 0, messageData.length - 1);
             receivedAllMessages = true;
         }
-        else {
+        else if(nrOfMessages > 1){
+            //SRCPOS is 1 since we do not need the header anymore we will not copy it to the parsing method
             if (currentMessage == 1) {
+                HBLogger.v(TAG, String.format("msg 1"));
                 firstMessageBuffer = new byte[messageData.length];
-                totalDataBuffer = new byte[firstMessageBuffer.length + messageData.length];
-                System.arraycopy(messageData, 0, firstMessageBuffer, 0, messageData.length);
+                System.arraycopy(messageData, 1, firstMessageBuffer, 0, messageData.length - 1);
             }
+            if (currentMessage == 2) {
+                HBLogger.v(TAG, String.format("msg 2"));
+                secondMessageBuffer = new byte[messageData.length];
+                System.arraycopy(messageData, 1, secondMessageBuffer, 0, messageData.length - 1);
+            }
+            if (currentMessage == 3) {
+                HBLogger.v(TAG, String.format("msg 3"));
+                thirdMessageBuffer = new byte[messageData.length];
+                System.arraycopy(messageData, 1, thirdMessageBuffer, 0, messageData.length - 1);
+            }
+            //if a Data Characteristic is going to exceed the total length of 80 and the minimum ATTMTU size is still at 23
+            //you have to ad an extra message buffer here.
 
-            System.arraycopy(firstMessageBuffer, 0, totalDataBuffer, 0, firstMessageBuffer.length);
-            System.arraycopy(messageData, 1, totalDataBuffer, firstMessageBuffer.length, messageData.length - 1); //SRCPOS is 1 because we dont want to send the header of the second message
-
-            if (currentMessage == 0) {
+            if (currentMessage == nrOfMessages) {
+                totalDataBuffer = new byte[(((nrOfMessages - 1) * firstMessageBuffer.length) + messageData.length) - nrOfMessages];
+                System.arraycopy(firstMessageBuffer, 0, totalDataBuffer, 0, firstMessageBuffer.length - 1);
+                System.arraycopy(secondMessageBuffer, 0, totalDataBuffer, firstMessageBuffer.length - 1, secondMessageBuffer.length - 1);
+                if(nrOfMessages >= 3){System.arraycopy(thirdMessageBuffer, 0, totalDataBuffer, firstMessageBuffer.length + secondMessageBuffer.length - 2, thirdMessageBuffer.length - 1);}
+                if(nrOfMessages == 4){System.arraycopy(messageData, 1, totalDataBuffer, firstMessageBuffer.length + secondMessageBuffer.length + thirdMessageBuffer.length - 3, messageData.length - 1);}
                 receivedAllMessages = true;
+                HBLogger.v(TAG, String.format("sizeof Data in the message (no headers) %d (this should be Terminal 'CHARACTERISTIC' presentdatalength - 1) ", totalDataBuffer.length));
             }
         }
 
         if(receivedAllMessages){
-            HBPhysicalActivityMonitorGaid hbPhysicalActivityMonitorGaid = new HBPhysicalActivityMonitorGaid(totalDataBuffer);
-            HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
-            if (listener != null) {
-                listener.onPamGaid(deviceAddress, hbPhysicalActivityMonitorGaid);
+            nrOfMessages = 0;
+            currentMessage = 1;
+
+            if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_GAID_CHARACTERISTIC_UUID)) {
+
+                HBPhysicalActivityMonitorGaid hbPhysicalActivityMonitorGaid = new HBPhysicalActivityMonitorGaid(totalDataBuffer);
+                HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+                if (listener != null) {
+                    listener.onPamGaid(deviceAddress, hbPhysicalActivityMonitorGaid);
+                }
+            }
+            if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_GASD_CHARACTERISTIC_UUID))
+            {
+                HBPhysicalActivityMonitorGasd hbPhysicalActivityMonitorGasd = new HBPhysicalActivityMonitorGasd(totalDataBuffer);
+                HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+                if (listener != null) {
+                    listener.onPamGasd(deviceAddress, hbPhysicalActivityMonitorGasd);
+                }
+            }
+            if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_CRAID_CHARACTERISTIC_UUID))
+            {
+                HBPhysicalActivityMonitorCraid hbPhysicalActivityMonitorCraid = new HBPhysicalActivityMonitorCraid(totalDataBuffer);
+                HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+                if (listener != null) {
+                    listener.onPamCraid(deviceAddress, hbPhysicalActivityMonitorCraid);
+                }
+            }
+            if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_CRASD_CHARACTERISTIC_UUID))
+            {
+                HBPhysicalActivityMonitorCrasd hbPhysicalActivityMonitorCrasd = new HBPhysicalActivityMonitorCrasd(totalDataBuffer);
+                HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+                if (listener != null) {
+                    listener.onPamCrasd(deviceAddress, hbPhysicalActivityMonitorCrasd);
+                }
+            }
+            if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_SCASD_CHARACTERISTIC_UUID))
+            {
+                HBPhysicalActivityMonitorScasd hbPhysicalActivityMonitorScasd = new HBPhysicalActivityMonitorScasd(totalDataBuffer);
+                HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+                if (listener != null) {
+                    listener.onPamScasd(deviceAddress, hbPhysicalActivityMonitorScasd);
+                }
+            }
+            if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_SAID_CHARACTERISTIC_UUID))
+            {
+                HBPhysicalActivityMonitorSaid hbPhysicalActivityMonitorSaid = new HBPhysicalActivityMonitorSaid(totalDataBuffer);
+                HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+                if (listener != null) {
+                    listener.onPamSaid(deviceAddress, hbPhysicalActivityMonitorSaid);
+                }
+            }
+            if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_SASD_CHARACTERISTIC_UUID))
+            {
+                HBPhysicalActivityMonitorSasd hbPhysicalActivityMonitorSasd = new HBPhysicalActivityMonitorSasd(totalDataBuffer);
+                HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
+                if (listener != null) {
+                    listener.onPamSasd(deviceAddress, hbPhysicalActivityMonitorSasd);
+                }
             }
         }
+    }
+
+    public void getPamFeature(HBDevice device) {
+        HBLogger.v(TAG, String.format("getPamFeature device: %s", device.getAddress()));
+        device.readCharacteristic(new HBReadCommand(SERVICE_UUID, PHYSICAL_ACTIVITY_MONITOR_FEATURE_CHARACTERISTIC_UUID));
     }
 
     public void writeToPamCP(HBDevice device, HBPhysicalActivityMonitorControlPoint filterProcedure) {
@@ -207,6 +321,13 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
             }
         }
 
+        if (filterProcedure.getOperation().numberOfParameters() == 2) {
+            data = new byte[3];
+            data[0] = opCodeData;
+            data[1] = (byte) (filterProcedure.getParameter1() & 0xff);
+            data[2] = (byte) (filterProcedure.getParameter2() & 0xff);
+        }
+
         if (filterProcedure.getOperation().numberOfParameters() == 3) {
             data = new byte[6];
 
@@ -227,16 +348,5 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
 
         device.writeCharacteristic(new HBWriteCommand(SERVICE_UUID,
                 PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHARACTERISTIC_UUID, data));
-    }
-
-    private void getPamSessDescriptor(String deviceAddress, BluetoothGattCharacteristic characteristic)
-    {
-        HBLogger.v(TAG, String.format("getPamSessDescriptor,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
-
-        HBPhysicalActivityMonitorSessDescriptor hbPhysicalActivityMonitorSessDescriptor = new HBPhysicalActivityMonitorSessDescriptor(characteristic.getValue());
-        HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
-        if (listener != null) {
-            listener.onPamSessDescriptor(deviceAddress, hbPhysicalActivityMonitorSessDescriptor);
-        }
     }
 }

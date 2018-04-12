@@ -44,7 +44,7 @@
 #define AVERAGE_ACTIVITY_TYPE_PRESENT	                23u
 #define WORN_DURATION_PRESENT	                        24u
 
-#define ALWAYS_PRESENT_GASD_FIELD_LENGTH                     17u
+#define ALWAYS_PRESENT_GASD_FIELD_LENGTH                17u
 
 /***************************************
 *       Data Struct Definition
@@ -85,7 +85,6 @@ CYBLE_CYPACKED typedef struct
     
 }CYBLE_CYPACKED_ATTR PAM_GASD_VALUE_T;
 
-
 /***************************************
 *        Function Prototypes
 ***************************************/
@@ -101,3 +100,34 @@ int generalsummarydataIndicate;
 #define PAMGAID_H__
 
 /* [] END OF FILE */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

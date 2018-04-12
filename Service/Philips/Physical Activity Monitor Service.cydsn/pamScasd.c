@@ -87,41 +87,41 @@ uint8 getPresentScasdFields(uint8 *PresentData)
     if(CHECK_BIT(ScasData.Flags, 1/*NORMAL WALKING STEPS PRESENT*/) &&
        CHECK_BIT(pamFeature, NORMAL_WALKING_STEPS_SUPPORTED))
     {
-        PresentData[length] = ScasData.NormalWalkingSteps[0];
+        PresentData[length] = ScasData.NormalWalkingSteps[2];
         PresentData[length+1] = ScasData.NormalWalkingSteps[1];
-        PresentData[length+2] = ScasData.NormalWalkingSteps[2];
+        PresentData[length+2] = ScasData.NormalWalkingSteps[0];
         length += sizeof(ScasData.NormalWalkingSteps);
     }
     if(CHECK_BIT(ScasData.Flags, 1/*INTENSITY STEPS PRESENT*/) &&
        CHECK_BIT(pamFeature, INTENSITY_STEPS_SUPPORTED))
     {
-        PresentData[length] = ScasData.IntensitySteps[0];
+        PresentData[length] = ScasData.IntensitySteps[2];
         PresentData[length+1] = ScasData.IntensitySteps[1];
-        PresentData[length+2] = ScasData.IntensitySteps[2];
+        PresentData[length+2] = ScasData.IntensitySteps[0];
         length += sizeof(ScasData.IntensitySteps);
     }
     if(CHECK_BIT(ScasData.Flags, 1/*FLOOR STEPS PRESENT*/) &&
        CHECK_BIT(pamFeature, FLOOR_STEPS_SUPPORTED))
     {
-        PresentData[length] = ScasData.FloorSteps[0];
+        PresentData[length] = ScasData.FloorSteps[2];
         PresentData[length+1] = ScasData.FloorSteps[1];
-        PresentData[length+2] = ScasData.FloorSteps[2];
+        PresentData[length+2] = ScasData.FloorSteps[0];
         length += sizeof(ScasData.FloorSteps);
     }
     if(CHECK_BIT(ScasData.Flags, 1/*Distance PRESENT*/) &&
        CHECK_BIT(pamFeature, DISTANCE_SUPPORTED))
     {
-        PresentData[length] = ScasData.Distance[0];
+        PresentData[length] = ScasData.Distance[2];
         PresentData[length+1] = ScasData.Distance[1];
-        PresentData[length+2] = ScasData.Distance[2];
+        PresentData[length+2] = ScasData.Distance[0];
         length += sizeof(ScasData.Distance);
     }
     if(CHECK_BIT(ScasData.Flags, 1/*WORN DURATION PRESENT*/) &&
        CHECK_BIT(pamFeature, WORN_DURATION_SUPPORTED))
     {
-        PresentData[length] = ScasData.WornDuration[0];
+        PresentData[length] = ScasData.WornDuration[2];
         PresentData[length+1] = ScasData.WornDuration[1];
-        PresentData[length+2] = ScasData.WornDuration[2];
+        PresentData[length+2] = ScasData.WornDuration[0];
         length += sizeof(ScasData.WornDuration);
     }
     

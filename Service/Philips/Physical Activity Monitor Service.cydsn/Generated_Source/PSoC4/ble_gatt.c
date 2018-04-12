@@ -158,7 +158,7 @@ CYBLE_STATE_T cyBle_state;
     0x000Fu,    /* Handle of the Client Characteristic Configuration descriptor */
 };
     
-    static uint8 cyBle_attValues[0x02D1u] = {
+    static uint8 cyBle_attValues[0x02D4u] = {
     /* Device Name */
     (uint8)'P', (uint8)'A', (uint8)'M', (uint8)'S',
 
@@ -264,7 +264,7 @@ CYBLE_STATE_T cyBle_state;
     (uint8)'m', (uint8)'a', (uint8)'r', (uint8)'y', (uint8)' ', (uint8)'D', (uint8)'a', (uint8)'t', (uint8)'a',
 
     /* Physical Activity Monitor Control Point */
-    0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u,
 
     /* Characteristic User Description */
     (uint8)'P', (uint8)'h', (uint8)'y', (uint8)'s', (uint8)'i', (uint8)'c', (uint8)'a', (uint8)'l', (uint8)' ',
@@ -362,17 +362,17 @@ CYBLE_GATTS_ATT_GEN_VAL_LEN_T cyBle_attValuesLen[CYBLE_GATT_DB_ATT_VAL_COUNT] = 
     { 0x0002u, (void *)&cyBle_attValuesCCCD[14] }, /* SleepActivitySummaryDataCCCD */
     { 0x001Bu, (void *)&cyBle_attValues[571] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[9] }, /* Physical Activity Monitor Control Point UUID */
-    { 0x0001u, (void *)&cyBle_attValues[598] }, /* Physical Activity Monitor Control Point */
+    { 0x0004u, (void *)&cyBle_attValues[598] }, /* Physical Activity Monitor Control Point */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[16] }, /* PhysicalActivityMonitorControlPointCCCD */
-    { 0x0027u, (void *)&cyBle_attValues[599] }, /* Characteristic User Description */
+    { 0x0027u, (void *)&cyBle_attValues[602] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[10] }, /* Current Session UUID */
-    { 0x0013u, (void *)&cyBle_attValues[638] }, /* Current Session */
+    { 0x0013u, (void *)&cyBle_attValues[641] }, /* Current Session */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[18] }, /* CurrentSessionCCCD */
-    { 0x000Fu, (void *)&cyBle_attValues[657] }, /* Characteristic User Description */
+    { 0x000Fu, (void *)&cyBle_attValues[660] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[11] }, /* Session Descriptor UUID */
-    { 0x001Fu, (void *)&cyBle_attValues[672] }, /* Session Descriptor */
+    { 0x001Fu, (void *)&cyBle_attValues[675] }, /* Session Descriptor */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[20] }, /* SessionDescriptorCCCD */
-    { 0x0012u, (void *)&cyBle_attValues[703] }, /* Characteristic User Description */
+    { 0x0012u, (void *)&cyBle_attValues[706] }, /* Characteristic User Description */
 };
 
 const CYBLE_GATTS_DB_T cyBle_gattDB[0x3Cu] = {
@@ -425,7 +425,7 @@ const CYBLE_GATTS_DB_T cyBle_gattDB[0x3Cu] = {
     { 0x002Fu, 0x2902u /* SleepActivitySummaryDataCCCD        */, 0x010A0301u /* rd,wr  */, 0x002Fu, {{0x0002u, (void *)&cyBle_attValuesLen[37]}} },
     { 0x0030u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0030u, {{0x001Bu, (void *)&cyBle_attValuesLen[38]}} },
     { 0x0031u, 0x2803u /* Characteristic                      */, 0x00280001u /* wr,ind */, 0x0034u, {{0x0010u, (void *)&cyBle_attValuesLen[39]}} },
-    { 0x0032u, 0x7F1Eu /* Physical Activity Monitor Control P */, 0x09280300u /* wr,ind */, 0x0034u, {{0x0001u, (void *)&cyBle_attValuesLen[40]}} },
+    { 0x0032u, 0x7F1Eu /* Physical Activity Monitor Control P */, 0x09280300u /* wr,ind */, 0x0034u, {{0x0004u, (void *)&cyBle_attValuesLen[40]}} },
     { 0x0033u, 0x2902u /* PhysicalActivityMonitorControlPoint */, 0x010A0301u /* rd,wr  */, 0x0033u, {{0x0002u, (void *)&cyBle_attValuesLen[41]}} },
     { 0x0034u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0034u, {{0x0027u, (void *)&cyBle_attValuesLen[42]}} },
     { 0x0035u, 0x2803u /* Characteristic                      */, 0x00220001u /* rd,ind */, 0x0038u, {{0x0010u, (void *)&cyBle_attValuesLen[43]}} },

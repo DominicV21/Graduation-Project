@@ -25,7 +25,7 @@
 #define PAM_ATT_MTU_SIZE                    (23u)
 #define PAM_MAX_MESSAGE_DATA_SIZE           (PAM_ATT_MTU_SIZE - 4u)
     
-#define ONE_BYTE                          (8u)
+#define ONE_BYTE                            (8u)
 #define TWO_BYTES_SHIFT                     (16u)
 #define THREE_BYTES_SHIFT                   (24u)
 #define FOUR_BYTES_SHIFT                    (32u)
@@ -44,6 +44,7 @@
 void ble_SendNotification(CYBLE_GATT_DB_ATTR_HANDLE_T characteristic, uint8* data, uint16 length);
 void ble_SendIndication(CYBLE_GATT_DB_ATTR_HANDLE_T characteristic, uint8* data, uint16 length);
 
+void CyBle_Set24ByPtr(uint8 ptr[], uint32 value);
 void CyBle_Set32ByPtr(uint8 ptr[], uint32 value);
 
 uint8 calculateNumberOfMessages(double sizeOfData);
@@ -57,10 +58,7 @@ uint16 Get_Ended_Data_SessionID;
 uint16 Get_Ended_Data_Sub_SessionID;
 uint8 Get_Ended_Data_Value;
 uint8 send_Deleted_Sessions;
+CYBIT Update_GASD_With_New_Activity;
+uint8 UserDefinedActivityTypeAllSubSessions[25][25];
 
- /*
-
-void GetUint24(uint32 *u32, uint8 u24Ptr[]);
-
-*/
 #endif /* PAMS_H__*/

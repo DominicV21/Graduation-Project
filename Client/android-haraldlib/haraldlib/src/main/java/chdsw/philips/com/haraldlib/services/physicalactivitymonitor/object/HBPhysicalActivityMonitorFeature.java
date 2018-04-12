@@ -10,8 +10,6 @@
 
 package chdsw.philips.com.haraldlib.services.physicalactivitymonitor.object;
 
-import java.math.BigInteger;
-
 public class HBPhysicalActivityMonitorFeature {
     private long flags;
 

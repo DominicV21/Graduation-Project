@@ -130,9 +130,9 @@ uint8 getPresentGaidFields(uint8 *PresentData)
     if(CHECK_BIT(GaiData.Flags[0], ELEVATION_PRESENT) &&
        CHECK_BIT(pamFeature, ELEVATION_SUPPORTED))
     {
-        PresentData[length] = GaiData.Elevation[0];
+        PresentData[length] = GaiData.Elevation[2];
         PresentData[length + 1] = GaiData.Elevation[1];
-        PresentData[length + 2] = GaiData.Elevation[2];
+        PresentData[length + 2] = GaiData.Elevation[0];
         length += sizeof(GaiData.Elevation);
     }
     if(CHECK_BIT(GaiData.Flags[1], ACTIVITY_COUNT_PER_MINUTE_PRESENT - ONE_BYTE) &&

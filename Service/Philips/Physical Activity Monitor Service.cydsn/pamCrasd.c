@@ -32,7 +32,7 @@ void UpdateCrasd(void)
         
         uint8 byteCount = 1u;//Starts at 1 because 0 is the header field
         
-        CyBle_Set16ByPtr(&PresentData[byteCount], CrasData.Flags);
+        CyBle_Set32ByPtr(&PresentData[byteCount], CrasData.Flags);
         byteCount += sizeof(CrasData.Flags);
         
         CyBle_Set16ByPtr(&PresentData[byteCount], CrasData.SessionID);
@@ -82,53 +82,53 @@ void UpdateCrasd(void)
 
 uint8 getPresentCrasdFields(uint8 *PresentData)
 {
-    uint8 length = ALWAYS_PRESENT_CRAID_FIELD_LENGTH;
+    uint8 length = ALWAYS_PRESENT_CRASD_FIELD_LENGTH;
     
     if(CHECK_BIT(CrasData.Flags, 1/*TIMEZONE1 PRESENT*/) &&
        CHECK_BIT(pamFeature, TIME_IN_HEART_RATE_ZONE1_SUPPORTED))
     {
-        PresentData[length] = CrasData.TimeInHeartRateZone1[0];
+        PresentData[length] = CrasData.TimeInHeartRateZone1[2];
         PresentData[length+1] = CrasData.TimeInHeartRateZone1[1];
-        PresentData[length+2] = CrasData.TimeInHeartRateZone1[2];
+        PresentData[length+2] = CrasData.TimeInHeartRateZone1[0];
         length += sizeof(CrasData.TimeInHeartRateZone1);
     }
     if(CHECK_BIT(CrasData.Flags, 1/*TIMEZONE2 PRESENT*/) &&
        CHECK_BIT(pamFeature, TIME_IN_HEART_RATE_ZONE2_SUPPORTED))
     {
-        PresentData[length] = CrasData.TimeInHeartRateZone2[0];
+        PresentData[length] = CrasData.TimeInHeartRateZone2[2];
         PresentData[length+1] = CrasData.TimeInHeartRateZone2[1];
-        PresentData[length+2] = CrasData.TimeInHeartRateZone2[2];
+        PresentData[length+2] = CrasData.TimeInHeartRateZone2[0];
         length += sizeof(CrasData.TimeInHeartRateZone2);
     }
     if(CHECK_BIT(CrasData.Flags, 1/*TIMEZONE3 PRESENT*/) &&
        CHECK_BIT(pamFeature, TIME_IN_HEART_RATE_ZONE3_SUPPORTED))
     {
-        PresentData[length] = CrasData.TimeInHeartRateZone3[0];
+        PresentData[length] = CrasData.TimeInHeartRateZone3[2];
         PresentData[length+1] = CrasData.TimeInHeartRateZone3[1];
-        PresentData[length+2] = CrasData.TimeInHeartRateZone3[2];
+        PresentData[length+2] = CrasData.TimeInHeartRateZone3[0];
         length += sizeof(CrasData.TimeInHeartRateZone3);
     }
     if(CHECK_BIT(CrasData.Flags, 1/*TIMEZONE4 PRESENT*/) &&
        CHECK_BIT(pamFeature, TIME_IN_HEART_RATE_ZONE4_SUPPORTED))
     {
-        PresentData[length] = CrasData.TimeInHeartRateZone4[0];
+        PresentData[length] = CrasData.TimeInHeartRateZone4[2];
         PresentData[length+1] = CrasData.TimeInHeartRateZone4[1];
-        PresentData[length+2] = CrasData.TimeInHeartRateZone4[2];
+        PresentData[length+2] = CrasData.TimeInHeartRateZone4[0];
         length += sizeof(CrasData.TimeInHeartRateZone4);
     }
     if(CHECK_BIT(CrasData.Flags, 1/*TIMEZONE5 PRESENT*/) &&
        CHECK_BIT(pamFeature, TIME_IN_HEART_RATE_ZONE5_SUPPORTED))
     {
-        PresentData[length] = CrasData.TimeInHeartRateZone5[0];
+        PresentData[length] = CrasData.TimeInHeartRateZone5[2];
         PresentData[length+1] = CrasData.TimeInHeartRateZone5[1];
-        PresentData[length+2] = CrasData.TimeInHeartRateZone5[2];
+        PresentData[length+2] = CrasData.TimeInHeartRateZone5[0];
         length += sizeof(CrasData.TimeInHeartRateZone5);
     }
     if(CHECK_BIT(pamFeature, VO2_MAX_SUPPORTED))
     {
         if(CHECK_BIT(CrasData.Flags, 1/*MIN VO2MAX PRESENT*/))
         {
-            PresentData[length] = CrasData.MaximumVO2Max;
+            PresentData[length] = CrasData.MinimumVO2Max;
             length += sizeof(CrasData.MaximumVO2Max);
         }
         if(CHECK_BIT(CrasData.Flags, 1/*MAX VO2MAX PRESENT*/))
@@ -253,9 +253,9 @@ uint8 getPresentCrasdFields(uint8 *PresentData)
     if(CHECK_BIT(CrasData.Flags, 1/*WORN DURATION PRESENT*/) &&
        CHECK_BIT(pamFeature, WORN_DURATION_SUPPORTED))
     {
-        PresentData[length] = CrasData.WornDuration[0];
+        PresentData[length] = CrasData.WornDuration[2];
         PresentData[length + 1] = CrasData.WornDuration[1];
-        PresentData[length + 2] = CrasData.WornDuration[2];
+        PresentData[length + 2] = CrasData.WornDuration[0];
         length += sizeof(CrasData.WornDuration);
     }
     

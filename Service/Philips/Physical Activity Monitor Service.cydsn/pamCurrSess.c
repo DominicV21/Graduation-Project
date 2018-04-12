@@ -33,7 +33,6 @@ void UpdateCurrSession(PAM_SESSIONDESCRIPTOR_VALUE_T *session)
     CurrSession.SubSessionID = session->SubSessionID;
     CurrSession.SubSessionStartBaseTime = session->SessionStartBaseTime;
     CurrSession.SubSessionStartTimeOffset = session->SessionStartTimeOffset;
-    CurrSession.PredominantActivityType = session->PredominantActivityType;
     
     tempHandle.attrHandle = CYBLE_PHYSICAL_ACTIVITY_MONITOR_CURRENT_SESSION_CHAR_HANDLE;
     tempHandle.value.val = (uint8 *)&CurrSession;

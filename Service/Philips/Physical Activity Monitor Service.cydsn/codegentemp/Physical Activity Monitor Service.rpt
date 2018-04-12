@@ -1,13 +1,13 @@
-Loading plugins phase: Elapsed time ==> 0s.985ms
+Loading plugins phase: Elapsed time ==> 0s.192ms
 <CYPRESSTAG name="CyDsfit arguments...">
-cydsfit arguments: -.fdsnotice -.fdswarpdepfile=warp_dependencies.txt -.fdselabdepfile=elab_dependencies.txt -.fdsbldfile=generated_files.txt -.fdsreffile=referenced_files.txt -p C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -d CY8C4247LQI-BL483 -s C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Generated_Source\PSoC4 -- -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE
+cydsfit arguments: -.fdsnotice -.fdswarpdepfile=warp_dependencies.txt -.fdselabdepfile=elab_dependencies.txt -.fdsbldfile=generated_files.txt -.fdsreffile=referenced_files.txt -p C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -d CY8C4247LQI-BL483 -s C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Generated_Source\PSoC4 -- -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE
 </CYPRESSTAG>
 <CYPRESSTAG name="Design elaboration results...">
 </CYPRESSTAG>
-Elaboration phase: Elapsed time ==> 2s.906ms
+Elaboration phase: Elapsed time ==> 2s.348ms
 <CYPRESSTAG name="HDL generation results...">
 </CYPRESSTAG>
-HDL generation phase: Elapsed time ==> 0s.075ms
+HDL generation phase: Elapsed time ==> 0s.051ms
 <CYPRESSTAG name="Synthesis results...">
 
      | | | | | | |
@@ -25,23 +25,23 @@ HDL generation phase: Elapsed time ==> 0s.075ms
 ======================================================================
 Compiling:  Physical Activity Monitor Service.v
 Program  :   C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\bin\warp.exe
-Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 Physical Activity Monitor Service.v -verilog
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 Physical Activity Monitor Service.v -verilog
 ======================================================================
 
 ======================================================================
 Compiling:  Physical Activity Monitor Service.v
 Program  :   C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\bin\warp.exe
-Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 Physical Activity Monitor Service.v -verilog
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 Physical Activity Monitor Service.v -verilog
 ======================================================================
 
 ======================================================================
 Compiling:  Physical Activity Monitor Service.v
 Program  :   vlogfe
-Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 -verilog Physical Activity Monitor Service.v
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 -verilog Physical Activity Monitor Service.v
 ======================================================================
 
 vlogfe V6.3 IR 41:  Verilog parser
-Wed Mar 21 09:48:25 2018
+Wed Apr 11 10:55:32 2018
 
 
 ======================================================================
@@ -51,7 +51,7 @@ Options  :    -yv2 -q10 Physical Activity Monitor Service.v
 ======================================================================
 
 vpp V6.3 IR 41:  Verilog Pre-Processor
-Wed Mar 21 09:48:25 2018
+Wed Apr 11 10:55:32 2018
 
 Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\or_v1_0\or_v1_0.v'
 Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_constant_v1_0\cy_constant_v1_0.v'
@@ -88,11 +88,11 @@ vlogfe:  No errors.
 ======================================================================
 Compiling:  Physical Activity Monitor Service.v
 Program  :   tovif
-Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 -verilog Physical Activity Monitor Service.v
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 -verilog Physical Activity Monitor Service.v
 ======================================================================
 
 tovif V6.3 IR 41:  High-level synthesis
-Wed Mar 21 09:48:26 2018
+Wed Apr 11 10:55:32 2018
 
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\std.vhd'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\cypress.vhd'.
@@ -103,9 +103,9 @@ Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\c
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\stdlogic\mod_cnst.vif'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\stdlogic\mod_mthv.vif'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\stdlogic\mod_genv.vif'.
-Linking 'C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\Physical Activity Monitor Service.ctl'.
+Linking 'C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\Physical Activity Monitor Service.ctl'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\or_v1_0\or_v1_0.v'.
-Linking 'C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\Physical Activity Monitor Service.v'.
+Linking 'C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\Physical Activity Monitor Service.v'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_constant_v1_0\cy_constant_v1_0.v'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_PWM_v3_30\B_PWM_v3_30.v'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\cypress.v'.
@@ -123,11 +123,11 @@ tovif:  No errors.
 ======================================================================
 Compiling:  Physical Activity Monitor Service.v
 Program  :   topld
-Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 -verilog Physical Activity Monitor Service.v
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -dcpsoc3 -verilog Physical Activity Monitor Service.v
 ======================================================================
 
 topld V6.3 IR 41:  Synthesis and optimization
-Wed Mar 21 09:48:26 2018
+Wed Apr 11 10:55:33 2018
 
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\std.vhd'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\cypress.vhd'.
@@ -138,9 +138,9 @@ Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\c
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\stdlogic\mod_cnst.vif'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\stdlogic\mod_mthv.vif'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\stdlogic\mod_genv.vif'.
-Linking 'C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\Physical Activity Monitor Service.ctl'.
+Linking 'C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\Physical Activity Monitor Service.ctl'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\or_v1_0\or_v1_0.v'.
-Linking 'C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\Physical Activity Monitor Service.v'.
+Linking 'C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\Physical Activity Monitor Service.v'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_constant_v1_0\cy_constant_v1_0.v'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_PWM_v3_30\B_PWM_v3_30.v'.
 Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\lib\common\cypress.v'.
@@ -685,16 +685,16 @@ topld:  No errors.
 
 CYPRESS_DIR    : C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp
 Warp Program   : C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\warp\bin\warp.exe
-Warp Arguments : -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya "-.fftprj=C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj" -dcpsoc3 "Physical Activity Monitor Service.v" -verilog
+Warp Arguments : -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya "-.fftprj=C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj" -dcpsoc3 "Physical Activity Monitor Service.v" -verilog
 </CYPRESSTAG>
-Warp synthesis phase: Elapsed time ==> 1s.948ms
+Warp synthesis phase: Elapsed time ==> 1s.046ms
 <CYPRESSTAG name="Fitter results...">
 <CYPRESSTAG name="Fitter startup details...">
-cyp3fit: V4.1.0.3210, Family: PSoC3, Started at: Wednesday, 21 March 2018 09:48:27
-Options: -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\Graduation-Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -d CY8C4247LQI-BL483 Physical Activity Monitor Service.v -verilog
+cyp3fit: V4.1.0.3210, Family: PSoC3, Started at: Wednesday, 11 April 2018 10:55:33
+Options: -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj -d CY8C4247LQI-BL483 Physical Activity Monitor Service.v -verilog
 </CYPRESSTAG>
 <CYPRESSTAG name="Design parsing">
-Design parsing phase: Elapsed time ==> 0s.011ms
+Design parsing phase: Elapsed time ==> 0s.014ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Tech Mapping">
 <CYPRESSTAG name="Initial Mapping" icon="FILE_RPT_TECHM">
@@ -1223,8 +1223,8 @@ DAC                           :      :      :      :
   7-bit IDAC                  :    0 :    1 :    1 :  0.00 %
   8-bit IDAC                  :    0 :    1 :    1 :  0.00 %
 </CYPRESSTAG>
-Technology Mapping: Elapsed time ==> 0s.077ms
-Tech Mapping phase: Elapsed time ==> 0s.100ms
+Technology Mapping: Elapsed time ==> 0s.071ms
+Tech Mapping phase: Elapsed time ==> 0s.101ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Analog Placement">
 <CYPRESSTAG name="FFB & IO Pre Placement">
@@ -1246,15 +1246,15 @@ ClockGenBlock                       : CLK_GEN_[FFB(CLK_GEN,0)]
 </CYPRESSTAG>
 </CYPRESSTAG>
 <CYPRESSTAG name="Real Analog Placement">
-Elapsed time ==> 0.1577840s
+Elapsed time ==> 0.1410674s
 </CYPRESSTAG>
-Analog Placement phase: Elapsed time ==> 0s.361ms
+Analog Placement phase: Elapsed time ==> 0s.353ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Analog Routing">
 <CYPRESSTAG name="Analog Routing">
-Route success=True, Iterations=1 Elapsed=0.0011640 secs
+Route success=True, Iterations=1 Elapsed=0.0007404 secs
 </CYPRESSTAG>
-Analog Routing phase: Elapsed time ==> 0s.002ms
+Analog Routing phase: Elapsed time ==> 0s.001ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Analog Code Generation">
 ============ Analog Final Answer Routes ============
@@ -1265,11 +1265,11 @@ Map of item to net {
 }
 Mux Info {
 }
-Analog Code Generation phase: Elapsed time ==> 0s.031ms
+Analog Code Generation phase: Elapsed time ==> 0s.018ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Digital Placement">
 <CYPRESSTAG name="Detailed placement messages">
-I2076: Total run-time: 0.3 sec.
+I2076: Total run-time: 0.4 sec.
 
 </CYPRESSTAG>
 <CYPRESSTAG name="PLD Packing">
@@ -1300,7 +1300,7 @@ PLD Packing: Elapsed time ==> 0s.001ms
 Initial Partitioning Summary not displayed at this verbose level.</CYPRESSTAG>
 <CYPRESSTAG name="Final Partitioning Summary">
 Final Partitioning Summary not displayed at this verbose level.</CYPRESSTAG>
-Partitioning: Elapsed time ==> 0s.014ms
+Partitioning: Elapsed time ==> 0s.010ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Final Placement Summary">
 
@@ -1951,33 +1951,33 @@ Port | Pin | Fixed |      Type |       Drive Mode |                Name | Connec
 </CYPRESSTAG>
 </CYPRESSTAG>
 </CYPRESSTAG>
-Digital component placer commit/Report: Elapsed time ==> 0s.023ms
-Digital Placement phase: Elapsed time ==> 1s.218ms
+Digital component placer commit/Report: Elapsed time ==> 0s.021ms
+Digital Placement phase: Elapsed time ==> 1s.258ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Digital Routing">
 "C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\bin/sjrouter.exe" --xml-path "C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\dev\psoc4/3/128k/route_arch-rrg.cydata" --vh2-path "Physical Activity Monitor Service_r.vh2" --pcf-path "Physical Activity Monitor Service.pco" --des-name "Physical Activity Monitor Service" --dsf-path "Physical Activity Monitor Service.dsf" --sdc-path "Physical Activity Monitor Service.sdc" --lib-path "Physical Activity Monitor Service_r.lib"
 Routing successful.
-Digital Routing phase: Elapsed time ==> 1s.090ms
+Digital Routing phase: Elapsed time ==> 0s.885ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Bitstream Generation">
-Bitstream Generation phase: Elapsed time ==> 0s.267ms
+Bitstream Generation phase: Elapsed time ==> 0s.224ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Bitstream Verification">
-Bitstream Verification phase: Elapsed time ==> 0s.037ms
+Bitstream Verification phase: Elapsed time ==> 0s.022ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Static timing analysis">
 Timing report is in Physical Activity Monitor Service_timing.html.
-Static timing analysis phase: Elapsed time ==> 0s.432ms
+Static timing analysis phase: Elapsed time ==> 0s.382ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Data reporting">
 Data reporting phase: Elapsed time ==> 0s.000ms
 </CYPRESSTAG>
 <CYPRESSTAG name="Database update...">
-Design database save phase: Elapsed time ==> 0s.208ms
+Design database save phase: Elapsed time ==> 0s.163ms
 </CYPRESSTAG>
-cydsfit: Elapsed time ==> 3s.820ms
+cydsfit: Elapsed time ==> 3s.472ms
 </CYPRESSTAG>
-Fitter phase: Elapsed time ==> 3s.821ms
-API generation phase: Elapsed time ==> 2s.002ms
-Dependency generation phase: Elapsed time ==> 0s.019ms
-Cleanup phase: Elapsed time ==> 0s.004ms
+Fitter phase: Elapsed time ==> 3s.473ms
+API generation phase: Elapsed time ==> 2s.593ms
+Dependency generation phase: Elapsed time ==> 0s.015ms
+Cleanup phase: Elapsed time ==> 0s.002ms

@@ -92,6 +92,13 @@ void ble_SendIndication(CYBLE_GATT_DB_ATTR_HANDLE_T characteristic, uint8* data,
     
 }
 
+void CyBle_Set24ByPtr(uint8 ptr[], uint32 value)
+{
+    ptr[0u] = (uint8) value;
+    ptr[1u] = (uint8) (value >> 8u);
+    ptr[2u] = (uint8) (value >> 16u);
+}
+
 void CyBle_Set32ByPtr(uint8 ptr[], uint32 value)
 {
     ptr[0u] = (uint8) value;
@@ -99,6 +106,8 @@ void CyBle_Set32ByPtr(uint8 ptr[], uint32 value)
     ptr[2u] = (uint8) (value >> 16u);
     ptr[3u] = (uint8) (value >> 24u);
 }
+
+
 
 /*
 void GetUint24(uint32 *u32, uint8 u24Ptr[])
