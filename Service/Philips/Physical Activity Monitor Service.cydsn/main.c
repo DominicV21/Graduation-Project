@@ -282,7 +282,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                             else
                             {
                                 DBG_PRINTF("There are no sessions in the database \r\n");
-                                err.errorCode = 0x85;
+                                err.errorCode = ERR_NO_SESSIONS_AVAILABLE;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
@@ -307,7 +307,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                             else if(totalSessionCount == 0)
                             {
                                 DBG_PRINTF("There are no sessions in the database \r\n");
-                                err.errorCode = 0x85;
+                                err.errorCode = ERR_NO_SESSIONS_AVAILABLE;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
@@ -327,7 +327,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                                 {
                                     Enquire_Sub_Sessions_Requested_For_ID = 0;
                                     DBG_PRINTF("There are no Sessions with this ID thus no sub sessions can be enquired \r\n");
-                                    err.errorCode = 0x81;
+                                    err.errorCode = ERR_INVALID_SESSION_ID;
                                     (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                     return;
                                 }
@@ -346,7 +346,8 @@ void BleEventHandler(uint32 event, void* eventParam)
                         else if(totalSessionCount == 0)
                         {
                             DBG_PRINTF("There are no sessions in the database \r\n");
-                            //this is going to be a indication via CP
+                            err.errorCode = ERR_NO_SESSIONS_AVAILABLE;
+                            (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                         }
                         else if(wrReqParam->handleValPair.value.val[5] > 6)
                         {
@@ -387,7 +388,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                                 DBG_PRINTF("This session is still running: %i \r\n", Get_Ended_Data_SessionID);
                                 Get_Ended_Data_SessionID = 0;
                                 Get_Ended_Data_Sub_SessionID = 0;
-                                err.errorCode = 0x83;
+                                err.errorCode = ERR_SESSION_STILL_RUNNING;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
@@ -396,7 +397,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                                 DBG_PRINTF("There are no Sessions with this ID: %i \r\n", Get_Ended_Data_SessionID);
                                 Get_Ended_Data_SessionID = 0;
                                 Get_Ended_Data_Sub_SessionID = 0;
-                                err.errorCode = 0x81;
+                                err.errorCode = ERR_INVALID_SESSION_ID;
                                 CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
@@ -421,7 +422,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                                 DBG_PRINTF("There are no Sub-Sessions with this ID: %i \r\n", Get_Ended_Data_Sub_SessionID);
                                 Get_Ended_Data_SessionID = 0;
                                 Get_Ended_Data_Sub_SessionID = 0;
-                                err.errorCode = 0x82;
+                                err.errorCode = ERR_INVALID_SUB_SESSION_ID;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
@@ -459,7 +460,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                             else
                             {
                                 DBG_PRINTF("Cannot start new Sub-Session need to start a session first\r\n");
-                                err.errorCode = 0x87;
+                                err.errorCode = ERR_NO_SESSION_RUNNING;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
@@ -467,7 +468,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                         else
                         {
                             DBG_PRINTF("Unknown Command\r\n Specify '0400' to start a session and '0401' to start sub-session \r\n");
-                            err.errorCode = 0x89;
+                            err.errorCode = ERR_UNDEFINED_VALUE;
                             (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                             return;
                         }
@@ -484,7 +485,7 @@ void BleEventHandler(uint32 event, void* eventParam)
                         else
                         {
                             DBG_PRINTF("Can't stop session, No running session\r\n");
-                            err.errorCode = 0x88;
+                            err.errorCode = ERR_NOTHING_TO_STOP;
                             (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                             return;
                         }
@@ -511,21 +512,22 @@ void BleEventHandler(uint32 event, void* eventParam)
                             case NO_SESSION_WITH_ID:
                             {
                                 DBG_PRINTF("There are no sessions with: \r\n SessionID: %i \r\n", toDeleteID);
-                                err.errorCode = 0x81;
+                                err.errorCode = ERR_INVALID_SESSION_ID;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
                             case SESSION_STILL_RUNNING:
                             {
                                 DBG_PRINTF("This session is still running: \r\n SessionID: %i \r\n", toDeleteID);
-                                err.errorCode = 0x83;
+                                err.errorCode = ERR_SESSION_STILL_RUNNING;
                                 (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                 return;
                             }
                             case NO_SESSIONS:
                             {
                                 DBG_PRINTF("There are no sessions\r\n");
-                                //This will be an indication via CP
+                                err.errorCode = ERR_NO_SESSIONS_AVAILABLE;
+                                (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                             }
                         }
                         break;
@@ -543,8 +545,8 @@ void BleEventHandler(uint32 event, void* eventParam)
                             else if(totalSessionCount == 0)
                             {
                                 DBG_PRINTF("There are no sessions in the database \r\n");
-                                
-                                //this is going to be a indication via CP
+                                err.errorCode = ERR_NO_SESSIONS_AVAILABLE;
+                                (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                             }
                             
                             int scope = wrReqParam->handleValPair.value.val[1];
@@ -573,7 +575,8 @@ void BleEventHandler(uint32 event, void* eventParam)
                                 default:
                                 {
                                     DBG_PRINTF("Invalid Parameter\r\n");
-                                    //INVALID PARAMETER
+                                    err.errorCode = ERR_UNDEFINED_VALUE;
+                                    (void)CyBle_GattsErrorRsp(cyBle_connHandle, &err);
                                     return;
                                 }
                             }
@@ -592,7 +595,7 @@ void BleEventHandler(uint32 event, void* eventParam)
             }
             
         case CYBLE_EVT_GATTS_READ_CHAR_VAL_ACCESS_REQ:
-            DBG_PRINTF("READ REQUEST\r\n");
+            //DBG_PRINTF("READ REQUEST\r\n");
             break;
         
         default:

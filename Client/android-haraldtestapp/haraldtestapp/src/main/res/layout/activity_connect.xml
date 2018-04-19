@@ -29,15 +29,6 @@
         android:paddingTop="@dimen/activity_vertical_margin">
 
 
-    <TextView
-        android:text="Choose primary service"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:id="@+id/serviceTextView" />
-
         <Button
             android:id="@+id/connectServiceButton"
             android:layout_width="match_parent"
@@ -45,17 +36,38 @@
             android:layout_alignParentBottom="true"
             android:text="Connect" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:choiceMode="singleChoice"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_below="@+id/serviceTextView"
-        android:layout_above="@+id/connectServiceButton"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:listSelector="#CCCCCC"
-        android:id="@+id/servicesListView" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/serviceTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Choose primary service"
+                android:textStyle="bold" />
+
+            <ListView
+                android:id="@+id/servicesListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/connectServiceButton"
+                android:layout_below="@+id/serviceTextView"
+                android:choiceMode="singleChoice"
+                android:listSelector="#CCCCCC"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <ListView
+                android:id="@+id/availableDevicesListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 

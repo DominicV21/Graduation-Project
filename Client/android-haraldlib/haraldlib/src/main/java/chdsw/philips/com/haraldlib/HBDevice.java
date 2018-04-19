@@ -472,7 +472,7 @@ public class HBDevice extends BluetoothGattCallback {
 
                             boolean success = false;
                             if (bluetoothCommand instanceof HBWriteCommand) {
-                                HBLogger.v(TAG, String.format("HBWriteCommand device: %s, service: %s, characteristic: %s, value: %s",
+                                HBLogger.v(TAG, String.format("HBWriteCommand device: %s,\r\n service: %s,\r\n characteristic: %s,\r\n value: %s",
                                         getAddress(), bluetoothCommand.getServiceUUID(), bluetoothCommand.getCharacteristicUUID(),
                                         Arrays.toString(((HBWriteCommand) bluetoothCommand).getValue())));
 

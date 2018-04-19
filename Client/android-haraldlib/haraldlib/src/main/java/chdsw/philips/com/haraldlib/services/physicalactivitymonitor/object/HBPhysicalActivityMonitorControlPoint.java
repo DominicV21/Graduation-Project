@@ -23,14 +23,10 @@ public class HBPhysicalActivityMonitorControlPoint {
         int offset = 0;
 
         response = data[offset++];
-        HBLogger.v("akdsfjh", "maxoffset" + maxOffset);
-        HBLogger.v("akdsfjh", "value" + value);
         for(; offset < maxOffset; offset++)
         {
             value |= data[offset]  << ((offset-1) * 8);
         }
-        HBLogger.v("akdsfjh", "valueafter" + value);
-
     }
 
     public HBPhysicalActivityMonitorControlPoint(HBControlPointOperation operation) {

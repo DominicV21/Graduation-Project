@@ -38,8 +38,8 @@
 
 CYBLE_CYPACKED typedef struct
 {
-    uint8 Header;
-    uint8 Flags[3u];
+    uint8  Header;
+    uint8  Flags[3u];
     uint16 SessionID;
     uint16 SubSessionID;
     uint32 RelativeTimestamp;
@@ -48,10 +48,10 @@ CYBLE_CYPACKED typedef struct
     uint16 IntensityEnergyExpenditurePerHour;
     uint16 TotalEnergyExpenditurePerHour;
     uint16 FatBurnedPerHour;
-    uint8 MetabolicEquivalent;
+    uint8  MetabolicEquivalent;
     uint16 Speed;
     uint16 MotionCadence;
-    int8 Elevation[3u];
+    int8   Elevation[3u];
     uint16 ActivityCountPerMinute;
     uint16 ActivityLevel;
     uint16 ActivityType;

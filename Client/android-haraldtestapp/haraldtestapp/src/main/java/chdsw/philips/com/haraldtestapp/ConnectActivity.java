@@ -6,16 +6,21 @@
 package chdsw.philips.com.haraldtestapp;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,6 +29,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import chdsw.philips.com.haraldlib.HBCentral;
@@ -38,6 +44,9 @@ public class ConnectActivity extends AppCompatActivity {
     private HBCentral hbCentral;
     private Button connectServiceButton;
     private ListView servicesListView;
+    private ListView availableDevicesListView;
+    private BluetoothAdapter BTAdapter;
+    private Set<BluetoothDevice> pairedDevices;
 
     private HBConnectionListener hbConnectionListener = new HBConnectionListener() {
 
@@ -66,6 +75,17 @@ public class ConnectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
 
+        //Phone does not support Bluetooth so let the user know and exit.
+        BTAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (!BTAdapter.isEnabled()) {
+            Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBT, 1);
+        }
+
+        availableDevicesListView = (ListView) findViewById(R.id.availableDevicesListView);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -74,9 +94,9 @@ public class ConnectActivity extends AppCompatActivity {
 
         List<UUID> supportedServices = this.hbCentral.getSupportedServices();
         List<ServiceDefinition> serviceDefinitions = new ArrayList<>();
-        for(UUID supportedService : supportedServices) {
+        for (UUID supportedService : supportedServices) {
             ServiceDefinition definition = ServiceDefinition.fromValue(supportedService);
-            if(definition != null) {
+            if (definition != null) {
                 serviceDefinitions.add(definition);
             }
         }
@@ -91,7 +111,7 @@ public class ConnectActivity extends AppCompatActivity {
 
             @Override
             public void setupView(ServiceDefinition item, Map<Integer, View> viewDescriptors) {
-                if(item != null) {
+                if (item != null) {
                     ((TextView) viewDescriptors.get(android.R.id.text1)).setText(item.getResourceId());
                 }
             }
@@ -111,13 +131,48 @@ public class ConnectActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 connectServiceButton.setEnabled(false);
-                ServiceDefinition selectedService = (ServiceDefinition)servicesListView.getAdapter().getItem(servicesListView.getCheckedItemPosition());
+                ServiceDefinition selectedService = (ServiceDefinition) servicesListView.getAdapter().getItem(servicesListView.getCheckedItemPosition());
 
                 connect(selectedService.getUUID());
             }
         });
         connectServiceButton.setEnabled(false);
     }
+
+    public void list(View v)
+    {
+        pairedDevices = BTAdapter.getBondedDevices();
+        ArrayList list = new ArrayList();
+
+        for(BluetoothDevice bt : pairedDevices) list.add(bt.getName());
+        Toast.makeText(getApplicationContext(), "Showing Paired Devices",Toast.LENGTH_SHORT).show();
+
+        final ArrayAdapter adapter = new  ArrayAdapter(this,android.R.layout.simple_list_item_1, list);
+
+        availableDevicesListView.setAdapter(adapter);
+    }
+
+    ///////////
+    public void on(View v){
+        if (!BTAdapter.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOn, 0);
+            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void off(View v){
+        BTAdapter.disable();
+        Toast.makeText(getApplicationContext(), "Turned off" ,Toast.LENGTH_LONG).show();
+    }
+
+    public  void visible(View v){
+        Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        startActivityForResult(getVisible, 0);
+    }
+    /////////////////////////
 
     @Override
     public void onResume() {

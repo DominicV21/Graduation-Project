@@ -116,7 +116,7 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
 
         if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHARACTERISTIC_UUID)) {
             HBLogger.v(TAG, "PHYSICAL_ACTIVITY_MONITOR_CONTROL_POINT_CHARACTERISTIC_UUID");
-            HBLogger.v(TAG, String.format("getCPValue,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
+            HBLogger.v(TAG, String.format("getCPValue,  device: %s, \r\n data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
             HBPhysicalActivityMonitorControlPoint hbPhysicalActivityMonitorControlPoint = new HBPhysicalActivityMonitorControlPoint(characteristic.getValue());
             HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
             if (listener != null) {
@@ -126,7 +126,7 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
 
         if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_CURR_SESS_CHARACTERISTIC_UUID)) {
             HBLogger.v(TAG, "PHYSICAL_ACTIVITY_MONITOR_CURR_SESS_CHARACTERISTIC_UUID");
-            HBLogger.v(TAG, String.format("getCurrentSession,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
+            HBLogger.v(TAG, String.format("getCurrentSession,  device: %s, \r\n data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
             HBPhysicalActivityMonitorCurrSess hbPhysicalActivityMonitorCurrSess = new HBPhysicalActivityMonitorCurrSess(characteristic.getValue());
             HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
             if (listener != null) {
@@ -137,7 +137,7 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
         if(characteristicUUID.equals(PHYSICAL_ACTIVITY_MONITOR_SESS_DESCR_CHARACTERISTIC_UUID))
         {
             HBLogger.v(TAG, "PHYSICAL_ACTIVITY_MONITOR_SESS_DESCR_CHARACTERISTIC_UUID");
-            HBLogger.v(TAG, String.format("getPamSessDescriptor,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
+            HBLogger.v(TAG, String.format("getPamSessDescriptor,  device: %s, \r\n data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
             HBPhysicalActivityMonitorSessDescriptor hbPhysicalActivityMonitorSessDescriptor = new HBPhysicalActivityMonitorSessDescriptor(characteristic.getValue());
             HBPhysicalActivityMonitorListener listener = getServiceListener(deviceAddress);
             if (listener != null) {
@@ -155,11 +155,11 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
      */
     public void characteristicErrorResponse(String deviceAddress,
                                             BluetoothGattCharacteristic characteristic, int status) {
-        HBLogger.v(TAG, String.format("characteristicErrorResponse device: %s, characteristic: %s, status: %d", deviceAddress, characteristic.getUuid(), status));
+        HBLogger.v(TAG, String.format("characteristicErrorResponse device: %s, \r\n characteristic: %s, \r\n status: %x", deviceAddress, characteristic.getUuid(), status));
     }
 
     private void getPamValue(String deviceAddress, BluetoothGattCharacteristic characteristic, UUID characteristicUUID){
-        HBLogger.v(TAG, String.format("getPamValue,  device: %s, data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
+        HBLogger.v(TAG, String.format("getPamValue,  device: %s, \r\n data: %s ", deviceAddress, Arrays.toString(characteristic.getValue())));
 
         receivedAllMessages = false;
         int HeaderPos = 0;
@@ -212,7 +212,7 @@ public class HBPhysicalActivityMonitorServiceHandler extends HBServiceHandler<HB
                 if(nrOfMessages >= 3){System.arraycopy(thirdMessageBuffer, 0, totalDataBuffer, firstMessageBuffer.length + secondMessageBuffer.length - 2, thirdMessageBuffer.length - 1);}
                 if(nrOfMessages == 4){System.arraycopy(messageData, 1, totalDataBuffer, firstMessageBuffer.length + secondMessageBuffer.length + thirdMessageBuffer.length - 3, messageData.length - 1);}
                 receivedAllMessages = true;
-                HBLogger.v(TAG, String.format("sizeof Data in the message (no headers) %d (this should be Terminal 'CHARACTERISTIC' presentdatalength - 1) ", totalDataBuffer.length));
+                HBLogger.v(TAG, String.format("sizeof Data in the message (no headers) %d \r\n (this should be Terminal 'CHARACTERISTIC' presentdatalength - 1) ", totalDataBuffer.length));
             }
         }
 
