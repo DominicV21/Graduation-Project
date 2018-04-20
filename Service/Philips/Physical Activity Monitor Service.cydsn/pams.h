@@ -61,4 +61,6 @@ uint8 send_Deleted_Sessions;
 CYBIT Update_GASD_With_New_Activity;
 uint8 UserDefinedActivityTypeAllSubSessions[25][25];
 
+extern uint8 RollingSequenceNumber;
+
 #endif /* PAMS_H__*/

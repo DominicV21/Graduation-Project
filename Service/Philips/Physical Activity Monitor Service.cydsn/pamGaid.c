@@ -59,7 +59,7 @@ void UpdateGaid(void)
         {
             if(x == 0)
             {
-                Message[0] = 0x80 + N - 1;
+                Message[0] = 0x80 + N - 1; 
             }
             else
             {

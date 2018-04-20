@@ -40,35 +40,39 @@ CY_ISR( Pin_SW2_Handler )
 {
     DBG_PRINTF("BUTTON PRESS \r\n");
 
-    CraiData.RelativeTimestamp++;
-    UpdateCraid();
-    
-    
-    CrasData.RelativeTimestamp++;
-    UpdateCrasd();
-    
     
     GaiData.RelativeTimestamp++;
-    GaiData.SessionID = 0xABCD;
     UpdateGaid();
     
-    GasData.RelativeTimestamp++;
-    GasData.SessionID = 0xABCD;
-    UpdateGasd();
-    
-    
-    
-    
-    SaiData.RelativeTimestamp++;
-    UpdateSaid();
-    
-    
-    SasData.RelativeTimestamp++;
-    UpdateSasd();
-    
-    
-    ScasData.RelativeTimestamp++;
-    UpdateScasd();
+    //CraiData.RelativeTimestamp++;
+    //UpdateCraid();
+    //
+    //
+    //CrasData.RelativeTimestamp++;
+    //UpdateCrasd();
+    //
+    //
+    //GaiData.RelativeTimestamp++;
+    //GaiData.SessionID = 0xABCD;
+    //UpdateGaid();
+    //
+    //GasData.RelativeTimestamp++;
+    //GasData.SessionID = 0xABCD;
+    //UpdateGasd();
+    //
+    //
+    //
+    //
+    //SaiData.RelativeTimestamp++;
+    //UpdateSaid();
+    //
+    //
+    //SasData.RelativeTimestamp++;
+    //UpdateSasd();
+    //
+    //
+    //ScasData.RelativeTimestamp++;
+    //UpdateScasd();
     
     
     Pin_SW2_ClearInterrupt();
@@ -139,6 +143,17 @@ void BleEventHandler(uint32 event, void* eventParam)
             DBG_PRINTF("indication confirmation \r\n");
             break;
         }
+        case CYBLE_EVT_GAP_AUTH_REQ:
+            DBG_PRINTF("CYBLE_EVT_GAP_AUTH_REQ: security: 0x%x, bonding: 0x%x, ekeySize: 0x%x, authErr: 0x%x \r\n", 
+                (*(CYBLE_GAP_AUTH_INFO_T *)eventParam).security, 
+                (*(CYBLE_GAP_AUTH_INFO_T *)eventParam).bonding, 
+                (*(CYBLE_GAP_AUTH_INFO_T *)eventParam).ekeySize, 
+                (*(CYBLE_GAP_AUTH_INFO_T *)eventParam).authErr);
+            break;
+        case CYBLE_EVT_GAP_PASSKEY_ENTRY_REQUEST:
+            DBG_PRINTF("\r\n");
+            DBG_PRINTF("CYBLE_EVT_GAP_PASSKEY_ENTRY_REQUEST press 'p' to enter passkey.\r\n");
+            break;
         case CYBLE_EVT_GAP_PASSKEY_DISPLAY_REQUEST:
         {
             DBG_PRINTF("\r\n");
@@ -632,22 +647,21 @@ int main(void)
         CyBle_ProcessEvents();
         
         if(CyBle_GetState() == CYBLE_STATE_CONNECTED)
-        {
+        #if(CYBLE_BONDING_REQUIREMENT == CYBLE_BONDING_YES)
+        /* Store bonding data to flash only when all debug information has been sent */
         #if (DEBUG_UART_ENABLED == ENABLED)
             if((cyBle_pendingFlashWrite != 0u) &&
                ((UART_DEB_SpiUartGetTxBufferSize() + UART_DEB_GET_TX_FIFO_SR_VALID) == 0u))
         #else
             if(cyBle_pendingFlashWrite != 0u)
         #endif /* (DEBUG_UART_ENABLED == ENABLED) */
-            {
-                /* Store bounding data to flash only when all debug information has been sent */
-                apiResult = CyBle_StoreBondingData(0u);
-            }
-            else
-            {
-                /* nothing else */ 
-            }
+        {
+            apiResult = CyBle_StoreBondingData(0u);
+            DBG_PRINTF("Store bonding data, status: %x \r\n", apiResult);
         }
+        #endif /* (CYBLE_BONDING_REQUIREMENT == CYBLE_BONDING_YES) */
+        
+        
         
         if(Enquire_Sessions_Requested)
         {
@@ -655,8 +669,14 @@ int main(void)
             {
                 procedureFailed = UpdateSessionDescriptor(mySessions[i]);
             }
-            if(procedureFailed) { updateControlPointEnquireSucces(0xFF, 0xFF); }
-            else                { updateControlPointEnquireSucces(0xFC, totalSessionCount); }
+            if(procedureFailed) 
+            { 
+                updateControlPointEnquireSucces(0xFF, 0xFF);
+            }
+            else                
+            { 
+                updateControlPointEnquireSucces(0xFC, totalSessionCount); 
+            }
             
             Enquire_Sessions_Requested = NO;
             procedureFailed = FALSE;
@@ -1015,9 +1035,9 @@ void InitializePhisicalActivityMonitor()
     
         
     //init GAI Data
-    GaiData.Flags[0] = 0x02;
-    GaiData.Flags[1] = 0x02;
-    GaiData.Flags[2] = 0x02;
+    GaiData.Flags[0] = 0xFF;
+    GaiData.Flags[1] = 0xFF;
+    GaiData.Flags[2] = 0xFF;
     UpdateGaid();
    
     //init GAS Data

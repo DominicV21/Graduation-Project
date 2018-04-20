@@ -129,6 +129,8 @@
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ble_eventHandler.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ble_custom.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ble_custom.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ble_dis.c</File>
+          <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\ble_dis.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\pwm.c</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\pwm.h</File>
           <File BuildType="BUILD" Toolchain="">Generated_Source\PSoC4\pwm_PM.c</File>

@@ -158,12 +158,12 @@ CYBLE_STATE_T cyBle_state;
     0x000Fu,    /* Handle of the Client Characteristic Configuration descriptor */
 };
     
-    static uint8 cyBle_attValues[0x02D4u] = {
+    static uint8 cyBle_attValues[0x02FCu] = {
     /* Device Name */
-    (uint8)'P', (uint8)'A', (uint8)'M', (uint8)'S',
+    (uint8)'P', (uint8)'A', (uint8)'M',
 
     /* Appearance */
-    0xC1u, 0x00u,
+    0x00u, 0x00u,
 
     /* Peripheral Preferred Connection Parameters */
     0x06u, 0x00u, 0x28u, 0x00u, 0x00u, 0x00u, 0xE8u, 0x03u,
@@ -289,6 +289,33 @@ CYBLE_STATE_T cyBle_state;
     (uint8)'S', (uint8)'e', (uint8)'s', (uint8)'s', (uint8)'i', (uint8)'o', (uint8)'n', (uint8)' ', (uint8)'D',
     (uint8)'e', (uint8)'s', (uint8)'c', (uint8)'r', (uint8)'i', (uint8)'p', (uint8)'t', (uint8)'o', (uint8)'r',
 
+    /* Manufacturer Name String */
+    (uint8)'P', (uint8)'h', (uint8)'i', (uint8)'l', (uint8)'i', (uint8)'p', (uint8)'s',
+
+    /* Model Number String */
+    (uint8)'1', (uint8)'2', (uint8)'3', (uint8)'4', (uint8)'5', (uint8)'6', (uint8)'7', (uint8)'8', (uint8)'9',
+
+    /* Serial Number String */
+    (uint8)'9', (uint8)'8', (uint8)'7', (uint8)'6', (uint8)'5', (uint8)'4', (uint8)'3', (uint8)'2', (uint8)'1',
+
+    /* Hardware Revision String */
+    
+
+    /* Firmware Revision String */
+    
+
+    /* Software Revision String */
+    
+
+    /* System ID */
+    0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
+
+    /* IEEE 11073-20601 Regulatory Certification Data List */
+    0x00u,
+
+    /* PnP ID */
+    0x01u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
+
 };
 #if(CYBLE_GATT_DB_CCCD_COUNT != 0u)
 uint8 cyBle_attValuesCCCD[CYBLE_GATT_DB_CCCD_COUNT];
@@ -322,63 +349,72 @@ const uint8 cyBle_attUuid128[][16u] = {
 };
 
 CYBLE_GATTS_ATT_GEN_VAL_LEN_T cyBle_attValuesLen[CYBLE_GATT_DB_ATT_VAL_COUNT] = {
-    { 0x0004u, (void *)&cyBle_attValues[0] }, /* Device Name */
-    { 0x0002u, (void *)&cyBle_attValues[4] }, /* Appearance */
-    { 0x0008u, (void *)&cyBle_attValues[6] }, /* Peripheral Preferred Connection Parameters */
-    { 0x0001u, (void *)&cyBle_attValues[14] }, /* Central Address Resolution */
-    { 0x0001u, (void *)&cyBle_attValues[15] }, /* Resolvable Private Address Only */
-    { 0x0004u, (void *)&cyBle_attValues[16] }, /* Service Changed */
+    { 0x0003u, (void *)&cyBle_attValues[0] }, /* Device Name */
+    { 0x0002u, (void *)&cyBle_attValues[3] }, /* Appearance */
+    { 0x0008u, (void *)&cyBle_attValues[5] }, /* Peripheral Preferred Connection Parameters */
+    { 0x0001u, (void *)&cyBle_attValues[13] }, /* Central Address Resolution */
+    { 0x0001u, (void *)&cyBle_attValues[14] }, /* Resolvable Private Address Only */
+    { 0x0004u, (void *)&cyBle_attValues[15] }, /* Service Changed */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[0] }, /* Client Characteristic Configuration */
     { 0x0010u, (void *)&cyBle_attUuid128[0] }, /* connectionFeedback UUID */
     { 0x0010u, (void *)&cyBle_attUuid128[1] }, /* Physical Activity Monitor Feature UUID */
-    { 0x0008u, (void *)&cyBle_attValues[20] }, /* Physical Activity Monitor Feature */
-    { 0x000Fu, (void *)&cyBle_attValues[28] }, /* Characteristic User Description */
+    { 0x0008u, (void *)&cyBle_attValues[19] }, /* Physical Activity Monitor Feature */
+    { 0x000Fu, (void *)&cyBle_attValues[27] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[2] }, /* General Activity Instantaneous Data UUID */
-    { 0x0026u, (void *)&cyBle_attValues[43] }, /* General Activity Instantaneous Data */
+    { 0x0026u, (void *)&cyBle_attValues[42] }, /* General Activity Instantaneous Data */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[2] }, /* GeneralActivityInstantaneousDataCCCD */
-    { 0x0023u, (void *)&cyBle_attValues[81] }, /* Characteristic User Description */
+    { 0x0023u, (void *)&cyBle_attValues[80] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[3] }, /* General Activity Summary Data UUID */
-    { 0x004Du, (void *)&cyBle_attValues[116] }, /* General Activity Summary Data */
+    { 0x004Du, (void *)&cyBle_attValues[115] }, /* General Activity Summary Data */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[4] }, /* GeneralActivitySummaryDataCCCD */
-    { 0x001Du, (void *)&cyBle_attValues[193] }, /* Characteristic User Description */
+    { 0x001Du, (void *)&cyBle_attValues[192] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[4] }, /* CardioRespiratory Activity Instantaneous Data UUID */
-    { 0x0018u, (void *)&cyBle_attValues[222] }, /* CardioRespiratory Activity Instantaneous Data */
+    { 0x0018u, (void *)&cyBle_attValues[221] }, /* CardioRespiratory Activity Instantaneous Data */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[6] }, /* CardioRespiratoryAvtivityInstantaneousDataCCCD */
-    { 0x0024u, (void *)&cyBle_attValues[246] }, /* Characteristic User Description */
+    { 0x0024u, (void *)&cyBle_attValues[245] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[5] }, /* CardioRespiratory Activity Summary Data UUID */
-    { 0x003Cu, (void *)&cyBle_attValues[282] }, /* CardioRespiratory Activity Summary Data */
+    { 0x003Cu, (void *)&cyBle_attValues[281] }, /* CardioRespiratory Activity Summary Data */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[8] }, /* CardioRespiratoryActivitySummaryDataCCCD */
-    { 0x0027u, (void *)&cyBle_attValues[342] }, /* Characteristic User Description */
+    { 0x0027u, (void *)&cyBle_attValues[341] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[6] }, /* Step Counter Activity Summary Data UUID */
-    { 0x001Du, (void *)&cyBle_attValues[381] }, /* Step Counter Activity Summary Data */
+    { 0x001Du, (void *)&cyBle_attValues[380] }, /* Step Counter Activity Summary Data */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[10] }, /* StepCounterActivitySummaryDataCCCD */
-    { 0x0022u, (void *)&cyBle_attValues[410] }, /* Characteristic User Description */
+    { 0x0022u, (void *)&cyBle_attValues[409] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[7] }, /* Sleep Activity Instantaneous Data UUID */
-    { 0x001Au, (void *)&cyBle_attValues[444] }, /* Sleep Activity Instantaneous Data */
+    { 0x001Au, (void *)&cyBle_attValues[443] }, /* Sleep Activity Instantaneous Data */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[12] }, /* SleepActivityInstantaneousDataCCCD */
-    { 0x0021u, (void *)&cyBle_attValues[470] }, /* Characteristic User Description */
+    { 0x0021u, (void *)&cyBle_attValues[469] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[8] }, /* Sleep Activity Summary Data UUID */
-    { 0x0044u, (void *)&cyBle_attValues[503] }, /* Sleep Activity Summary Data */
+    { 0x0044u, (void *)&cyBle_attValues[502] }, /* Sleep Activity Summary Data */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[14] }, /* SleepActivitySummaryDataCCCD */
-    { 0x001Bu, (void *)&cyBle_attValues[571] }, /* Characteristic User Description */
+    { 0x001Bu, (void *)&cyBle_attValues[570] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[9] }, /* Physical Activity Monitor Control Point UUID */
-    { 0x0004u, (void *)&cyBle_attValues[598] }, /* Physical Activity Monitor Control Point */
+    { 0x0004u, (void *)&cyBle_attValues[597] }, /* Physical Activity Monitor Control Point */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[16] }, /* PhysicalActivityMonitorControlPointCCCD */
-    { 0x0027u, (void *)&cyBle_attValues[602] }, /* Characteristic User Description */
+    { 0x0027u, (void *)&cyBle_attValues[601] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[10] }, /* Current Session UUID */
-    { 0x0013u, (void *)&cyBle_attValues[641] }, /* Current Session */
+    { 0x0013u, (void *)&cyBle_attValues[640] }, /* Current Session */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[18] }, /* CurrentSessionCCCD */
-    { 0x000Fu, (void *)&cyBle_attValues[660] }, /* Characteristic User Description */
+    { 0x000Fu, (void *)&cyBle_attValues[659] }, /* Characteristic User Description */
     { 0x0010u, (void *)&cyBle_attUuid128[11] }, /* Session Descriptor UUID */
-    { 0x001Fu, (void *)&cyBle_attValues[675] }, /* Session Descriptor */
+    { 0x001Fu, (void *)&cyBle_attValues[674] }, /* Session Descriptor */
     { 0x0002u, (void *)&cyBle_attValuesCCCD[20] }, /* SessionDescriptorCCCD */
-    { 0x0012u, (void *)&cyBle_attValues[706] }, /* Characteristic User Description */
+    { 0x0012u, (void *)&cyBle_attValues[705] }, /* Characteristic User Description */
+    { 0x0007u, (void *)&cyBle_attValues[723] }, /* Manufacturer Name String */
+    { 0x0009u, (void *)&cyBle_attValues[730] }, /* Model Number String */
+    { 0x0009u, (void *)&cyBle_attValues[739] }, /* Serial Number String */
+    { 0x0000u, (void *)&cyBle_attValues[748] }, /* Hardware Revision String */
+    { 0x0000u, (void *)&cyBle_attValues[748] }, /* Firmware Revision String */
+    { 0x0000u, (void *)&cyBle_attValues[748] }, /* Software Revision String */
+    { 0x0008u, (void *)&cyBle_attValues[748] }, /* System ID */
+    { 0x0001u, (void *)&cyBle_attValues[756] }, /* IEEE 11073-20601 Regulatory Certification Data List */
+    { 0x0007u, (void *)&cyBle_attValues[757] }, /* PnP ID */
 };
 
-const CYBLE_GATTS_DB_T cyBle_gattDB[0x3Cu] = {
+const CYBLE_GATTS_DB_T cyBle_gattDB[0x4Fu] = {
     { 0x0001u, 0x2800u /* Primary service                     */, 0x00000001u /*        */, 0x000Bu, {{0x1800u, NULL}}                           },
     { 0x0002u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0003u, {{0x2A00u, NULL}}                           },
-    { 0x0003u, 0x2A00u /* Device Name                         */, 0x01020001u /* rd     */, 0x0003u, {{0x0004u, (void *)&cyBle_attValuesLen[0]}} },
+    { 0x0003u, 0x2A00u /* Device Name                         */, 0x01020001u /* rd     */, 0x0003u, {{0x0003u, (void *)&cyBle_attValuesLen[0]}} },
     { 0x0004u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0005u, {{0x2A01u, NULL}}                           },
     { 0x0005u, 0x2A01u /* Appearance                          */, 0x01020001u /* rd     */, 0x0005u, {{0x0002u, (void *)&cyBle_attValuesLen[1]}} },
     { 0x0006u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0007u, {{0x2A04u, NULL}}                           },
@@ -390,52 +426,71 @@ const CYBLE_GATTS_DB_T cyBle_gattDB[0x3Cu] = {
     { 0x000Cu, 0x2800u /* Primary service                     */, 0x00000001u /*        */, 0x000Fu, {{0x1801u, NULL}}                           },
     { 0x000Du, 0x2803u /* Characteristic                      */, 0x00200001u /* ind    */, 0x000Fu, {{0x2A05u, NULL}}                           },
     { 0x000Eu, 0x2A05u /* Service Changed                     */, 0x01200000u /* ind    */, 0x000Fu, {{0x0004u, (void *)&cyBle_attValuesLen[5]}} },
-    { 0x000Fu, 0x2902u /* Client Characteristic Configuration */, 0x010A0301u /* rd,wr  */, 0x000Fu, {{0x0002u, (void *)&cyBle_attValuesLen[6]}} },
+    { 0x000Fu, 0x2902u /* Client Characteristic Configuration */, 0x010A0701u /* rd,wr  */, 0x000Fu, {{0x0002u, (void *)&cyBle_attValuesLen[6]}} },
     { 0x0010u, 0x2800u /* Primary service                     */, 0x08000001u /*        */, 0x0010u, {{0x0010u, (void *)&cyBle_attValuesLen[7]}} },
     { 0x0011u, 0x2800u /* Primary service                     */, 0x00000001u /*        */, 0x003Cu, {{0x7f10u, NULL}}                           },
     { 0x0012u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0014u, {{0x0010u, (void *)&cyBle_attValuesLen[8]}} },
-    { 0x0013u, 0x7F11u /* Physical Activity Monitor Feature   */, 0x09020003u /* rd     */, 0x0014u, {{0x0008u, (void *)&cyBle_attValuesLen[9]}} },
+    { 0x0013u, 0x7F11u /* Physical Activity Monitor Feature   */, 0x09020007u /* rd     */, 0x0014u, {{0x0008u, (void *)&cyBle_attValuesLen[9]}} },
     { 0x0014u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0014u, {{0x000Fu, (void *)&cyBle_attValuesLen[10]}} },
     { 0x0015u, 0x2803u /* Characteristic                      */, 0x00120001u /* rd,ntf */, 0x0018u, {{0x0010u, (void *)&cyBle_attValuesLen[11]}} },
-    { 0x0016u, 0x7F12u /* General Activity Instantaneous Data */, 0x09120003u /* rd,ntf */, 0x0018u, {{0x0026u, (void *)&cyBle_attValuesLen[12]}} },
-    { 0x0017u, 0x2902u /* GeneralActivityInstantaneousDataCCC */, 0x010A0301u /* rd,wr  */, 0x0017u, {{0x0002u, (void *)&cyBle_attValuesLen[13]}} },
+    { 0x0016u, 0x7F12u /* General Activity Instantaneous Data */, 0x09120007u /* rd,ntf */, 0x0018u, {{0x0026u, (void *)&cyBle_attValuesLen[12]}} },
+    { 0x0017u, 0x2902u /* GeneralActivityInstantaneousDataCCC */, 0x010A0701u /* rd,wr  */, 0x0017u, {{0x0002u, (void *)&cyBle_attValuesLen[13]}} },
     { 0x0018u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0018u, {{0x0023u, (void *)&cyBle_attValuesLen[14]}} },
     { 0x0019u, 0x2803u /* Characteristic                      */, 0x00220001u /* rd,ind */, 0x001Cu, {{0x0010u, (void *)&cyBle_attValuesLen[15]}} },
-    { 0x001Au, 0x7F13u /* General Activity Summary Data       */, 0x09220003u /* rd,ind */, 0x001Cu, {{0x004Du, (void *)&cyBle_attValuesLen[16]}} },
-    { 0x001Bu, 0x2902u /* GeneralActivitySummaryDataCCCD      */, 0x010A0301u /* rd,wr  */, 0x001Bu, {{0x0002u, (void *)&cyBle_attValuesLen[17]}} },
+    { 0x001Au, 0x7F13u /* General Activity Summary Data       */, 0x09220007u /* rd,ind */, 0x001Cu, {{0x004Du, (void *)&cyBle_attValuesLen[16]}} },
+    { 0x001Bu, 0x2902u /* GeneralActivitySummaryDataCCCD      */, 0x010A0701u /* rd,wr  */, 0x001Bu, {{0x0002u, (void *)&cyBle_attValuesLen[17]}} },
     { 0x001Cu, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x001Cu, {{0x001Du, (void *)&cyBle_attValuesLen[18]}} },
     { 0x001Du, 0x2803u /* Characteristic                      */, 0x00120001u /* rd,ntf */, 0x0020u, {{0x0010u, (void *)&cyBle_attValuesLen[19]}} },
-    { 0x001Eu, 0x7F14u /* CardioRespiratory Activity Instanta */, 0x09120003u /* rd,ntf */, 0x0020u, {{0x0018u, (void *)&cyBle_attValuesLen[20]}} },
-    { 0x001Fu, 0x2902u /* CardioRespiratoryAvtivityInstantane */, 0x010A0301u /* rd,wr  */, 0x001Fu, {{0x0002u, (void *)&cyBle_attValuesLen[21]}} },
+    { 0x001Eu, 0x7F14u /* CardioRespiratory Activity Instanta */, 0x09120007u /* rd,ntf */, 0x0020u, {{0x0018u, (void *)&cyBle_attValuesLen[20]}} },
+    { 0x001Fu, 0x2902u /* CardioRespiratoryAvtivityInstantane */, 0x010A0701u /* rd,wr  */, 0x001Fu, {{0x0002u, (void *)&cyBle_attValuesLen[21]}} },
     { 0x0020u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0020u, {{0x0024u, (void *)&cyBle_attValuesLen[22]}} },
     { 0x0021u, 0x2803u /* Characteristic                      */, 0x00220001u /* rd,ind */, 0x0024u, {{0x0010u, (void *)&cyBle_attValuesLen[23]}} },
-    { 0x0022u, 0x7F15u /* CardioRespiratory Activity Summary  */, 0x09220003u /* rd,ind */, 0x0024u, {{0x003Cu, (void *)&cyBle_attValuesLen[24]}} },
-    { 0x0023u, 0x2902u /* CardioRespiratoryActivitySummaryDat */, 0x010A0301u /* rd,wr  */, 0x0023u, {{0x0002u, (void *)&cyBle_attValuesLen[25]}} },
+    { 0x0022u, 0x7F15u /* CardioRespiratory Activity Summary  */, 0x09220007u /* rd,ind */, 0x0024u, {{0x003Cu, (void *)&cyBle_attValuesLen[24]}} },
+    { 0x0023u, 0x2902u /* CardioRespiratoryActivitySummaryDat */, 0x010A0701u /* rd,wr  */, 0x0023u, {{0x0002u, (void *)&cyBle_attValuesLen[25]}} },
     { 0x0024u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0024u, {{0x0027u, (void *)&cyBle_attValuesLen[26]}} },
     { 0x0025u, 0x2803u /* Characteristic                      */, 0x00220001u /* rd,ind */, 0x0028u, {{0x0010u, (void *)&cyBle_attValuesLen[27]}} },
-    { 0x0026u, 0x7F16u /* Step Counter Activity Summary Data  */, 0x09220003u /* rd,ind */, 0x0028u, {{0x001Du, (void *)&cyBle_attValuesLen[28]}} },
-    { 0x0027u, 0x2902u /* StepCounterActivitySummaryDataCCCD  */, 0x010A0301u /* rd,wr  */, 0x0027u, {{0x0002u, (void *)&cyBle_attValuesLen[29]}} },
+    { 0x0026u, 0x7F16u /* Step Counter Activity Summary Data  */, 0x09220007u /* rd,ind */, 0x0028u, {{0x001Du, (void *)&cyBle_attValuesLen[28]}} },
+    { 0x0027u, 0x2902u /* StepCounterActivitySummaryDataCCCD  */, 0x010A0701u /* rd,wr  */, 0x0027u, {{0x0002u, (void *)&cyBle_attValuesLen[29]}} },
     { 0x0028u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0028u, {{0x0022u, (void *)&cyBle_attValuesLen[30]}} },
     { 0x0029u, 0x2803u /* Characteristic                      */, 0x00120001u /* rd,ntf */, 0x002Cu, {{0x0010u, (void *)&cyBle_attValuesLen[31]}} },
-    { 0x002Au, 0x7F17u /* Sleep Activity Instantaneous Data   */, 0x09120003u /* rd,ntf */, 0x002Cu, {{0x001Au, (void *)&cyBle_attValuesLen[32]}} },
-    { 0x002Bu, 0x2902u /* SleepActivityInstantaneousDataCCCD  */, 0x010A0301u /* rd,wr  */, 0x002Bu, {{0x0002u, (void *)&cyBle_attValuesLen[33]}} },
+    { 0x002Au, 0x7F17u /* Sleep Activity Instantaneous Data   */, 0x09120007u /* rd,ntf */, 0x002Cu, {{0x001Au, (void *)&cyBle_attValuesLen[32]}} },
+    { 0x002Bu, 0x2902u /* SleepActivityInstantaneousDataCCCD  */, 0x010A0701u /* rd,wr  */, 0x002Bu, {{0x0002u, (void *)&cyBle_attValuesLen[33]}} },
     { 0x002Cu, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x002Cu, {{0x0021u, (void *)&cyBle_attValuesLen[34]}} },
     { 0x002Du, 0x2803u /* Characteristic                      */, 0x00220001u /* rd,ind */, 0x0030u, {{0x0010u, (void *)&cyBle_attValuesLen[35]}} },
-    { 0x002Eu, 0x7F18u /* Sleep Activity Summary Data         */, 0x09220003u /* rd,ind */, 0x0030u, {{0x0044u, (void *)&cyBle_attValuesLen[36]}} },
-    { 0x002Fu, 0x2902u /* SleepActivitySummaryDataCCCD        */, 0x010A0301u /* rd,wr  */, 0x002Fu, {{0x0002u, (void *)&cyBle_attValuesLen[37]}} },
+    { 0x002Eu, 0x7F18u /* Sleep Activity Summary Data         */, 0x09220007u /* rd,ind */, 0x0030u, {{0x0044u, (void *)&cyBle_attValuesLen[36]}} },
+    { 0x002Fu, 0x2902u /* SleepActivitySummaryDataCCCD        */, 0x010A0701u /* rd,wr  */, 0x002Fu, {{0x0002u, (void *)&cyBle_attValuesLen[37]}} },
     { 0x0030u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0030u, {{0x001Bu, (void *)&cyBle_attValuesLen[38]}} },
     { 0x0031u, 0x2803u /* Characteristic                      */, 0x00280001u /* wr,ind */, 0x0034u, {{0x0010u, (void *)&cyBle_attValuesLen[39]}} },
-    { 0x0032u, 0x7F1Eu /* Physical Activity Monitor Control P */, 0x09280300u /* wr,ind */, 0x0034u, {{0x0004u, (void *)&cyBle_attValuesLen[40]}} },
-    { 0x0033u, 0x2902u /* PhysicalActivityMonitorControlPoint */, 0x010A0301u /* rd,wr  */, 0x0033u, {{0x0002u, (void *)&cyBle_attValuesLen[41]}} },
+    { 0x0032u, 0x7F1Eu /* Physical Activity Monitor Control P */, 0x09280700u /* wr,ind */, 0x0034u, {{0x0004u, (void *)&cyBle_attValuesLen[40]}} },
+    { 0x0033u, 0x2902u /* PhysicalActivityMonitorControlPoint */, 0x010A0701u /* rd,wr  */, 0x0033u, {{0x0002u, (void *)&cyBle_attValuesLen[41]}} },
     { 0x0034u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0034u, {{0x0027u, (void *)&cyBle_attValuesLen[42]}} },
     { 0x0035u, 0x2803u /* Characteristic                      */, 0x00220001u /* rd,ind */, 0x0038u, {{0x0010u, (void *)&cyBle_attValuesLen[43]}} },
-    { 0x0036u, 0x7F1Fu /* Current Session                     */, 0x09220003u /* rd,ind */, 0x0038u, {{0x0013u, (void *)&cyBle_attValuesLen[44]}} },
-    { 0x0037u, 0x2902u /* CurrentSessionCCCD                  */, 0x010A0301u /* rd,wr  */, 0x0037u, {{0x0002u, (void *)&cyBle_attValuesLen[45]}} },
+    { 0x0036u, 0x7F1Fu /* Current Session                     */, 0x09220007u /* rd,ind */, 0x0038u, {{0x0013u, (void *)&cyBle_attValuesLen[44]}} },
+    { 0x0037u, 0x2902u /* CurrentSessionCCCD                  */, 0x010A0701u /* rd,wr  */, 0x0037u, {{0x0002u, (void *)&cyBle_attValuesLen[45]}} },
     { 0x0038u, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x0038u, {{0x000Fu, (void *)&cyBle_attValuesLen[46]}} },
     { 0x0039u, 0x2803u /* Characteristic                      */, 0x00200001u /* ind    */, 0x003Cu, {{0x0010u, (void *)&cyBle_attValuesLen[47]}} },
     { 0x003Au, 0x7F20u /* Session Descriptor                  */, 0x09200000u /* ind    */, 0x003Cu, {{0x001Fu, (void *)&cyBle_attValuesLen[48]}} },
-    { 0x003Bu, 0x2902u /* SessionDescriptorCCCD               */, 0x010A0301u /* rd,wr  */, 0x003Bu, {{0x0002u, (void *)&cyBle_attValuesLen[49]}} },
+    { 0x003Bu, 0x2902u /* SessionDescriptorCCCD               */, 0x010A0701u /* rd,wr  */, 0x003Bu, {{0x0002u, (void *)&cyBle_attValuesLen[49]}} },
     { 0x003Cu, 0x2901u /* Characteristic User Description     */, 0x01020001u /* rd     */, 0x003Cu, {{0x0012u, (void *)&cyBle_attValuesLen[50]}} },
+    { 0x003Du, 0x2800u /* Primary service                     */, 0x00000001u /*        */, 0x004Fu, {{0x180Au, NULL}}                           },
+    { 0x003Eu, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x003Fu, {{0x2A29u, NULL}}                           },
+    { 0x003Fu, 0x2A29u /* Manufacturer Name String            */, 0x01020007u /* rd     */, 0x003Fu, {{0x0007u, (void *)&cyBle_attValuesLen[51]}} },
+    { 0x0040u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0041u, {{0x2A24u, NULL}}                           },
+    { 0x0041u, 0x2A24u /* Model Number String                 */, 0x01020007u /* rd     */, 0x0041u, {{0x0009u, (void *)&cyBle_attValuesLen[52]}} },
+    { 0x0042u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0043u, {{0x2A25u, NULL}}                           },
+    { 0x0043u, 0x2A25u /* Serial Number String                */, 0x01020007u /* rd     */, 0x0043u, {{0x0009u, (void *)&cyBle_attValuesLen[53]}} },
+    { 0x0044u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0045u, {{0x2A27u, NULL}}                           },
+    { 0x0045u, 0x2A27u /* Hardware Revision String            */, 0x01020007u /* rd     */, 0x0045u, {{0x0000u, (void *)&cyBle_attValuesLen[54]}} },
+    { 0x0046u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0047u, {{0x2A26u, NULL}}                           },
+    { 0x0047u, 0x2A26u /* Firmware Revision String            */, 0x01020007u /* rd     */, 0x0047u, {{0x0000u, (void *)&cyBle_attValuesLen[55]}} },
+    { 0x0048u, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x0049u, {{0x2A28u, NULL}}                           },
+    { 0x0049u, 0x2A28u /* Software Revision String            */, 0x01020007u /* rd     */, 0x0049u, {{0x0000u, (void *)&cyBle_attValuesLen[56]}} },
+    { 0x004Au, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x004Bu, {{0x2A23u, NULL}}                           },
+    { 0x004Bu, 0x2A23u /* System ID                           */, 0x01020007u /* rd     */, 0x004Bu, {{0x0008u, (void *)&cyBle_attValuesLen[57]}} },
+    { 0x004Cu, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x004Du, {{0x2A2Au, NULL}}                           },
+    { 0x004Du, 0x2A2Au /* IEEE 11073-20601 Regulatory Certifi */, 0x01020007u /* rd     */, 0x004Du, {{0x0001u, (void *)&cyBle_attValuesLen[58]}} },
+    { 0x004Eu, 0x2803u /* Characteristic                      */, 0x00020001u /* rd     */, 0x004Fu, {{0x2A50u, NULL}}                           },
+    { 0x004Fu, 0x2A50u /* PnP ID                              */, 0x01020007u /* rd     */, 0x004Fu, {{0x0007u, (void *)&cyBle_attValuesLen[59]}} },
 };
 
 

@@ -15,12 +15,12 @@
 #ifndef PAMCONTROLPOINT_H__
 #define PAMCONTROLPOINT_H__
     
-#define CP_RSP_ENQUIRE_SESSIONS_SUCCESS        (0xFC);
-#define CP_RSP_ENQUIRE_SESSIONS_FAIL           (0xFF);
-#define CP_RSP_ENQUIRE_SUB_SESSIONS_SUCCESS    (0xFB);
-#define CP_RSP_ENQUIRE_SUB_SESSIONS_FAIL       (0xFE);
-#define CP_RSP_GET_ENDED_DATA_SUCCESS          (0xFA);
-#define CP_RSP_GET_ENDED_DATA_FAIL             (0xFD);
+#define CP_RSP_ENQUIRE_SESSIONS_SUCCESS        0xFC;
+#define CP_RSP_ENQUIRE_SESSIONS_FAIL           0xFF;
+#define CP_RSP_ENQUIRE_SUB_SESSIONS_SUCCESS    0xFB;
+#define CP_RSP_ENQUIRE_SUB_SESSIONS_FAIL       0xFE;
+#define CP_RSP_GET_ENDED_DATA_SUCCESS          0xFA;
+#define CP_RSP_GET_ENDED_DATA_FAIL             0xFD;
     
 #define ERR_OP_CODE_NOT_SUPPORTED           0x80;
 #define ERR_INVALID_SESSION_ID              0x81;
@@ -33,8 +33,6 @@
 #define ERR_NOTHING_TO_STOP                 0x88;
 #define ERR_UNDEFINED_VALUE                 0x89;
 #define ERR_OPERATION_FAILED                0x90;
-
-
     
 PAM_SESSIONDESCRIPTOR_VALUE_T mySessions[MAX_SESSIONS];
 PAM_SESSIONDESCRIPTOR_VALUE_T mySubSessions[MAX_SESSIONS];

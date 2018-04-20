@@ -82,7 +82,7 @@ import chdsw.philips.com.haraldlib.services.weightscale.HBWeightScaleServiceHand
  */
 public class HBCentral {
     public static final String TAG = "HBCentral";
-    private static final long CONNECT_TIMEOUT = 10_000L;
+    private static final long CONNECT_TIMEOUT = 30_000L;
 
     private enum HBScanMode {IDLE, SCANNING, CONNECTING}
 

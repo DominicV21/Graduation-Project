@@ -27,6 +27,7 @@
 #include "ble_StackGattDb.h"
 #include "ble_StackHostMain.h"
 #include "ble_StackL2cap.h"
+#include "ble_dis.h"
 #include "ble_StackGattServer.h"
 #include "ble_StackGattClient.h"
 #include "ble_Stack.h"

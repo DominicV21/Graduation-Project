@@ -46,7 +46,7 @@
 *        Constants
 ***************************************/
     
-#define MAX_SESSIONS                         (25u)
+#define MAX_SESSIONS                         (15u)
 
 /***************************************
 *        Function Prototypes

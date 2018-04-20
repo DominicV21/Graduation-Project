@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="Philips\Physical Activity Monitor Service\Header Files\pamControlPoint.h">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="Philips\Physical Activity Monitor Service\Header Files\pams.h">
 <ExpandedNodeIds>
 <v>Philips</v>
 <v>Philips\Physical Activity Monitor Service</v>
@@ -60,13 +60,6 @@
 <v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
-<v>Philips</v>
-<v>Philips\Physical Activity Monitor Service</v>
-<v>Philips\Physical Activity Monitor Service\TopDesign</v>
-<v>Philips\Physical Activity Monitor Service\Physical Activity Monitor Service.cydwr</v>
-<v>Philips\Physical Activity Monitor Service\Physical Activity Monitor Service.cydwr\Pins</v>
-<v>Philips\Physical Activity Monitor Service\Physical Activity Monitor Service.cydwr\Analog</v>
-<v>Philips\Physical Activity Monitor Service\Physical Activity Monitor Service.cydwr\Clocks</v>
 <v>Philips\Physical Activity Monitor Service\Physical Activity Monitor Service.cydwr\Interrupts</v>
 <v>Philips\Physical Activity Monitor Service\Physical Activity Monitor Service.cydwr\System</v>
 <v>Philips\Physical Activity Monitor Service\Physical Activity Monitor Service.cydwr\Directives</v>
@@ -108,6 +101,13 @@
 <v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\ble_bless_isr</v>
 <v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\Clock_1</v>
 <v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\connected_LED</v>
+<v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\cy_boot</v>
+<v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\cy_lfclk</v>
+<v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\disconnected_LED</v>
+<v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\isr_timer</v>
+<v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\Pin_SW2</v>
+<v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\Pin_SW2_Int</v>
+<v>Philips\Physical Activity Monitor Service\Generated_Source\PSoC4\pwm</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 <CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
@@ -137,6 +137,7 @@
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_bless_isr.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_custom.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_dis.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_eventHandler.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_gatt.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_HAL_INT.lst</v>
@@ -207,6 +208,7 @@
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_bless_isr.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_custom.lst</v>
+<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_dis.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_eventHandler.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_gatt.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\ble_HAL_INT.lst</v>
@@ -243,7 +245,6 @@
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Pin_SW2_Int.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\Pin_SW2_PM.lst</v>
 <v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pwm.lst</v>
-<v>Philips\Physical Activity Monitor Service\CortexM0\ARM_GCC_541\Debug\Listing Files\pwm_PM.lst</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 </TreeStates>
@@ -309,16 +310,8 @@
 </CyGuid_fdba8dfd-b15b-4469-9bbb-9e40c3e70997>
 <Unloaded />
 <OpenDocs>
-<name v=".\Physical Activity Monitor Service.cydsn\main.c" />
-<name v=".\Physical Activity Monitor Service.cydsn\pamControlPoint.h" />
-<name v=".\Physical Activity Monitor Service.cydsn\pamControlPoint.c" />
-<name v=".\Physical Activity Monitor Service.cydsn\pams.h" />
-<name v=".\Physical Activity Monitor Service.cydsn\common.h" />
-<name v=".\Physical Activity Monitor Service.cydsn\pamSessDescr.h" />
 <name v=".\Physical Activity Monitor Service.cydsn\TopDesign\TopDesign.cysch" />
-<name v=".\Physical Activity Monitor Service.cydsn\pamCraid.h" />
-<name v=".\Physical Activity Monitor Service.cydsn\pamCraid.c" />
-<name v=".\Physical Activity Monitor Service.cydsn\pamGaid.h" />
+<name v=".\Physical Activity Monitor Service.cydsn\main.c" />
 </OpenDocs>
 <OpenDocsLayout><![CDATA[<?xml version="1.0"?><!--
 
@@ -326,7 +319,7 @@
   Copyright (c) 2001-2016 Actipro Software LLC.  All rights reserved.
   http://www.actiprosoftware.com
 
---><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Vertical"><TabbedMdiContainer Size="1084, 563" SelectedTabbedMdiWindow="114f75af-9b54-4d8b-a0c4-bac8e2ade81a"><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\main.c" Guid="114f75af-9b54-4d8b-a0c4-bac8e2ade81a" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\pamControlPoint.h" Guid="4d1a8918-a14c-4282-93bb-ea0689ad80b0" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\pamControlPoint.c" Guid="cede8b69-594d-479d-9f48-294aa72b5a0a" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\pams.h" Guid="74717f84-d1b3-43b4-b8fd-208e04d415c6" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\common.h" Guid="b1bd300b-1048-4ee9-bd82-76ceba1d7c95" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\pamSessDescr.h" Guid="7e00b6ba-9a02-4931-a270-d914603adb44" /><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="1f17988e-f9fe-41a1-b927-80f247e4a394" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\TopDesign\TopDesign.cysch" Guid="576c1676-a751-493c-a25a-904bee3a0700" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\pamCraid.h" Guid="879b49b1-51fe-4488-95c2-03854b19d6db" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\pamCraid.c" Guid="be887285-be7d-4fa3-961f-fba4ac169e23" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\pamGaid.h" Guid="9227de7e-c804-4521-af26-41ef2b107cd5" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
+--><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Vertical"><TabbedMdiContainer Size="1233, 749" SelectedTabbedMdiWindow="bac71c4c-55d0-4abb-9815-413af03ab3da"><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\TopDesign\TopDesign.cysch" Guid="88064b55-a13b-4cc6-962a-05cc7c338ac8" /><DocumentWindow Key="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\main.c" Guid="bac71c4c-55d0-4abb-9815-413af03ab3da" /><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="1f17988e-f9fe-41a1-b927-80f247e4a394" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
 <config v="" />
 <AutoUpdate v="true" />
 </CyGuid_843a90a4-0c4b-4e44-991d-05e7fb117a21>

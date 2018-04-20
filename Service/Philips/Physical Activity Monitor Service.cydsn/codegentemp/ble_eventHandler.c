@@ -100,7 +100,7 @@ static CYBLE_DISC_INCL_INFO_T cyBle_discInclInfo;
     static uint8 disServiceIndex;      /* To discovery descriptors for multiple HID service instances */
 #endif /* CYBLE_HIDS_CLIENT */
 
-CYBLE_DISC_SRVC_INFO_T cyBle_serverInfo[CYBLE_SRVI_COUNT] = /*4*/
+CYBLE_DISC_SRVC_INFO_T cyBle_serverInfo[CYBLE_SRVI_COUNT] = /*5*/
 {
     {{CYBLE_GATT_INVALID_ATTR_HANDLE_VALUE, CYBLE_GATT_INVALID_ATTR_HANDLE_VALUE}, CYBLE_UUID_GAP_SERVICE},
     {{CYBLE_GATT_INVALID_ATTR_HANDLE_VALUE, CYBLE_GATT_INVALID_ATTR_HANDLE_VALUE}, CYBLE_UUID_GATT_SERVICE},
@@ -224,11 +224,11 @@ CYBLE_GAPC_T cyBle_gapc;
 /* Default device security */
 CYBLE_GAP_AUTH_INFO_T cyBle_authInfo =
 {
-    (CYBLE_GAP_SEC_MODE_1 | CYBLE_GAP_SEC_LEVEL_2 ), /* uint8 security */
+    (CYBLE_GAP_SEC_MODE_1 | CYBLE_GAP_SEC_LEVEL_3 ), /* uint8 security */
     CYBLE_GAP_BONDING, /* uint8 bonding */
     0x10u,      /* uint8 ekeySize */
     CYBLE_GAP_AUTH_ERROR_NONE, /* CYBLE_AUTH_FAILED_REASON_T authErr */
-    0x00u,      /* uint8 pairingProperties */
+    0x01u,      /* uint8 pairingProperties */
 };
 
 #if(CYBLE_GATT_ROLE_SERVER)

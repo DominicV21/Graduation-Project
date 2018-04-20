@@ -27,6 +27,8 @@
   <file name="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\ble_StackGattDb.h" value="HEADER;;;;;ble" />
   <file name="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\ble_StackHostMain.h" value="HEADER;;;;;ble" />
   <file name="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\ble_StackL2cap.h" value="HEADER;;;;;ble" />
+  <file name="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\ble_dis.c" value="SOURCE_C;CortexM0;;;;ble" />
+  <file name="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\ble_dis.h" value="HEADER;;;;;ble" />
   <file name="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\ble_StackGattServer.h" value="HEADER;;;;;ble" />
   <file name="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\ble_StackGattClient.h" value="HEADER;;;;;ble" />
   <file name="C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\codegentemp\ble_Stack.h" value="HEADER;;;;;ble" />

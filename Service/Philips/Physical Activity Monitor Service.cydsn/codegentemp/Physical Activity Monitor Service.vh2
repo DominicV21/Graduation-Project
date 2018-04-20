@@ -2,7 +2,7 @@
 --	Conversion of Physical Activity Monitor Service.v to vh2:
 --
 --	Cypress Semiconductor - WARP Version 6.3 IR 41
---	Wed Apr 18 11:56:22 2018
+--	Fri Apr 20 11:28:14 2018
 --
 
 USE cypress.cypress.all;

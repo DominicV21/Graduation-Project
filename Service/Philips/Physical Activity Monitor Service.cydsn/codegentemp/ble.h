@@ -91,7 +91,7 @@
         #define CYBLE_MAX_RESOLVABLE_DEVICES        (0u)
         #define CYBLE_ENABLE_LL_PRIVACY             (0u)
     #endif /* CYBLE_M0S8BLESS_VERSION_2 */
-    #define CYBLE_GAP_SECURITY_LEVEL                (0x01u)
+    #define CYBLE_GAP_SECURITY_LEVEL                (0x02u)
 #else
     #if(CYBLE_M0S8BLESS_VERSION_2)
         #define CYBLE_MAX_RESOLVABLE_DEVICES        (CYBLE_DEFAULT_RPA_LIST_SZ)    
@@ -134,8 +134,8 @@
 #if(CYBLE_GAP_ROLE_PERIPHERAL || CYBLE_GAP_ROLE_BROADCASTER)
     #define CYBLE_FAST_ADV_INT_MIN                  (0x0020u)
     #define CYBLE_FAST_ADV_INT_MAX                  (0x0030u)
-    #define CYBLE_FAST_ADV_TIMEOUT                  (0x0000u)
-    #define CYBLE_SLOW_ADV_ENABLED                  (0x00u)
+    #define CYBLE_FAST_ADV_TIMEOUT                  (0x001Eu)
+    #define CYBLE_SLOW_ADV_ENABLED                  (0x01u)
     #define CYBLE_SLOW_ADV_INT_MIN                  (0x0640u)
     #define CYBLE_SLOW_ADV_INT_MAX                  (0x4000u)
     #define CYBLE_SLOW_ADV_TIMEOUT                  (0x0096u)
@@ -168,7 +168,7 @@
     CYBLE_GAP_IOCAP_NOINPUT_NOOUTPUT
     CYBLE_GAP_IOCAP_KEYBOARD_DISPLAY
 */
-#define CYBLE_IO_CAPABILITY                         (CYBLE_GAP_IOCAP_NOINPUT_NOOUTPUT)
+#define CYBLE_IO_CAPABILITY                         (CYBLE_GAP_IOCAP_DISPLAY_ONLY)
 #define CYBLE_PAIRING_METHOD                        (0x00u)
 #define CYBLE_BONDING_REQUIREMENT                   (0x00u)
 
@@ -178,10 +178,10 @@
 
 #define CYBLE_ADV_PKT_INDEX_FLAGS   (0x00u)
 #define CYBLE_ADV_PKT_INDEX_LOCAL_NAME   (0x03u)
-#define CYBLE_ADV_PKT_INDEX_SERVICE_UUID_16   (0x09u)
+#define CYBLE_ADV_PKT_INDEX_SERVICE_UUID_16   (0x08u)
 
 #define CYBLE_SCN_PKT_INDEX_LOCAL_NAME   (0x00u)
-#define CYBLE_SCN_PKT_INDEX_SERVICE_UUID_16   (0x06u)
+#define CYBLE_SCN_PKT_INDEX_SERVICE_UUID_16   (0x05u)
 
 
 
@@ -193,7 +193,7 @@
 
 /* Security options from the customizer */
 #define CYBLE_SECURITY_MODE                         (0x00u)
-#define CYBLE_SECURITY_LEVEL                        (0x01u)
+#define CYBLE_SECURITY_LEVEL                        (0x02u)
 #define CYBLE_SECURITY_ENC_KEY_SIZE                 (0x10u)
 
 #if (CYBLE_STRICT_PAIRING_ENABLED)
