@@ -1,6 +1,0 @@
-C:\Users\310309623\Desktop\OneDrive - Philips\Afstudeerstage\Afstuderen\Stage\Project\Service\Philips\Physical Activity Monitor Service.cydsn\Physical Activity Monitor Service.cyprj|b8415530-8e75-4e81-bc06-0db1847c6b90
-C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|8a13a463-2281-4414-988b-6bc4bc7310e7
-C:\Users\310309623\Documents\PSoC Creator\4.1\Downloads ( 4.1).cylib\Downloads ( 4.1).cyprj|77f35913-200e-49f1-b190-4bc449d2d87f
-C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|eb3252a5-63e7-43f9-beb0-12b4489a8eaf
-C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|88bae7f8-fe8e-441b-bf07-068139b0b8d5
-C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|823e99f0-4ad6-4202-8018-1fc43145d54f
